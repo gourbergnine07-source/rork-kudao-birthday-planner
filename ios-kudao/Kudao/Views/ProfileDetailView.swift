@@ -414,6 +414,9 @@ struct ProfileDetailView: View {
                 if profile.isCollaborative {
                     participantsStrip
                         .padding(.top, 6)
+                } else if profile.isOwnedByMe {
+                    inviteStrip
+                        .padding(.top, 6)
                 }
             }
         }
@@ -479,67 +482,96 @@ struct ProfileDetailView: View {
 
     /// Everyone who can see the profile, tappable to open the participants screen.
     private var participantsStrip: some View {
-        let people = collaboration
-            .shares(for: profile, context: modelContext)
+        let rows = collaboration.shares(for: profile, context: modelContext)
+        let people = rows
             .filter { !$0.sharedWithUserID.isEmpty }
             .sorted { lhs, rhs in
                 if lhs.isOwner != rhs.isOwner { return lhs.isOwner }
                 return lhs.invitedAt < rhs.invitedAt
             }
-        let visible = Array(people.prefix(5))
-        let extra = max(0, people.count - visible.count)
+        let pending = rows.filter { $0.sharedWithUserID.isEmpty && !$0.inviteCode.isEmpty }.count
 
-        return Button {
-            isShowingParticipants = true
-        } label: {
-            HStack(spacing: 8) {
-                HStack(spacing: -10) {
-                    ForEach(visible) { share in
-                        AvatarView(
-                            name: share.displayName.isEmpty ? "?" : share.displayName,
-                            photoData: nil,
-                            size: 30,
-                            ringColor: Palette.surface,
-                            ringWidth: 2
-                        )
-                    }
-
-                    if extra > 0 {
-                        Text("+\(extra)")
-                            .font(.system(.caption2, design: .rounded, weight: .heavy))
-                            .foregroundStyle(.secondary)
-                            .frame(width: 30, height: 30)
-                            .background(Circle().fill(Palette.surfaceRaised))
-                            .overlay(Circle().strokeBorder(Palette.surface, lineWidth: 2))
-                    }
-                }
-
-                VStack(alignment: .leading, spacing: 1) {
-                    Text(
-                        profile.isOwnedByMe
-                            ? String(format: strings.participantsCountFormat, max(people.count, 1))
-                            : String(format: strings.sharedByFormat, profile.shareOwnerName)
+        return HStack(spacing: 8) {
+            Button {
+                isShowingParticipants = true
+            } label: {
+                HStack(spacing: 8) {
+                    ParticipantStack(
+                        names: people.map(\.displayName),
+                        size: 30,
+                        ringColor: Palette.surface,
+                        maxVisible: 5
                     )
-                    .font(.system(.caption, design: .rounded, weight: .bold))
-                    .foregroundStyle(.primary)
-                    .lineLimit(1)
 
-                    if collaboration.isSyncing(profile) {
-                        Text(strings.syncingLabel)
-                            .font(.system(.caption2, design: .rounded))
-                            .foregroundStyle(.secondary)
+                    VStack(alignment: .leading, spacing: 1) {
+                        Text(
+                            profile.isOwnedByMe
+                                ? String(format: strings.participantsCountFormat, max(people.count, 1))
+                                : String(format: strings.sharedByFormat, profile.shareOwnerName)
+                        )
+                        .font(.system(.caption, design: .rounded, weight: .bold))
+                        .foregroundStyle(.primary)
+                        .lineLimit(1)
+
+                        if collaboration.isSyncing(profile) {
+                            Text(strings.syncingLabel)
+                                .font(.system(.caption2, design: .rounded))
+                                .foregroundStyle(.secondary)
+                        } else if pending > 0 {
+                            Text(String(format: strings.pendingInvitesCountFormat, pending))
+                                .font(.system(.caption2, design: .rounded, weight: .semibold))
+                                .foregroundStyle(Palette.violet)
+                                .lineLimit(1)
+                        }
                     }
-                }
 
-                Image(systemName: "chevron.right")
-                    .font(.system(size: 10, weight: .heavy))
-                    .foregroundStyle(.tertiary)
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 10, weight: .heavy))
+                        .foregroundStyle(.tertiary)
+                }
+                .padding(.leading, 8)
+                .padding(.trailing, 12)
+                .padding(.vertical, 7)
+                .background(Capsule().fill(Palette.surface))
+                .overlay(Capsule().strokeBorder(Palette.violet.opacity(0.3), lineWidth: 1))
             }
-            .padding(.leading, 8)
-            .padding(.trailing, 12)
-            .padding(.vertical, 7)
-            .background(Capsule().fill(Palette.surface))
-            .overlay(Capsule().strokeBorder(Palette.hairline, lineWidth: 1))
+            .buttonStyle(PressableCardStyle())
+            .accessibilityElement(children: .combine)
+
+            // The owner can keep growing the room without opening the menu.
+            if profile.isOwnedByMe {
+                Button {
+                    startSharing()
+                } label: {
+                    Image(systemName: "person.badge.plus")
+                        .font(.system(size: 13, weight: .bold))
+                        .foregroundStyle(.white)
+                        .frame(width: 34, height: 34)
+                        .background(Circle().fill(Palette.violet))
+                        .shadow(color: Palette.violet.opacity(0.3), radius: 8, y: 4)
+                }
+                .buttonStyle(PressableCardStyle())
+                .accessibilityLabel(strings.inviteSomeoneAction)
+            }
+        }
+    }
+
+    /// Nobody has been invited yet: offer it right under the countdown.
+    private var inviteStrip: some View {
+        Button {
+            startSharing()
+        } label: {
+            HStack(spacing: 7) {
+                Image(systemName: "person.2.badge.plus.fill")
+                    .font(.system(size: 13, weight: .bold))
+                Text(strings.inviteSomeoneAction)
+                    .font(.system(.caption, design: .rounded, weight: .bold))
+            }
+            .foregroundStyle(Palette.violet)
+            .padding(.horizontal, 14)
+            .padding(.vertical, 9)
+            .background(Capsule().fill(Palette.violet.opacity(0.12)))
+            .overlay(Capsule().strokeBorder(Palette.violet.opacity(0.3), lineWidth: 1))
         }
         .buttonStyle(PressableCardStyle())
     }

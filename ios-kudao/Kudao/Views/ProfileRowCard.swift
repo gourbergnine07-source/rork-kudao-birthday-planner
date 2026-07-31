@@ -11,6 +11,8 @@ struct ProfileRowCard: View {
     let settings: AppSettings
     /// True when the profile sits behind Face ID / Touch ID / passcode.
     var isLocked: Bool = false
+    /// Who else is in this profile; `.none` for a solo one.
+    var collaboration: CollaborationSummary = .none
 
     private var countdown: BirthdayCountdown { profile.countdown }
     private var strings: Strings { settings.strings }
@@ -51,6 +53,19 @@ struct ProfileRowCard: View {
                             .accessibilityLabel(strings.pendingBadgeLabel)
                     }
                 }
+                .overlay(alignment: .topLeading) {
+                    // A shared profile wears a small crest, mirroring the occasion glyph.
+                    if collaboration.isCollaborative {
+                        Image(systemName: collaboration.isMirror ? "person.2.circle.fill" : "person.2.fill")
+                            .font(.system(size: 9, weight: .heavy))
+                            .foregroundStyle(.white)
+                            .frame(width: 21, height: 21)
+                            .background(Circle().fill(Palette.violet))
+                            .overlay(Circle().strokeBorder(cardFill, lineWidth: 2))
+                            .offset(x: -3, y: -1)
+                            .accessibilityLabel(strings.sharedBadge)
+                    }
+                }
 
             VStack(alignment: .leading, spacing: 5) {
                 HStack(spacing: 6) {
@@ -85,6 +100,11 @@ struct ProfileRowCard: View {
                     Text(settings.dayMonth(countdown.nextDate))
                         .font(.system(.subheadline, design: .rounded))
                         .foregroundStyle(.secondary)
+                }
+
+                if collaboration.isCollaborative {
+                    collaborationLine
+                        .padding(.top, 1)
                 }
 
                 if isImminent {
@@ -135,6 +155,31 @@ struct ProfileRowCard: View {
             x: 0,
             y: 6
         )
+        .accessibilityElement(children: .combine)
+    }
+
+    /// Faces of the people involved, plus who owns the profile.
+    private var collaborationLine: some View {
+        HStack(spacing: 7) {
+            ParticipantStack(
+                names: collaboration.participantNames,
+                size: 20,
+                ringColor: cardFill,
+                maxVisible: 3
+            )
+
+            Text(collaboration.caption(strings))
+                .font(.system(.caption2, design: .rounded, weight: .bold))
+                .foregroundStyle(Palette.violet)
+                .lineLimit(1)
+
+            if collaboration.permission == .view {
+                Image(systemName: "eye.fill")
+                    .font(.system(size: 9, weight: .bold))
+                    .foregroundStyle(Palette.teal)
+                    .accessibilityLabel(strings.readOnlyBadge)
+            }
+        }
         .accessibilityElement(children: .combine)
     }
 

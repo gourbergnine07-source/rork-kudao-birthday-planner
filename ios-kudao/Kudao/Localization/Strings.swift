@@ -337,6 +337,13 @@ nonisolated struct Strings: Sendable {
     let votesEmptyLabel: String
     let syncingLabel: String
     let collaborationSectionTitle: String
+    let collaborationHubTitle: String
+    let collaborationHubCountFormat: String
+    let collaborationInviteTitle: String
+    let collaborationInviteMessage: String
+    let inviteSomeoneAction: String
+    let pendingInvitesCountFormat: String
+    let collaborationOnlyYou: String
 
     let ageBracketLabel: String
     let ageBracketChild: String
@@ -901,6 +908,13 @@ extension Strings {
         votesEmptyLabel: "Ancora nessun voto",
         syncingLabel: "Aggiornamento\u{2026}",
         collaborationSectionTitle: "Condivisione",
+        collaborationHubTitle: "Insieme ad altri",
+        collaborationHubCountFormat: "%d profili condivisi",
+        collaborationInviteTitle: "Organizza in gruppo",
+        collaborationInviteMessage: "Invita chi vuoi in un profilo, o unisciti con un codice.",
+        inviteSomeoneAction: "Invita qualcuno",
+        pendingInvitesCountFormat: "%d inviti in attesa",
+        collaborationOnlyYou: "Solo tu, per ora",
         ageBracketLabel: "Fascia d\u{2019}et\u{00E0}",
         ageBracketChild: "Bambino",
         ageBracketTeen: "Adolescente",
@@ -1456,6 +1470,13 @@ extension Strings {
         votesEmptyLabel: "No votes yet",
         syncingLabel: "Refreshing\u{2026}",
         collaborationSectionTitle: "Sharing",
+        collaborationHubTitle: "Together with others",
+        collaborationHubCountFormat: "%d shared profiles",
+        collaborationInviteTitle: "Plan it together",
+        collaborationInviteMessage: "Invite anyone into a profile, or join with a code.",
+        inviteSomeoneAction: "Invite someone",
+        pendingInvitesCountFormat: "%d invites pending",
+        collaborationOnlyYou: "Just you, for now",
         ageBracketLabel: "Age group",
         ageBracketChild: "Child",
         ageBracketTeen: "Teenager",
@@ -2011,6 +2032,13 @@ extension Strings {
         votesEmptyLabel: "Aucun vote pour l'instant",
         syncingLabel: "Actualisation\u{2026}",
         collaborationSectionTitle: "Partage",
+        collaborationHubTitle: "\u{00C0} plusieurs",
+        collaborationHubCountFormat: "%d profils partag\u{00E9}s",
+        collaborationInviteTitle: "Organisez \u{00E0} plusieurs",
+        collaborationInviteMessage: "Invitez qui vous voulez dans un profil, ou rejoignez avec un code.",
+        inviteSomeoneAction: "Inviter quelqu\u{2019}un",
+        pendingInvitesCountFormat: "%d invitations en attente",
+        collaborationOnlyYou: "Vous seul, pour l\u{2019}instant",
         ageBracketLabel: "Tranche d\u{2019}\u{00E2}ge",
         ageBracketChild: "Enfant",
         ageBracketTeen: "Adolescent",
@@ -2566,6 +2594,13 @@ extension Strings {
         votesEmptyLabel: "A\u{00FA}n sin votos",
         syncingLabel: "Actualizando\u{2026}",
         collaborationSectionTitle: "Compartir",
+        collaborationHubTitle: "Junto a otras personas",
+        collaborationHubCountFormat: "%d perfiles compartidos",
+        collaborationInviteTitle: "Organiza en grupo",
+        collaborationInviteMessage: "Invita a quien quieras a un perfil, o \u{00FA}nete con un c\u{00F3}digo.",
+        inviteSomeoneAction: "Invitar a alguien",
+        pendingInvitesCountFormat: "%d invitaciones pendientes",
+        collaborationOnlyYou: "Solo t\u{00FA}, por ahora",
         ageBracketLabel: "Franja de edad",
         ageBracketChild: "Ni\u{00F1}o",
         ageBracketTeen: "Adolescente",

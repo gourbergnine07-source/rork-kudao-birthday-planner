@@ -11,6 +11,8 @@ struct HeroProfileCard: View {
     let settings: AppSettings
     /// True when the profile sits behind Face ID / Touch ID / passcode.
     var isLocked: Bool = false
+    /// Who else is in this profile; `.none` for a solo one.
+    var collaboration: CollaborationSummary = .none
 
     private var countdown: BirthdayCountdown { profile.countdown }
     private var strings: Strings { settings.strings }
@@ -122,12 +124,48 @@ struct HeroProfileCard: View {
                 }
                 .foregroundStyle(.white.opacity(0.92))
                 .padding(.top, 2)
+
+                if collaboration.isCollaborative {
+                    collaborationRibbon
+                }
             }
             .padding(20)
         }
         .frame(maxWidth: .infinity)
         .clipShape(.rect(cornerRadius: 30, style: .continuous))
         .shadow(color: occasion.accent.opacity(0.32), radius: 22, x: 0, y: 12)
+        .accessibilityElement(children: .combine)
+    }
+
+    /// Faces of everyone in the room, sitting on the coloured card.
+    private var collaborationRibbon: some View {
+        HStack(spacing: 8) {
+            ParticipantStack(
+                names: collaboration.participantNames,
+                size: 24,
+                ringColor: .white.opacity(0.85),
+                maxVisible: 4,
+                placeholderTint: .white
+            )
+
+            Text(collaboration.caption(strings))
+                .font(.system(.footnote, design: .rounded, weight: .bold))
+                .foregroundStyle(.white)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+
+            if collaboration.permission == .view {
+                Image(systemName: "eye.fill")
+                    .font(.system(size: 10, weight: .bold))
+                    .foregroundStyle(.white.opacity(0.9))
+            }
+
+            Spacer(minLength: 0)
+        }
+        .padding(.leading, 6)
+        .padding(.trailing, 12)
+        .padding(.vertical, 6)
+        .background(Capsule().fill(.white.opacity(0.18)))
         .accessibilityElement(children: .combine)
     }
 

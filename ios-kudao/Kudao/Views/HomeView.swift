@@ -106,6 +106,7 @@ struct HomeView: View {
     @Environment(BiometricGate.self) private var gate
     @Environment(KudaoIdentity.self) private var identity
     @Query private var profiles: [BirthdayProfile]
+    @Query private var shares: [ProfileShare]
 
     @State private var isCreatingProfile: Bool = false
     @State private var path: [BirthdayProfile] = []
@@ -122,6 +123,7 @@ struct HomeView: View {
     @State private var galleryProfileID: UUID?
     @State private var isShowingSettings: Bool = false
     @State private var isShowingMyProfile: Bool = false
+    @State private var isJoiningShare: Bool = false
     @State private var unlockFailed: Bool = false
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -166,6 +168,16 @@ struct HomeView: View {
     }
 
     private var showsOccasionFilter: Bool { presentOccasions.count > 1 }
+
+    /// One summary per shared profile, computed once for the whole screen.
+    private var collaborationMap: [UUID: CollaborationSummary] {
+        CollaborationSummary.map(profiles: profiles, shares: shares)
+    }
+
+    /// Profiles that live in a share room, closest date first.
+    private var collaborativeProfiles: [BirthdayProfile] {
+        ProfileSortOrder.nearestBirthday.sorted(profiles.filter(\.isCollaborative))
+    }
 
     var body: some View {
         NavigationStack(path: $path) {
@@ -219,6 +231,9 @@ struct HomeView: View {
             }
             .sheet(isPresented: $isShowingMyProfile) {
                 MyProfileView()
+            }
+            .sheet(isPresented: $isJoiningShare) {
+                JoinShareView()
             }
             .alert(strings.unlockFailedTitle, isPresented: $unlockFailed) {
                 Button(strings.doneAction, role: .cancel) {}
@@ -401,6 +416,7 @@ struct HomeView: View {
                     filteredEmptyState
                 } else {
                     reviewBanner
+                    collaborationHub
                     upcomingSections
                 }
             }
@@ -500,11 +516,20 @@ struct HomeView: View {
             VStack(spacing: 12) {
                 ForEach(results) { profile in
                     profileLink(profile) {
-                        ProfileRowCard(profile: profile, settings: settings, isLocked: isLocked(profile))
+                        ProfileRowCard(
+                            profile: profile,
+                            settings: settings,
+                            isLocked: isLocked(profile),
+                            collaboration: summary(for: profile)
+                        )
                     }
                 }
             }
         }
+    }
+
+    private func summary(for profile: BirthdayProfile) -> CollaborationSummary {
+        collaborationMap[profile.id] ?? .none
     }
 
     private var sortMenu: some View {
@@ -529,6 +554,155 @@ struct HomeView: View {
         }
         .accessibilityLabel("\(strings.sortLabel): \(sortOrder.title(strings))")
         .sensoryFeedback(.selection, trigger: sortOrder)
+    }
+
+    // MARK: - Collaboration
+
+    /// Everyone the user is planning with, plus the way in for a new collaboration.
+    @ViewBuilder
+    private var collaborationHub: some View {
+        let rooms = collaborativeProfiles
+
+        if rooms.isEmpty {
+            joinDiscoveryRow
+        } else {
+            VStack(alignment: .leading, spacing: 12) {
+                HStack(spacing: 9) {
+                    ZStack {
+                        Circle()
+                            .fill(Palette.violet.opacity(0.16))
+                            .frame(width: 30, height: 30)
+                        Image(systemName: "person.2.fill")
+                            .font(.system(size: 13, weight: .bold))
+                            .foregroundStyle(Palette.violet)
+                    }
+
+                    VStack(alignment: .leading, spacing: 1) {
+                        Text(strings.collaborationHubTitle)
+                            .font(.system(.subheadline, design: .rounded, weight: .bold))
+                        Text(String(format: strings.collaborationHubCountFormat, rooms.count))
+                            .font(.system(.caption, design: .rounded))
+                            .foregroundStyle(.secondary)
+                    }
+
+                    Spacer(minLength: 0)
+
+                    Button {
+                        isJoiningShare = true
+                    } label: {
+                        Image(systemName: "person.badge.key.fill")
+                            .font(.system(size: 13, weight: .bold))
+                            .foregroundStyle(Palette.violet)
+                            .frame(width: 32, height: 32)
+                            .background(Circle().fill(Palette.violet.opacity(0.12)))
+                    }
+                    .buttonStyle(PressableCardStyle())
+                    .accessibilityLabel(strings.joinShareMenuTitle)
+                }
+
+                ScrollView(.horizontal) {
+                    HStack(spacing: 8) {
+                        ForEach(rooms) { profile in
+                            collaborationChip(profile)
+                        }
+                    }
+                }
+                .scrollIndicators(.hidden)
+                .scrollClipDisabled()
+            }
+            .padding(14)
+            .background(
+                RoundedRectangle(cornerRadius: 22, style: .continuous)
+                    .fill(Palette.surface)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 22, style: .continuous)
+                    .strokeBorder(Palette.violet.opacity(0.28), lineWidth: 1)
+            )
+            .shadow(color: Palette.violet.opacity(0.1), radius: 12, y: 6)
+        }
+    }
+
+    private func collaborationChip(_ profile: BirthdayProfile) -> some View {
+        let summary = self.summary(for: profile)
+
+        return Button {
+            open(profile) { path = [profile] }
+        } label: {
+            HStack(spacing: 9) {
+                AvatarView(name: profile.name, photoData: profile.photoData, size: 30)
+
+                VStack(alignment: .leading, spacing: 1) {
+                    Text(profile.name)
+                        .font(.system(.footnote, design: .rounded, weight: .bold))
+                        .foregroundStyle(.primary)
+                        .lineLimit(1)
+                    Text(summary.caption(strings))
+                        .font(.system(.caption2, design: .rounded))
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                }
+
+                ParticipantStack(
+                    names: summary.participantNames,
+                    size: 20,
+                    ringColor: Palette.surfaceRaised,
+                    maxVisible: 3
+                )
+            }
+            .padding(.leading, 7)
+            .padding(.trailing, 11)
+            .padding(.vertical, 7)
+            .background(Capsule().fill(Palette.surfaceRaised))
+            .overlay(Capsule().strokeBorder(Palette.violet.opacity(0.22), lineWidth: 1))
+        }
+        .buttonStyle(PressableCardStyle())
+        .accessibilityElement(children: .combine)
+    }
+
+    /// Shown while nobody collaborates yet: explains the feature and opens the code sheet.
+    private var joinDiscoveryRow: some View {
+        Button {
+            isJoiningShare = true
+        } label: {
+            HStack(spacing: 11) {
+                ZStack {
+                    Circle()
+                        .fill(Palette.violet.opacity(0.14))
+                        .frame(width: 34, height: 34)
+                    Image(systemName: "person.2.badge.key.fill")
+                        .font(.system(size: 14, weight: .bold))
+                        .foregroundStyle(Palette.violet)
+                }
+
+                VStack(alignment: .leading, spacing: 1) {
+                    Text(strings.collaborationInviteTitle)
+                        .font(.system(.subheadline, design: .rounded, weight: .bold))
+                        .foregroundStyle(.primary)
+                    Text(strings.collaborationInviteMessage)
+                        .font(.system(.caption, design: .rounded))
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.leading)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                Spacer(minLength: 0)
+
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 11, weight: .heavy))
+                    .foregroundStyle(.tertiary)
+            }
+            .padding(14)
+            .background(
+                RoundedRectangle(cornerRadius: 22, style: .continuous)
+                    .fill(Palette.surface)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 22, style: .continuous)
+                    .strokeBorder(Palette.violet.opacity(0.24), lineWidth: 1)
+            )
+        }
+        .buttonStyle(PressableCardStyle())
     }
 
     @ViewBuilder
@@ -612,7 +786,12 @@ struct HomeView: View {
                 .foregroundStyle(.secondary)
 
             profileLink(hero) {
-                HeroProfileCard(profile: hero, settings: settings, isLocked: isLocked(hero))
+                HeroProfileCard(
+                    profile: hero,
+                    settings: settings,
+                    isLocked: isLocked(hero),
+                    collaboration: summary(for: hero)
+                )
             }
         }
 
@@ -634,7 +813,12 @@ struct HomeView: View {
             VStack(spacing: 12) {
                 ForEach(Array(rest.enumerated()), id: \.element.id) { index, profile in
                     profileLink(profile) {
-                        ProfileRowCard(profile: profile, settings: settings, isLocked: isLocked(profile))
+                        ProfileRowCard(
+                            profile: profile,
+                            settings: settings,
+                            isLocked: isLocked(profile),
+                            collaboration: summary(for: profile)
+                        )
                     }
                     .opacity(appeared ? 1 : 0)
                     .offset(y: appeared ? 0 : 18)
