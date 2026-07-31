@@ -64,6 +64,17 @@ nonisolated struct Strings: Sendable {
     let imminentBadge: String
     let imminentDaysFormat: String
 
+    let calendarModeLabel: String
+    let listModeLabel: String
+    let previousMonthLabel: String
+    let nextMonthLabel: String
+    let todayAction: String
+    let addBirthdayAction: String
+    let monthCountFormat: String
+    let monthNoBirthdays: String
+    let tapDayHint: String
+    let moreOnDayFormat: String
+
     let diaryTab: String
     let preferencesTab: String
     let suggestionsTab: String
@@ -259,6 +270,16 @@ extension Strings {
         nextBirthdayLabel: "Prossimo compleanno",
         imminentBadge: "Questa settimana",
         imminentDaysFormat: "Tra %d giorni",
+        calendarModeLabel: "Calendario",
+        listModeLabel: "Elenco",
+        previousMonthLabel: "Mese precedente",
+        nextMonthLabel: "Mese successivo",
+        todayAction: "Oggi",
+        addBirthdayAction: "Aggiungi festeggiato",
+        monthCountFormat: "%d compleanni questo mese",
+        monthNoBirthdays: "Nessun compleanno questo mese",
+        tapDayHint: "Tocca un giorno per aggiungere",
+        moreOnDayFormat: "+%d",
         diaryTab: "Diario",
         preferencesTab: "Preferenze",
         suggestionsTab: "Suggerimenti",
@@ -444,6 +465,16 @@ extension Strings {
         nextBirthdayLabel: "Next birthday",
         imminentBadge: "This week",
         imminentDaysFormat: "In %d days",
+        calendarModeLabel: "Calendar",
+        listModeLabel: "List",
+        previousMonthLabel: "Previous month",
+        nextMonthLabel: "Next month",
+        todayAction: "Today",
+        addBirthdayAction: "Add a celebration",
+        monthCountFormat: "%d birthdays this month",
+        monthNoBirthdays: "No birthdays this month",
+        tapDayHint: "Tap a day to add someone",
+        moreOnDayFormat: "+%d",
         diaryTab: "Diary",
         preferencesTab: "Preferences",
         suggestionsTab: "Suggestions",
@@ -629,6 +660,16 @@ extension Strings {
         nextBirthdayLabel: "Prochain anniversaire",
         imminentBadge: "Cette semaine",
         imminentDaysFormat: "Dans %d jours",
+        calendarModeLabel: "Calendrier",
+        listModeLabel: "Liste",
+        previousMonthLabel: "Mois précédent",
+        nextMonthLabel: "Mois suivant",
+        todayAction: "Aujourd'hui",
+        addBirthdayAction: "Ajouter un anniversaire",
+        monthCountFormat: "%d anniversaires ce mois-ci",
+        monthNoBirthdays: "Aucun anniversaire ce mois-ci",
+        tapDayHint: "Touchez un jour pour ajouter",
+        moreOnDayFormat: "+%d",
         diaryTab: "Journal",
         preferencesTab: "Préférences",
         suggestionsTab: "Suggestions",
@@ -814,6 +855,16 @@ extension Strings {
         nextBirthdayLabel: "Próximo cumpleaños",
         imminentBadge: "Esta semana",
         imminentDaysFormat: "En %d días",
+        calendarModeLabel: "Calendario",
+        listModeLabel: "Lista",
+        previousMonthLabel: "Mes anterior",
+        nextMonthLabel: "Mes siguiente",
+        todayAction: "Hoy",
+        addBirthdayAction: "Añadir cumpleaños",
+        monthCountFormat: "%d cumpleaños este mes",
+        monthNoBirthdays: "Ningún cumpleaños este mes",
+        tapDayHint: "Toca un día para añadir",
+        moreOnDayFormat: "+%d",
         diaryTab: "Diario",
         preferencesTab: "Preferencias",
         suggestionsTab: "Sugerencias",

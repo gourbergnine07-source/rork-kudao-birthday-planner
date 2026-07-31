@@ -55,7 +55,29 @@ enum ProfileSortOrder: String, CaseIterable, Identifiable {
     }
 }
 
-/// Root screen: every celebration profile ordered by how close the birthday is.
+/// The two ways the home screen can present the saved celebrations.
+enum HomeMode: String, CaseIterable, Identifiable {
+    case calendar
+    case list
+
+    var id: String { rawValue }
+
+    var symbolName: String {
+        switch self {
+        case .calendar: "calendar"
+        case .list: "list.bullet"
+        }
+    }
+
+    func title(_ strings: Strings) -> String {
+        switch self {
+        case .calendar: strings.calendarModeLabel
+        case .list: strings.listModeLabel
+        }
+    }
+}
+
+/// Root screen: a month calendar of photo tiles, or the countdown list.
 struct HomeView: View {
     @Environment(AppSettings.self) private var settings
     @Environment(NotificationService.self) private var notifications
@@ -72,6 +94,11 @@ struct HomeView: View {
     @State private var suggestionsProfileID: UUID?
     @State private var isShowingSettings: Bool = false
     @State private var unlockFailed: Bool = false
+    @State private var mode: HomeMode = .calendar
+    @State private var visibleMonth: Date = Date()
+    /// Birthday pre-filled in the creation form when it opens from a calendar day.
+    @State private var newProfileDate: Date?
+    @Namespace private var modeNamespace
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.scenePhase) private var scenePhase
@@ -127,7 +154,7 @@ struct HomeView: View {
                 }
             }
             .safeAreaInset(edge: .bottom) {
-                if !profiles.isEmpty {
+                if !profiles.isEmpty, mode == .list {
                     addButton
                         .padding(.trailing, 20)
                         .padding(.bottom, 8)
@@ -141,7 +168,7 @@ struct HomeView: View {
                 )
             }
             .sheet(isPresented: $isCreatingProfile) {
-                ProfileFormView(profile: nil)
+                ProfileFormView(profile: nil, initialDate: newProfileDate)
             }
             .sheet(item: $reviewProfile) { profile in
                 PlanConfirmationView(profile: profile) {
@@ -270,28 +297,92 @@ struct HomeView: View {
             VStack(alignment: .leading, spacing: 18) {
                 header
 
-                HStack(spacing: 10) {
-                    SearchField(
-                        placeholder: strings.searchPlaceholder,
-                        clearLabel: strings.searchClear,
-                        text: $searchText
-                    )
-                    sortMenu
-                }
+                modePicker
 
-                if isSearching {
-                    searchResults
-                } else {
+                if mode == .calendar {
                     reviewBanner
-                    upcomingSections
+                    calendarSection
+                } else {
+                    HStack(spacing: 10) {
+                        SearchField(
+                            placeholder: strings.searchPlaceholder,
+                            clearLabel: strings.searchClear,
+                            text: $searchText
+                        )
+                        sortMenu
+                    }
+
+                    if isSearching {
+                        searchResults
+                    } else {
+                        reviewBanner
+                        upcomingSections
+                    }
                 }
             }
             .padding(.horizontal, 20)
-            .padding(.bottom, 90)
+            .padding(.bottom, mode == .calendar ? 24 : 90)
         }
         .scrollIndicators(.hidden)
         .scrollDismissesKeyboard(.immediately)
         .onAppear { appeared = true }
+    }
+
+    // MARK: - Mode switch
+
+    private var modePicker: some View {
+        HStack(spacing: 4) {
+            ForEach(HomeMode.allCases) { option in
+                let isSelected = option == mode
+                Button {
+                    withAnimation(reduceMotion ? nil : .spring(response: 0.34, dampingFraction: 0.78)) {
+                        mode = option
+                        if option == .calendar { searchText = "" }
+                    }
+                } label: {
+                    HStack(spacing: 6) {
+                        Image(systemName: option.symbolName)
+                            .font(.system(size: 12, weight: .bold))
+                        Text(option.title(strings))
+                            .font(.system(.subheadline, design: .rounded, weight: .bold))
+                    }
+                    .foregroundStyle(isSelected ? .white : Color.secondary)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 10)
+                    .background {
+                        if isSelected {
+                            Capsule()
+                                .fill(Palette.warmGradient)
+                                .matchedGeometryEffect(id: "homeMode", in: modeNamespace)
+                                .shadow(color: Palette.coral.opacity(0.3), radius: 8, y: 4)
+                        }
+                    }
+                    .contentShape(Capsule())
+                }
+                .buttonStyle(.plain)
+            }
+        }
+        .padding(4)
+        .background(Capsule().fill(Palette.surface))
+        .overlay(Capsule().strokeBorder(Palette.hairline, lineWidth: 1))
+        .sensoryFeedback(.selection, trigger: mode)
+    }
+
+    private var calendarSection: some View {
+        CalendarMonthView(
+            profiles: profiles,
+            settings: settings,
+            month: $visibleMonth,
+            isLocked: { isLocked($0) },
+            onSelect: { profile in
+                open(profile) { path.append(profile) }
+            },
+            onAdd: { date in
+                newProfileDate = date
+                isCreatingProfile = true
+            }
+        )
+        .padding(.top, 2)
     }
 
     @ViewBuilder
@@ -511,6 +602,7 @@ struct HomeView: View {
 
     private var addButton: some View {
         Button {
+            newProfileDate = nil
             isCreatingProfile = true
         } label: {
             Image(systemName: "plus")
