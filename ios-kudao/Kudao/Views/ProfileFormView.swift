@@ -256,11 +256,14 @@ struct ProfileFormView: View {
         dismiss()
     }
 
-    /// Creating or editing a profile (re)plans its local reminders right away.
+    /// Creating or editing a profile (re)plans its local reminders and refreshes the widget.
     private func scheduleReminders(for profile: BirthdayProfile) {
         let strings = self.strings
+        let privacy = ReminderPrivacy(hidesSurprisePreviews: settings.hidesSurpriseNotificationPreviews)
+        let settings = self.settings
         Task {
-            await notifications.sync(profiles: [profile], strings: strings)
+            await notifications.sync(profiles: [profile], strings: strings, privacy: privacy)
+            WidgetBridge.publish(profiles: [profile], settings: settings)
         }
     }
 }

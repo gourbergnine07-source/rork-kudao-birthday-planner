@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		XXBD849CB6BFC3B6C99582XX /* KudaoWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = XX912C66EC4FE0AFC982C0XX /* KudaoWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		105FC58A2E9EAD3200EA8BCF /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -21,13 +25,46 @@
 			remoteGlobalIDString = 105FC5792E9EAD3100EA8BCF;
 			remoteInfo = Kudao;
 		};
+		XX85E355EEB50581044B09XX /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 105FC5722E9EAD3100EA8BCF /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = XXFE5AEC4062E175965F8BXX;
+			remoteInfo = KudaoWidget;
+		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		XX8618DA762832199DA68BXX /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				XXBD849CB6BFC3B6C99582XX /* KudaoWidget.appex in Embed Foundation Extensions */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			name = "Embed Foundation Extensions";
+			dstPath = "";
+			dstSubfolderSpec = 13;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		105FC57A2E9EAD3100EA8BCF /* Kudao.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Kudao.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		105FC5892E9EAD3200EA8BCF /* KudaoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KudaoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		105FC5932E9EAD3200EA8BCF /* KudaoUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KudaoUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		XX912C66EC4FE0AFC982C0XX /* KudaoWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = KudaoWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		XX7AB968D974D84898A95EXX /* Exceptions for "KudaoWidget" folder in "KudaoWidget" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+				KudaoWidget.entitlements,
+			);
+			target = XXFE5AEC4062E175965F8BXX /* KudaoWidget */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		105FC57C2E9EAD3100EA8BCF /* Kudao */ = {
@@ -44,6 +81,14 @@
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = KudaoUITests;
 			sourceTree = "<group>";
+		};
+		XX9F1E171A8D1B503C09A3XX /* KudaoWidget */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = KudaoWidget;
+			sourceTree = "<group>";
+			exceptions = (
+				XX7AB968D974D84898A95EXX /* Exceptions for "KudaoWidget" folder in "KudaoWidget" target */,
+			);
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
@@ -69,6 +114,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		XXE7A5548FA7CC2AE23F61XX /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -79,6 +131,7 @@
 				105FC58C2E9EAD3200EA8BCF /* KudaoTests */,
 				105FC5962E9EAD3200EA8BCF /* KudaoUITests */,
 				105FC57B2E9EAD3100EA8BCF /* Products */,
+				XX9F1E171A8D1B503C09A3XX /* KudaoWidget */,
 			);
 			sourceTree = "<group>";
 		};
@@ -88,6 +141,7 @@
 				105FC57A2E9EAD3100EA8BCF /* Kudao.app */,
 				105FC5892E9EAD3200EA8BCF /* KudaoTests.xctest */,
 				105FC5932E9EAD3200EA8BCF /* KudaoUITests.xctest */,
+				XX912C66EC4FE0AFC982C0XX /* KudaoWidget.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -102,10 +156,12 @@
 				105FC5762E9EAD3100EA8BCF /* Sources */,
 				105FC5772E9EAD3100EA8BCF /* Frameworks */,
 				105FC5782E9EAD3100EA8BCF /* Resources */,
+				XX8618DA762832199DA68BXX /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				XXA17DFD0A1491D163A82EXX /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				105FC57C2E9EAD3100EA8BCF /* Kudao */,
@@ -163,6 +219,26 @@
 			productReference = 105FC5932E9EAD3200EA8BCF /* KudaoUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
+		XXFE5AEC4062E175965F8BXX /* KudaoWidget */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = XX309EDFFD4D5AECD9AFCDXX /* Build configuration list for PBXNativeTarget "KudaoWidget" */;
+			buildPhases = (
+				XXB9639555AA6D0A7BA091XX /* Sources */,
+				XXE7A5548FA7CC2AE23F61XX /* Frameworks */,
+				XXDFF2CBE2FD4E9D132076XX /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = KudaoWidget;
+			productName = KudaoWidget;
+			productReference = XX912C66EC4FE0AFC982C0XX /* KudaoWidget.appex */;
+			productType = "com.apple.product-type.app-extension";
+			fileSystemSynchronizedGroups = (
+				XX9F1E171A8D1B503C09A3XX /* KudaoWidget */,
+			);
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -203,6 +279,7 @@
 				105FC5792E9EAD3100EA8BCF /* Kudao */,
 				105FC5882E9EAD3200EA8BCF /* KudaoTests */,
 				105FC5922E9EAD3200EA8BCF /* KudaoUITests */,
+				XXFE5AEC4062E175965F8BXX /* KudaoWidget */,
 			);
 		};
 /* End PBXProject section */
@@ -223,6 +300,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		105FC5912E9EAD3200EA8BCF /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		XXDFF2CBE2FD4E9D132076XX /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -253,6 +337,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		XXB9639555AA6D0A7BA091XX /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -265,6 +356,11 @@
 			isa = PBXTargetDependency;
 			target = 105FC5792E9EAD3100EA8BCF /* Kudao */;
 			targetProxy = 105FC5942E9EAD3200EA8BCF /* PBXContainerItemProxy */;
+		};
+		XXA17DFD0A1491D163A82EXX /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = XXFE5AEC4062E175965F8BXX /* KudaoWidget */;
+			targetProxy = XX85E355EEB50581044B09XX /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -395,12 +491,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Kudao/Kudao.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_NSFaceIDUsageDescription = "Kudao usa Face ID per proteggere i profili in modalit\U00e0 sorpresa.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -428,12 +526,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Kudao/Kudao.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_NSFaceIDUsageDescription = "Kudao usa Face ID per proteggere i profili in modalit\U00e0 sorpresa.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -466,7 +566,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				MARKETING_VERSION = 1.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "app.rork.ek3qfxdplwz49ny1h3a7x.tests";
+				PRODUCT_BUNDLE_IDENTIFIER = app.rork.ek3qfxdplwz49ny1h3a7x.tests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -488,7 +588,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				MARKETING_VERSION = 1.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "app.rork.ek3qfxdplwz49ny1h3a7x.tests";
+				PRODUCT_BUNDLE_IDENTIFIER = app.rork.ek3qfxdplwz49ny1h3a7x.tests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -508,7 +608,7 @@
 				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "app.rork.ek3qfxdplwz49ny1h3a7x.uitests";
+				PRODUCT_BUNDLE_IDENTIFIER = app.rork.ek3qfxdplwz49ny1h3a7x.uitests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -528,7 +628,7 @@
 				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "app.rork.ek3qfxdplwz49ny1h3a7x.uitests";
+				PRODUCT_BUNDLE_IDENTIFIER = app.rork.ek3qfxdplwz49ny1h3a7x.uitests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -539,6 +639,52 @@
 				TEST_TARGET_NAME = Kudao;
 			};
 			name = Release;
+		};
+		XX2596A7DE66E4F3CF7DFEXX /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = KudaoWidget/KudaoWidget.entitlements;
+				PRODUCT_BUNDLE_IDENTIFIER = app.rork.ek3qfxdplwz49ny1h3a7x.kudaowidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = KudaoWidget/Info.plist;
+				SWIFT_VERSION = 5.0;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				MARKETING_VERSION = 1.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				INFOPLIST_KEY_CFBundleDisplayName = "$(PRODUCT_NAME)";
+			};
+			name = Release;
+		};
+		XXB34A014B584D317A6E8FXX /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = KudaoWidget/KudaoWidget.entitlements;
+				PRODUCT_BUNDLE_IDENTIFIER = app.rork.ek3qfxdplwz49ny1h3a7x.kudaowidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = KudaoWidget/Info.plist;
+				SWIFT_VERSION = 5.0;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				MARKETING_VERSION = 1.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				INFOPLIST_KEY_CFBundleDisplayName = "$(PRODUCT_NAME)";
+			};
+			name = Debug;
 		};
 /* End XCBuildConfiguration section */
 
@@ -575,6 +721,15 @@
 			buildConfigurations = (
 				105FC5A42E9EAD3200EA8BCF /* Debug */,
 				105FC5A52E9EAD3200EA8BCF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		XX309EDFFD4D5AECD9AFCDXX /* Build configuration list for PBXNativeTarget "KudaoWidget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				XXB34A014B584D317A6E8FXX /* Debug */,
+				XX2596A7DE66E4F3CF7DFEXX /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

@@ -59,6 +59,7 @@ enum ProfileSortOrder: String, CaseIterable, Identifiable {
 struct HomeView: View {
     @Environment(AppSettings.self) private var settings
     @Environment(NotificationService.self) private var notifications
+    @Environment(BiometricGate.self) private var gate
     @Query private var profiles: [BirthdayProfile]
 
     @State private var isCreatingProfile: Bool = false
@@ -69,6 +70,8 @@ struct HomeView: View {
     @State private var reviewProfile: BirthdayProfile?
     /// Profile that must open straight on the suggestions tab after "Edit".
     @State private var suggestionsProfileID: UUID?
+    @State private var isShowingSettings: Bool = false
+    @State private var unlockFailed: Bool = false
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.scenePhase) private var scenePhase
@@ -120,7 +123,7 @@ struct HomeView: View {
                         .foregroundStyle(Palette.coral)
                 }
                 ToolbarItem(placement: .topBarTrailing) {
-                    languageMenu
+                    settingsButton
                 }
             }
             .safeAreaInset(edge: .bottom) {
@@ -145,6 +148,14 @@ struct HomeView: View {
                     openSuggestions(for: profile)
                 }
             }
+            .sheet(isPresented: $isShowingSettings) {
+                AppSettingsView()
+            }
+            .alert(strings.unlockFailedTitle, isPresented: $unlockFailed) {
+                Button(strings.doneAction, role: .cancel) {}
+            } message: {
+                Text(strings.unlockFailedMessage)
+            }
             .environment(\.locale, settings.locale)
         }
         .tint(Palette.coral)
@@ -152,7 +163,17 @@ struct HomeView: View {
             await syncReminders()
         }
         .onChange(of: scenePhase) { _, phase in
-            guard phase == .active else { return }
+            switch phase {
+            case .active:
+                Task { await syncReminders() }
+            case .background:
+                // Surprise profiles re-lock as soon as the app leaves the screen.
+                gate.lockAll()
+            default:
+                break
+            }
+        }
+        .onChange(of: privacySignature) { _, _ in
             Task { await syncReminders() }
         }
         .onChange(of: notifications.pendingReviewProfileID) { _, pending in
@@ -166,7 +187,21 @@ struct HomeView: View {
     // MARK: - Reminders
 
     private func syncReminders() async {
-        await notifications.sync(profiles: profiles, strings: strings)
+        await notifications.sync(
+            profiles: profiles,
+            strings: strings,
+            privacy: ReminderPrivacy(hidesSurprisePreviews: settings.hidesSurpriseNotificationPreviews)
+        )
+        WidgetBridge.publish(profiles: profiles, settings: settings)
+    }
+
+    /// Changes that must be mirrored into the scheduled notifications and the widget.
+    private var privacySignature: String {
+        [
+            settings.hidesSurpriseNotificationPreviews ? "1" : "0",
+            settings.protectsSurpriseProfiles ? "1" : "0",
+            settings.language.rawValue,
+        ].joined(separator: "|")
     }
 
     /// A tapped reminder opens the confirmation sheet for that profile.
@@ -174,12 +209,58 @@ struct HomeView: View {
         guard let pending, let match = profiles.first(where: { $0.id == pending }) else { return }
         notifications.consumePendingReview()
         path = []
-        reviewProfile = match
+        open(match) { reviewProfile = match }
     }
 
     private func openSuggestions(for profile: BirthdayProfile) {
         suggestionsProfileID = profile.id
         path = [profile]
+    }
+
+    // MARK: - Surprise lock
+
+    private func isLocked(_ profile: BirthdayProfile) -> Bool {
+        settings.requiresUnlock(profile) && !gate.isUnlocked(profile.id)
+    }
+
+    /// Runs `action` immediately, or behind Face ID / Touch ID / passcode for protected surprises.
+    private func open(_ profile: BirthdayProfile, action: @escaping () -> Void) {
+        guard isLocked(profile) else {
+            action()
+            return
+        }
+
+        let reason = String(format: strings.unlockReasonFormat, profile.name)
+        let profileID = profile.id
+        Task {
+            if await gate.unlock(profileID: profileID, reason: reason) {
+                action()
+            } else {
+                unlockFailed = true
+            }
+        }
+    }
+
+    /// Regular rows push straight away; protected surprises authenticate first.
+    @ViewBuilder
+    private func profileLink<Content: View>(
+        _ profile: BirthdayProfile,
+        @ViewBuilder label: () -> Content
+    ) -> some View {
+        if isLocked(profile) {
+            Button {
+                open(profile) { path.append(profile) }
+            } label: {
+                label()
+            }
+            .buttonStyle(PressableCardStyle())
+            .accessibilityHint(strings.lockedBadgeLabel)
+        } else {
+            NavigationLink(value: profile) {
+                label()
+            }
+            .buttonStyle(PressableCardStyle())
+        }
     }
 
     // MARK: - Sections
@@ -230,10 +311,9 @@ struct HomeView: View {
 
             VStack(spacing: 12) {
                 ForEach(results) { profile in
-                    NavigationLink(value: profile) {
-                        ProfileRowCard(profile: profile, settings: settings)
+                    profileLink(profile) {
+                        ProfileRowCard(profile: profile, settings: settings, isLocked: isLocked(profile))
                     }
-                    .buttonStyle(PressableCardStyle())
                 }
             }
         }
@@ -298,7 +378,7 @@ struct HomeView: View {
                     HStack(spacing: 8) {
                         ForEach(pending) { profile in
                             Button {
-                                reviewProfile = profile
+                                open(profile) { reviewProfile = profile }
                             } label: {
                                 HStack(spacing: 8) {
                                     AvatarView(name: profile.name, photoData: profile.photoData, size: 26)
@@ -343,10 +423,9 @@ struct HomeView: View {
                 .tracking(1.1)
                 .foregroundStyle(.secondary)
 
-            NavigationLink(value: hero) {
-                HeroProfileCard(profile: hero, settings: settings)
+            profileLink(hero) {
+                HeroProfileCard(profile: hero, settings: settings, isLocked: isLocked(hero))
             }
-            .buttonStyle(PressableCardStyle())
         }
 
         let rest = ordered.filter { $0.id != nextUp?.id }
@@ -366,10 +445,9 @@ struct HomeView: View {
 
             VStack(spacing: 12) {
                 ForEach(Array(rest.enumerated()), id: \.element.id) { index, profile in
-                    NavigationLink(value: profile) {
-                        ProfileRowCard(profile: profile, settings: settings)
+                    profileLink(profile) {
+                        ProfileRowCard(profile: profile, settings: settings, isLocked: isLocked(profile))
                     }
-                    .buttonStyle(PressableCardStyle())
                     .opacity(appeared ? 1 : 0)
                     .offset(y: appeared ? 0 : 18)
                     .animation(
@@ -446,20 +524,23 @@ struct HomeView: View {
         .accessibilityLabel(strings.newProfileTitle)
     }
 
-    private var languageMenu: some View {
-        @Bindable var bindableSettings = settings
-        return Menu {
-            Picker(strings.languageLabel, selection: $bindableSettings.language) {
-                ForEach(AppLanguage.allCases) { language in
-                    Text("\(language.flag)  \(language.displayName)").tag(language)
-                }
-            }
+    private var settingsButton: some View {
+        Button {
+            isShowingSettings = true
         } label: {
-            Image(systemName: "globe")
+            Image(systemName: "gearshape.fill")
                 .font(.system(size: 16, weight: .semibold))
                 .foregroundStyle(Palette.coral)
+                .overlay(alignment: .topTrailing) {
+                    if settings.protectsSurpriseProfiles {
+                        Circle()
+                            .fill(Palette.berry)
+                            .frame(width: 6, height: 6)
+                            .offset(x: 3, y: -2)
+                    }
+                }
         }
-        .accessibilityLabel(strings.languageLabel)
+        .accessibilityLabel(strings.appSettingsMenu)
     }
 }
 
@@ -478,5 +559,6 @@ struct PressableCardStyle: ButtonStyle {
     HomeView()
         .environment(AppSettings())
         .environment(NotificationService.shared)
+        .environment(BiometricGate.shared)
         .modelContainer(KudaoModelContainer.preview())
 }

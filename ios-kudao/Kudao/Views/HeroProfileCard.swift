@@ -9,6 +9,8 @@ import SwiftUI
 struct HeroProfileCard: View {
     let profile: BirthdayProfile
     let settings: AppSettings
+    /// True when the profile sits behind Face ID / Touch ID / passcode.
+    var isLocked: Bool = false
 
     private var countdown: BirthdayCountdown { profile.countdown }
     private var strings: Strings { settings.strings }
@@ -66,7 +68,11 @@ struct HeroProfileCard: View {
                                 onDark: true
                             )
                             if profile.isSurpriseMode {
-                                KudaoChip(title: strings.surpriseBadge, systemImage: "eye.slash.fill", onDark: true)
+                                KudaoChip(
+                                    title: isLocked ? strings.lockedBadgeLabel : strings.surpriseBadge,
+                                    systemImage: isLocked ? "lock.fill" : "eye.slash.fill",
+                                    onDark: true
+                                )
                             }
                         }
                     }

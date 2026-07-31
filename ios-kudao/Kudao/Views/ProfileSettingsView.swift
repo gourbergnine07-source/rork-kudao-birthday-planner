@@ -306,8 +306,9 @@ struct ProfileSettingsView: View {
     private func persistAndReschedule() {
         try? modelContext.save()
         let strings = self.strings
+        let privacy = ReminderPrivacy(hidesSurprisePreviews: settings.hidesSurpriseNotificationPreviews)
         Task {
-            await notifications.sync(profiles: [profile], strings: strings)
+            await notifications.sync(profiles: [profile], strings: strings, privacy: privacy)
         }
     }
 }

@@ -16,5 +16,6 @@ struct ContentView: View {
     ContentView()
         .environment(AppSettings())
         .environment(NotificationService.shared)
+        .environment(BiometricGate.shared)
         .modelContainer(KudaoModelContainer.preview())
 }

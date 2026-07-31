@@ -10,6 +10,14 @@ import SwiftData
 import UIKit
 import UserNotifications
 
+/// How much a reminder is allowed to reveal on the lock screen.
+nonisolated struct ReminderPrivacy: Sendable, Equatable {
+    /// Surprise profiles get a neutral "Kudao reminder" wording instead of the name.
+    let hidesSurprisePreviews: Bool
+
+    static let revealing = ReminderPrivacy(hidesSurprisePreviews: false)
+}
+
 /// One local notification Kudao wants scheduled.
 nonisolated struct ScheduledReminder: Sendable, Identifiable, Equatable {
     let id: String
@@ -74,8 +82,14 @@ final class NotificationService {
     }
 
     /// Rebuilds the full set of pending reminders for the given profiles.
-    func sync(profiles: [BirthdayProfile], strings: Strings) async {
-        let reminders = profiles.flatMap { Self.reminders(for: $0, strings: strings) }
+    func sync(
+        profiles: [BirthdayProfile],
+        strings: Strings,
+        privacy: ReminderPrivacy = .revealing
+    ) async {
+        let reminders = profiles.flatMap {
+            Self.reminders(for: $0, strings: strings, privacy: privacy)
+        }
 
         guard await requestAuthorization() else {
             center.removeAllPendingNotificationRequests()
@@ -143,20 +157,28 @@ final class NotificationService {
     }
 
     /// Builds the reminders a profile currently deserves.
-    static func reminders(for profile: BirthdayProfile, strings: Strings) -> [ScheduledReminder] {
+    static func reminders(
+        for profile: BirthdayProfile,
+        strings: Strings,
+        privacy: ReminderPrivacy = .revealing
+    ) -> [ScheduledReminder] {
         guard !profile.isDeleted else { return [] }
 
         let name = profile.name.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !name.isEmpty else { return [] }
 
+        /// Surprise profiles can be stripped of every identifying detail.
+        let isDiscreet = privacy.hidesSurprisePreviews && profile.isSurpriseMode
         var result: [ScheduledReminder] = []
 
         if let fireDate = profile.birthdayReminderDate {
             result.append(
                 ScheduledReminder(
                     id: identifier(kind: "birthday", profileID: profile.id),
-                    title: strings.notificationBirthdayTitle,
-                    body: String(format: strings.notificationBirthdayBodyFormat, name),
+                    title: isDiscreet ? strings.notificationGenericTitle : strings.notificationBirthdayTitle,
+                    body: isDiscreet
+                        ? strings.notificationGenericBody
+                        : String(format: strings.notificationBirthdayBodyFormat, name),
                     fireDate: fireDate,
                     profileID: profile.id
                 )
@@ -165,15 +187,15 @@ final class NotificationService {
 
         if let fireDate = profile.giftReminderDate {
             let giftIdea = profile.partyPlan?.giftIdea.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-            let body = giftIdea.isEmpty
+            let revealingBody = giftIdea.isEmpty
                 ? String(format: strings.notificationGiftBodyFallbackFormat, name)
                 : String(format: strings.notificationGiftBodyFormat, name, giftIdea)
 
             result.append(
                 ScheduledReminder(
                     id: identifier(kind: "gift", profileID: profile.id),
-                    title: strings.notificationGiftTitle,
-                    body: body,
+                    title: isDiscreet ? strings.notificationGenericTitle : strings.notificationGiftTitle,
+                    body: isDiscreet ? strings.notificationGenericBody : revealingBody,
                     fireDate: fireDate,
                     profileID: profile.id
                 )

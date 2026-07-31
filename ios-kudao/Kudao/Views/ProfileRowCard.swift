@@ -9,6 +9,8 @@ import SwiftUI
 struct ProfileRowCard: View {
     let profile: BirthdayProfile
     let settings: AppSettings
+    /// True when the profile sits behind Face ID / Touch ID / passcode.
+    var isLocked: Bool = false
 
     private var countdown: BirthdayCountdown { profile.countdown }
     private var strings: Strings { settings.strings }
@@ -45,10 +47,21 @@ struct ProfileRowCard: View {
                         .lineLimit(1)
 
                     if profile.isSurpriseMode {
-                        Image(systemName: "eye.slash.fill")
-                            .font(.system(size: 10, weight: .bold))
-                            .foregroundStyle(Palette.berry)
-                            .accessibilityLabel(strings.surpriseBadge)
+                        HStack(spacing: 3) {
+                            Image(systemName: "eye.slash.fill")
+                                .font(.system(size: 9, weight: .bold))
+                            if isLocked {
+                                Image(systemName: "lock.fill")
+                                    .font(.system(size: 9, weight: .bold))
+                            }
+                        }
+                        .foregroundStyle(Palette.berry)
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 3)
+                        .background(Capsule().fill(Palette.berry.opacity(0.14)))
+                        .accessibilityLabel(
+                            isLocked ? "\(strings.surpriseBadge), \(strings.lockedBadgeLabel)" : strings.surpriseBadge
+                        )
                     }
                 }
 

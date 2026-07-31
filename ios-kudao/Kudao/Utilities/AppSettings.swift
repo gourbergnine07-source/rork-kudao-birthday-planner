@@ -6,10 +6,12 @@
 import Foundation
 import Observation
 
-/// Holds the active language and exposes the matching string table.
+/// Holds the active language, the app-wide privacy switches and the matching string table.
 @Observable
 final class AppSettings {
     private static let languageKey = "kudao.language"
+    private static let biometricLockKey = "kudao.surprise.biometricLock"
+    private static let hidePreviewsKey = "kudao.surprise.hideNotificationPreviews"
 
     var language: AppLanguage {
         didSet {
@@ -18,13 +20,46 @@ final class AppSettings {
         }
     }
 
+    /// Requires biometrics (or the device passcode) before any surprise profile opens.
+    var protectsSurpriseProfiles: Bool {
+        didSet {
+            guard protectsSurpriseProfiles != oldValue else { return }
+            UserDefaults.standard.set(protectsSurpriseProfiles, forKey: Self.biometricLockKey)
+            KudaoSharedStore.set(protectsSurpriseProfiles, forKey: Self.biometricLockKey)
+        }
+    }
+
+    /// Replaces the reminder name with a neutral "Kudao reminder" wording for surprise profiles.
+    var hidesSurpriseNotificationPreviews: Bool {
+        didSet {
+            guard hidesSurpriseNotificationPreviews != oldValue else { return }
+            UserDefaults.standard.set(hidesSurpriseNotificationPreviews, forKey: Self.hidePreviewsKey)
+            KudaoSharedStore.set(hidesSurpriseNotificationPreviews, forKey: Self.hidePreviewsKey)
+        }
+    }
+
     init() {
-        if let stored = UserDefaults.standard.string(forKey: Self.languageKey),
+        let defaults = UserDefaults.standard
+        if let stored = defaults.string(forKey: Self.languageKey),
            let saved = AppLanguage(rawValue: stored) {
             language = saved
         } else {
             language = AppLanguage.detectedFromDevice()
         }
+
+        protectsSurpriseProfiles = defaults.bool(forKey: Self.biometricLockKey)
+        // Surprises stay private by default.
+        hidesSurpriseNotificationPreviews = defaults.object(forKey: Self.hidePreviewsKey) as? Bool ?? true
+    }
+
+    /// True when a profile's details must be unlocked before being shown.
+    func requiresUnlock(_ profile: BirthdayProfile) -> Bool {
+        protectsSurpriseProfiles && profile.isSurpriseMode
+    }
+
+    /// True when the person's name must never leave the app unmasked.
+    func masksIdentity(of profile: BirthdayProfile) -> Bool {
+        profile.isSurpriseMode && (protectsSurpriseProfiles || hidesSurpriseNotificationPreviews)
     }
 
     var strings: Strings { language.strings }

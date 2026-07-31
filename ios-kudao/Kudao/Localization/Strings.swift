@@ -183,6 +183,28 @@ nonisolated struct Strings: Sendable {
     let confirmAction: String
     let modifyAction: String
     let pendingBadgeLabel: String
+
+    let appSettingsMenu: String
+    let settingsTitle: String
+    let settingsLanguageSection: String
+    let settingsSurpriseSection: String
+    let settingsSurpriseFooter: String
+    let faceIDToggleTitle: String
+    let faceIDToggleDescription: String
+    let hidePreviewsToggleTitle: String
+    let hidePreviewsToggleDescription: String
+    let biometryUnavailableNote: String
+    let unlockReasonFormat: String
+    let unlockAction: String
+    let unlockFailedTitle: String
+    let unlockFailedMessage: String
+    let lockedBadgeLabel: String
+    let notificationGenericTitle: String
+    let notificationGenericBody: String
+    let maskedProfileName: String
+    let settingsWidgetSection: String
+    let settingsWidgetHint: String
+    let settingsSharingNote: String
 }
 
 extension Strings {
@@ -347,7 +369,28 @@ extension Strings {
         planReviewNoPlanMessage: "Apri i suggerimenti per creare il piano festa di questo profilo.",
         confirmAction: "Conferma",
         modifyAction: "Modifica",
-        pendingBadgeLabel: "Piano da confermare"
+        pendingBadgeLabel: "Piano da confermare",
+        appSettingsMenu: "Impostazioni app",
+        settingsTitle: "Impostazioni",
+        settingsLanguageSection: "Lingua",
+        settingsSurpriseSection: "Modalità sorpresa",
+        settingsSurpriseFooter: "Queste protezioni valgono per tutti i profili con la modalità sorpresa attiva.",
+        faceIDToggleTitle: "Proteggi profili sorpresa con Face ID",
+        faceIDToggleDescription: "Chiede Face ID, Touch ID o il codice del dispositivo prima di aprire un profilo sorpresa.",
+        hidePreviewsToggleTitle: "Nascondi anteprima notifiche per profili sorpresa",
+        hidePreviewsToggleDescription: "Le notifiche mostrano solo “Promemoria Kudao”, senza il nome della persona.",
+        biometryUnavailableNote: "Nessuna biometria configurata: verrà chiesto il codice del dispositivo.",
+        unlockReasonFormat: "Sblocca il profilo di %@",
+        unlockAction: "Sblocca",
+        unlockFailedTitle: "Sblocco non riuscito",
+        unlockFailedMessage: "Non è stato possibile verificare la tua identità. Riprova.",
+        lockedBadgeLabel: "Profilo protetto",
+        notificationGenericTitle: "Promemoria Kudao",
+        notificationGenericBody: "Apri Kudao per vedere il promemoria.",
+        maskedProfileName: "Sorpresa",
+        settingsWidgetSection: "Widget",
+        settingsWidgetHint: "Tieni premuto sulla schermata Home, tocca Modifica, poi Aggiungi widget e scegli Kudao per il conto alla rovescia.",
+        settingsSharingNote: "I profili sorpresa resteranno esclusi da qualsiasi condivisione con il festeggiato."
     )
 
     static let english = Strings(
@@ -511,7 +554,28 @@ extension Strings {
         planReviewNoPlanMessage: "Open the suggestions to build this profile's party plan.",
         confirmAction: "Confirm",
         modifyAction: "Edit",
-        pendingBadgeLabel: "Plan to confirm"
+        pendingBadgeLabel: "Plan to confirm",
+        appSettingsMenu: "App settings",
+        settingsTitle: "Settings",
+        settingsLanguageSection: "Language",
+        settingsSurpriseSection: "Surprise mode",
+        settingsSurpriseFooter: "These protections apply to every profile with surprise mode enabled.",
+        faceIDToggleTitle: "Protect surprise profiles with Face ID",
+        faceIDToggleDescription: "Asks for Face ID, Touch ID or your device passcode before opening a surprise profile.",
+        hidePreviewsToggleTitle: "Hide notification previews for surprise profiles",
+        hidePreviewsToggleDescription: "Notifications only show “Kudao reminder”, never the person’s name.",
+        biometryUnavailableNote: "No biometrics set up: your device passcode will be requested.",
+        unlockReasonFormat: "Unlock %@’s profile",
+        unlockAction: "Unlock",
+        unlockFailedTitle: "Unlock failed",
+        unlockFailedMessage: "We couldn’t verify your identity. Please try again.",
+        lockedBadgeLabel: "Protected profile",
+        notificationGenericTitle: "Kudao reminder",
+        notificationGenericBody: "Open Kudao to see the reminder.",
+        maskedProfileName: "Surprise",
+        settingsWidgetSection: "Widget",
+        settingsWidgetHint: "Touch and hold the Home Screen, tap Edit, then Add Widget and pick Kudao for the countdown.",
+        settingsSharingNote: "Surprise profiles will stay out of any sharing with the birthday person."
     )
 
     static let french = Strings(
@@ -675,7 +739,28 @@ extension Strings {
         planReviewNoPlanMessage: "Ouvrez les suggestions pour créer le plan de fête de ce profil.",
         confirmAction: "Confirmer",
         modifyAction: "Modifier",
-        pendingBadgeLabel: "Plan à confirmer"
+        pendingBadgeLabel: "Plan à confirmer",
+        appSettingsMenu: "Réglages de l’app",
+        settingsTitle: "Réglages",
+        settingsLanguageSection: "Langue",
+        settingsSurpriseSection: "Mode surprise",
+        settingsSurpriseFooter: "Ces protections s’appliquent à tous les profils en mode surprise.",
+        faceIDToggleTitle: "Protéger les profils surprise avec Face ID",
+        faceIDToggleDescription: "Demande Face ID, Touch ID ou le code de l’appareil avant d’ouvrir un profil surprise.",
+        hidePreviewsToggleTitle: "Masquer l’aperçu des notifications des profils surprise",
+        hidePreviewsToggleDescription: "Les notifications affichent seulement « Rappel Kudao », jamais le nom de la personne.",
+        biometryUnavailableNote: "Aucune biométrie configurée : le code de l’appareil sera demandé.",
+        unlockReasonFormat: "Déverrouiller le profil de %@",
+        unlockAction: "Déverrouiller",
+        unlockFailedTitle: "Déverrouillage échoué",
+        unlockFailedMessage: "Nous n’avons pas pu vérifier votre identité. Veuillez réessayer.",
+        lockedBadgeLabel: "Profil protégé",
+        notificationGenericTitle: "Rappel Kudao",
+        notificationGenericBody: "Ouvrez Kudao pour voir le rappel.",
+        maskedProfileName: "Surprise",
+        settingsWidgetSection: "Widget",
+        settingsWidgetHint: "Appuyez longuement sur l’écran d’accueil, touchez Modifier, puis Ajouter un widget et choisissez Kudao.",
+        settingsSharingNote: "Les profils surprise resteront exclus de tout partage avec la personne fêtée."
     )
 
     static let spanish = Strings(
@@ -839,6 +924,27 @@ extension Strings {
         planReviewNoPlanMessage: "Abre las sugerencias para crear el plan de fiesta de este perfil.",
         confirmAction: "Confirmar",
         modifyAction: "Editar",
-        pendingBadgeLabel: "Plan por confirmar"
+        pendingBadgeLabel: "Plan por confirmar",
+        appSettingsMenu: "Ajustes de la app",
+        settingsTitle: "Ajustes",
+        settingsLanguageSection: "Idioma",
+        settingsSurpriseSection: "Modo sorpresa",
+        settingsSurpriseFooter: "Estas protecciones se aplican a todos los perfiles con el modo sorpresa activo.",
+        faceIDToggleTitle: "Proteger perfiles sorpresa con Face ID",
+        faceIDToggleDescription: "Pide Face ID, Touch ID o el código del dispositivo antes de abrir un perfil sorpresa.",
+        hidePreviewsToggleTitle: "Ocultar la vista previa de notificaciones de perfiles sorpresa",
+        hidePreviewsToggleDescription: "Las notificaciones muestran solo “Recordatorio Kudao”, nunca el nombre de la persona.",
+        biometryUnavailableNote: "Sin biometría configurada: se pedirá el código del dispositivo.",
+        unlockReasonFormat: "Desbloquear el perfil de %@",
+        unlockAction: "Desbloquear",
+        unlockFailedTitle: "No se pudo desbloquear",
+        unlockFailedMessage: "No hemos podido verificar tu identidad. Inténtalo de nuevo.",
+        lockedBadgeLabel: "Perfil protegido",
+        notificationGenericTitle: "Recordatorio Kudao",
+        notificationGenericBody: "Abre Kudao para ver el recordatorio.",
+        maskedProfileName: "Sorpresa",
+        settingsWidgetSection: "Widget",
+        settingsWidgetHint: "Mantén pulsada la pantalla de inicio, toca Editar, luego Añadir widget y elige Kudao.",
+        settingsSharingNote: "Los perfiles sorpresa quedarán fuera de cualquier compartición con la persona homenajeada."
     )
 }
