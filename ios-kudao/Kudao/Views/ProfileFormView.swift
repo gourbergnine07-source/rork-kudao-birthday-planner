@@ -10,8 +10,6 @@ import PhotosUI
 /// Create or edit a celebration profile.
 struct ProfileFormView: View {
     let profile: BirthdayProfile?
-    /// Pre-selected birthday, used when the form opens from a calendar day.
-    var initialDate: Date?
 
     @Environment(AppSettings.self) private var settings
     @Environment(NotificationService.self) private var notifications
@@ -299,12 +297,7 @@ struct ProfileFormView: View {
     // MARK: - Actions
 
     private func loadExisting() {
-        guard let profile else {
-            if let initialDate, !didSave, name.isEmpty {
-                birthDate = initialDate
-            }
-            return
-        }
+        guard let profile else { return }
         guard !didSave, name.isEmpty else { return }
         name = profile.name
         lastName = profile.lastName
