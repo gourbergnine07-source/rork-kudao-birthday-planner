@@ -34,6 +34,16 @@ nonisolated enum AppLanguage: String, CaseIterable, Identifiable, Sendable {
 
     var locale: Locale { Locale(identifier: rawValue) }
 
+    /// English name of the language, used inside AI prompts.
+    var promptName: String {
+        switch self {
+        case .italian: "Italian"
+        case .english: "English"
+        case .french: "French"
+        case .spanish: "Spanish"
+        }
+    }
+
     var strings: Strings {
         switch self {
         case .italian: .italian

@@ -280,5 +280,5 @@ private struct FormCard<Content: View>: View {
 #Preview {
     ProfileFormView(profile: nil)
         .environment(AppSettings())
-        .modelContainer(for: [BirthdayProfile.self, DiaryEntry.self], inMemory: true)
+        .modelContainer(for: [BirthdayProfile.self, DiaryEntry.self, DiaryTag.self], inMemory: true)
 }

@@ -14,10 +14,23 @@ struct HomeView: View {
     @State private var isCreatingProfile: Bool = false
     @State private var path: [BirthdayProfile] = []
     @State private var appeared: Bool = false
+    @State private var searchText: String = ""
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private var strings: Strings { settings.strings }
+
+    private var query: String {
+        searchText.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    private var isSearching: Bool { !query.isEmpty }
+
+    /// Profiles matching the search field, keeping the birthday-proximity order.
+    private var results: [BirthdayProfile] {
+        guard isSearching else { return ordered }
+        return ordered.filter { $0.name.localizedStandardContains(query) }
+    }
 
     private var ordered: [BirthdayProfile] {
         profiles.sorted { lhs, rhs in
@@ -35,7 +48,7 @@ struct HomeView: View {
             ZStack {
                 WarmBackdrop()
 
-                if ordered.isEmpty {
+                if profiles.isEmpty {
                     emptyState
                 } else {
                     content
@@ -53,7 +66,7 @@ struct HomeView: View {
                 }
             }
             .safeAreaInset(edge: .bottom) {
-                if !ordered.isEmpty {
+                if !profiles.isEmpty {
                     addButton
                         .padding(.trailing, 20)
                         .padding(.bottom, 8)
@@ -78,46 +91,88 @@ struct HomeView: View {
             VStack(alignment: .leading, spacing: 18) {
                 header
 
-                if let hero = ordered.first {
-                    Text(strings.upNext.uppercased())
-                        .font(.system(.caption, design: .rounded, weight: .bold))
-                        .tracking(1.1)
-                        .foregroundStyle(.secondary)
+                SearchField(
+                    placeholder: strings.searchPlaceholder,
+                    clearLabel: strings.searchClear,
+                    text: $searchText
+                )
 
-                    NavigationLink(value: hero) {
-                        HeroProfileCard(profile: hero, settings: settings)
-                    }
-                    .buttonStyle(PressableCardStyle())
-                }
-
-                if ordered.count > 1 {
-                    Text(strings.othersSection.uppercased())
-                        .font(.system(.caption, design: .rounded, weight: .bold))
-                        .tracking(1.1)
-                        .foregroundStyle(.secondary)
-                        .padding(.top, 6)
-
-                    VStack(spacing: 12) {
-                        ForEach(Array(ordered.dropFirst().enumerated()), id: \.element.id) { index, profile in
-                            NavigationLink(value: profile) {
-                                ProfileRowCard(profile: profile, settings: settings)
-                            }
-                            .buttonStyle(PressableCardStyle())
-                            .opacity(appeared ? 1 : 0)
-                            .offset(y: appeared ? 0 : 18)
-                            .animation(
-                                reduceMotion ? nil : .smooth(duration: 0.45).delay(Double(index) * 0.05),
-                                value: appeared
-                            )
-                        }
-                    }
+                if isSearching {
+                    searchResults
+                } else {
+                    upcomingSections
                 }
             }
             .padding(.horizontal, 20)
             .padding(.bottom, 90)
         }
         .scrollIndicators(.hidden)
+        .scrollDismissesKeyboard(.immediately)
         .onAppear { appeared = true }
+    }
+
+    @ViewBuilder
+    private var searchResults: some View {
+        if results.isEmpty {
+            PlaceholderPanel(
+                icon: "magnifyingglass",
+                title: strings.noResultsTitle,
+                message: String(format: strings.noResultsMessageFormat, query)
+            )
+            .padding(.top, 4)
+        } else {
+            Text(strings.resultsSection.uppercased())
+                .font(.system(.caption, design: .rounded, weight: .bold))
+                .tracking(1.1)
+                .foregroundStyle(.secondary)
+
+            VStack(spacing: 12) {
+                ForEach(results) { profile in
+                    NavigationLink(value: profile) {
+                        ProfileRowCard(profile: profile, settings: settings)
+                    }
+                    .buttonStyle(PressableCardStyle())
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var upcomingSections: some View {
+        if let hero = ordered.first {
+            Text(strings.upNext.uppercased())
+                .font(.system(.caption, design: .rounded, weight: .bold))
+                .tracking(1.1)
+                .foregroundStyle(.secondary)
+
+            NavigationLink(value: hero) {
+                HeroProfileCard(profile: hero, settings: settings)
+            }
+            .buttonStyle(PressableCardStyle())
+        }
+
+        if ordered.count > 1 {
+            Text(strings.othersSection.uppercased())
+                .font(.system(.caption, design: .rounded, weight: .bold))
+                .tracking(1.1)
+                .foregroundStyle(.secondary)
+                .padding(.top, 6)
+
+            VStack(spacing: 12) {
+                ForEach(Array(ordered.dropFirst().enumerated()), id: \.element.id) { index, profile in
+                    NavigationLink(value: profile) {
+                        ProfileRowCard(profile: profile, settings: settings)
+                    }
+                    .buttonStyle(PressableCardStyle())
+                    .opacity(appeared ? 1 : 0)
+                    .offset(y: appeared ? 0 : 18)
+                    .animation(
+                        reduceMotion ? nil : .smooth(duration: 0.45).delay(Double(index) * 0.05),
+                        value: appeared
+                    )
+                }
+            }
+        }
     }
 
     private var header: some View {
@@ -216,5 +271,5 @@ struct PressableCardStyle: ButtonStyle {
 #Preview {
     HomeView()
         .environment(AppSettings())
-        .modelContainer(for: [BirthdayProfile.self, DiaryEntry.self], inMemory: true)
+        .modelContainer(for: [BirthdayProfile.self, DiaryEntry.self, DiaryTag.self], inMemory: true)
 }

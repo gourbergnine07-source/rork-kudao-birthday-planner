@@ -48,6 +48,19 @@ final class AppSettings {
         )
     }
 
+    /// "Oggi, 14:32" / "Ieri, 09:05" / "3 giugno, 18:20" depending on how recent the date is.
+    func noteTimestamp(_ date: Date) -> String {
+        let time = date.formatted(
+            Date.FormatStyle(locale: locale)
+                .hour(.defaultDigits(amPM: .abbreviated))
+                .minute(.twoDigits)
+        )
+        let calendar = Calendar.current
+        if calendar.isDateInToday(date) { return "\(strings.todayLabel), \(time)" }
+        if calendar.isDateInYesterday(date) { return "\(strings.yesterdayLabel), \(time)" }
+        return "\(dayMonth(date)), \(time)"
+    }
+
     func weekdayDayMonth(_ date: Date) -> String {
         date.formatted(
             Date.FormatStyle(locale: locale)

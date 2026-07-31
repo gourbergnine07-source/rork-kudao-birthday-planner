@@ -6,7 +6,7 @@
 import SwiftUI
 import SwiftData
 
-/// Full profile screen: header with countdown, diary and suggestions tabs.
+/// Full profile screen: header with countdown, diary, preferences and suggestions.
 struct ProfileDetailView: View {
     let profile: BirthdayProfile
 
@@ -19,6 +19,7 @@ struct ProfileDetailView: View {
     @State private var isEditing: Bool = false
     @State private var isConfirmingDelete: Bool = false
     @State private var pendingDeletion: Bool = false
+    @State private var analyzer = DiaryAnalyzer()
     @Namespace private var tabNamespace
 
     private var strings: Strings { settings.strings }
@@ -26,6 +27,7 @@ struct ProfileDetailView: View {
 
     enum ProfileTab: String, CaseIterable, Identifiable {
         case diary
+        case preferences
         case suggestions
 
         var id: String { rawValue }
@@ -33,6 +35,7 @@ struct ProfileDetailView: View {
         var symbolName: String {
             switch self {
             case .diary: "book.closed.fill"
+            case .preferences: "tag.fill"
             case .suggestions: "sparkles"
             }
         }
@@ -40,6 +43,7 @@ struct ProfileDetailView: View {
         func title(_ strings: Strings) -> String {
             switch self {
             case .diary: strings.diaryTab
+            case .preferences: strings.preferencesTab
             case .suggestions: strings.suggestionsTab
             }
         }
@@ -60,6 +64,7 @@ struct ProfileDetailView: View {
                 .padding(.horizontal, 20)
             }
             .scrollIndicators(.hidden)
+            .scrollDismissesKeyboard(.interactively)
         }
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -222,7 +227,7 @@ struct ProfileDetailView: View {
     // MARK: - Tabs
 
     private var tabSelector: some View {
-        HStack(spacing: 6) {
+        HStack(spacing: 4) {
             ForEach(ProfileTab.allCases) { tab in
                 let isSelected = tab == selectedTab
                 Button {
@@ -233,11 +238,16 @@ struct ProfileDetailView: View {
                     HStack(spacing: 6) {
                         Image(systemName: tab.symbolName)
                             .font(.system(size: 12, weight: .bold))
-                        Text(tab.title(strings))
-                            .font(.system(.subheadline, design: .rounded, weight: .semibold))
+                        if isSelected {
+                            Text(tab.title(strings))
+                                .font(.system(.subheadline, design: .rounded, weight: .semibold))
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.85)
+                        }
                     }
                     .foregroundStyle(isSelected ? .white : .secondary)
-                    .frame(maxWidth: .infinity)
+                    .frame(maxWidth: isSelected ? .infinity : nil)
+                    .padding(.horizontal, isSelected ? 12 : 16)
                     .padding(.vertical, 11)
                     .background {
                         if isSelected {
@@ -249,6 +259,7 @@ struct ProfileDetailView: View {
                     .contentShape(Capsule())
                 }
                 .buttonStyle(.plain)
+                .accessibilityLabel(tab.title(strings))
             }
         }
         .padding(5)
@@ -261,14 +272,11 @@ struct ProfileDetailView: View {
     private var tabContent: some View {
         switch selectedTab {
         case .diary:
-            PlaceholderPanel(
-                icon: "book.closed.fill",
-                title: strings.diaryEmptyTitle,
-                message: strings.diaryEmptyMessage,
-                badge: strings.comingSoon,
-                tint: Palette.coral
-            )
-            .transition(.opacity.combined(with: .offset(y: 8)))
+            DiaryTabView(profile: profile, analyzer: analyzer)
+                .transition(.opacity.combined(with: .offset(y: 8)))
+        case .preferences:
+            PreferencesTabView(profile: profile)
+                .transition(.opacity.combined(with: .offset(y: 8)))
         case .suggestions:
             PlaceholderPanel(
                 icon: "sparkles",
@@ -312,56 +320,6 @@ private struct StatTile: View {
         )
         .overlay(
             RoundedRectangle(cornerRadius: 20, style: .continuous)
-                .strokeBorder(Palette.hairline, lineWidth: 1)
-        )
-    }
-}
-
-/// Empty placeholder for the tabs that arrive in a later step.
-private struct PlaceholderPanel: View {
-    let icon: String
-    let title: String
-    let message: String
-    let badge: String
-    let tint: Color
-
-    var body: some View {
-        VStack(spacing: 14) {
-            ZStack {
-                Circle()
-                    .fill(tint.opacity(0.14))
-                    .frame(width: 72, height: 72)
-                Image(systemName: icon)
-                    .font(.system(size: 28, weight: .medium))
-                    .foregroundStyle(tint)
-            }
-
-            Text(title)
-                .font(.system(.headline, design: .rounded, weight: .bold))
-
-            Text(message)
-                .font(.system(.subheadline, design: .rounded))
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
-                .fixedSize(horizontal: false, vertical: true)
-
-            Text(badge.uppercased())
-                .font(.system(.caption2, design: .rounded, weight: .bold))
-                .tracking(1)
-                .foregroundStyle(tint)
-                .padding(.horizontal, 10)
-                .padding(.vertical, 5)
-                .background(Capsule().fill(tint.opacity(0.12)))
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 36)
-        .padding(.horizontal, 24)
-        .background(
-            RoundedRectangle(cornerRadius: 26, style: .continuous)
-                .fill(Palette.surface)
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 26, style: .continuous)
                 .strokeBorder(Palette.hairline, lineWidth: 1)
         )
     }

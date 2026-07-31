@@ -18,6 +18,8 @@ enum Palette {
     nonisolated static var berry: Color { dynamic(0xC42A6B, 0xFF6FA5) }
     nonisolated static var clay: Color { dynamic(0xA0563B, 0xC9866A) }
     nonisolated static var plum: Color { dynamic(0x5B1E2B, 0x2A1216) }
+    nonisolated static var teal: Color { dynamic(0x11776B, 0x4FC9B5) }
+    nonisolated static var violet: Color { dynamic(0x6B45A6, 0xB79BFF) }
 
     nonisolated static var warmGradient: LinearGradient {
         LinearGradient(

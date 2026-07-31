@@ -22,6 +22,9 @@ final class BirthdayProfile {
     @Relationship(deleteRule: .cascade, inverse: \DiaryEntry.profile)
     var diaryEntries: [DiaryEntry] = []
 
+    @Relationship(deleteRule: .cascade, inverse: \DiaryTag.profile)
+    var diaryTags: [DiaryTag] = []
+
     init(
         name: String,
         birthDate: Date,
