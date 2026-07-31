@@ -609,6 +609,38 @@ nonisolated struct Strings: Sendable {
     let appliedToExistingLabel: String
     let resetToShippedAction: String
     let noProfilesInCategoryLabel: String
+
+    // MARK: Gallery timeline
+
+    let galleryAutoOrderNote: String
+
+    // MARK: Diary reminders
+
+    let diaryReminderSectionTitle: String
+    let diaryReminderToggleTitle: String
+    let diaryReminderCaption: String
+    let diaryFrequencyLabel: String
+    let diaryCadenceDaily: String
+    let diaryCadenceEveryThreeDays: String
+    let diaryCadenceWeekly: String
+    let diaryCadenceNever: String
+    let diaryReminderTimeLabel: String
+    let diaryReminderNextFormat: String
+    let diaryReminderPeopleFormat: String
+    let diaryReminderRemembranceNote: String
+    let diaryReminderExcludeTitle: String
+    let diaryReminderExcludeCaption: String
+    let diaryReminderOffNote: String
+    let diaryNudgeTitle: String
+    let diaryNudgeVariantOne: String
+    let diaryNudgeVariantTwo: String
+    let diaryNudgeVariantThree: String
+    let diaryNudgePersonFormatOne: String
+    let diaryNudgePersonFormatTwo: String
+    let quickNoteTitle: String
+    let quickNoteCaption: String
+    let quickNoteEmptyMessage: String
+    let quickNoteSaveAction: String
 }
 
 extension Strings {
@@ -1181,7 +1213,33 @@ extension Strings {
         applyToExistingFormat: "Applica ai %d profili esistenti",
         appliedToExistingLabel: "Applicato",
         resetToShippedAction: "Valori consigliati",
-        noProfilesInCategoryLabel: "Nessun profilo di questo tipo, per ora."
+        noProfilesInCategoryLabel: "Nessun profilo di questo tipo, per ora.",
+        galleryAutoOrderNote: "Ordinati in automatico: i ricordi pi\u{00F9} recenti in alto.",
+        diaryReminderSectionTitle: "Promemoria diario",
+        diaryReminderToggleTitle: "Promemoria diario",
+        diaryReminderCaption: "Un invito gentile ad annotare qualcosa, anche quando la ricorrenza \u{00E8} lontana.",
+        diaryFrequencyLabel: "Frequenza",
+        diaryCadenceDaily: "Giornaliera",
+        diaryCadenceEveryThreeDays: "Ogni 3 giorni",
+        diaryCadenceWeekly: "Settimanale",
+        diaryCadenceNever: "Mai",
+        diaryReminderTimeLabel: "Orario dell\u{2019}invito",
+        diaryReminderNextFormat: "Prossimo invito: %@",
+        diaryReminderPeopleFormat: "%d profili coinvolti",
+        diaryReminderRemembranceNote: "Le commemorazioni restano sempre fuori da questi inviti.",
+        diaryReminderExcludeTitle: "Escludi dai promemoria diario",
+        diaryReminderExcludeCaption: "Questo profilo non verr\u{00E0} pi\u{00F9} nominato negli inviti a scrivere.",
+        diaryReminderOffNote: "I promemoria diario sono disattivati nelle impostazioni notifiche.",
+        diaryNudgeTitle: "Diario Kudao",
+        diaryNudgeVariantOne: "Hai notato qualcosa su qualcuno di speciale oggi? Scrivilo su Kudao.",
+        diaryNudgeVariantTwo: "Un dettaglio, un gusto, un\u{2019}idea: annotalo ora, ti sar\u{00E0} utile dopo.",
+        diaryNudgeVariantThree: "Tieni aggiornati i profili delle persone che contano.",
+        diaryNudgePersonFormatOne: "Hai scoperto qualcosa su %@ di recente?",
+        diaryNudgePersonFormatTwo: "Due righe su %@: il te del futuro ringrazier\u{00E0}.",
+        quickNoteTitle: "Nota al volo",
+        quickNoteCaption: "Scegli la persona e scrivi: bastano poche parole.",
+        quickNoteEmptyMessage: "Nessun profilo disponibile per una nota. Creane uno e torna qui.",
+        quickNoteSaveAction: "Salva"
     )
 
     static let english = Strings(
@@ -1753,7 +1811,33 @@ extension Strings {
         applyToExistingFormat: "Apply to %d existing profiles",
         appliedToExistingLabel: "Applied",
         resetToShippedAction: "Recommended values",
-        noProfilesInCategoryLabel: "No profile of this kind yet."
+        noProfilesInCategoryLabel: "No profile of this kind yet.",
+        galleryAutoOrderNote: "Sorted automatically: newest memories first.",
+        diaryReminderSectionTitle: "Diary reminders",
+        diaryReminderToggleTitle: "Diary reminders",
+        diaryReminderCaption: "A gentle nudge to note something down, even when the date is far away.",
+        diaryFrequencyLabel: "Frequency",
+        diaryCadenceDaily: "Daily",
+        diaryCadenceEveryThreeDays: "Every 3 days",
+        diaryCadenceWeekly: "Weekly",
+        diaryCadenceNever: "Never",
+        diaryReminderTimeLabel: "Reminder time",
+        diaryReminderNextFormat: "Next nudge: %@",
+        diaryReminderPeopleFormat: "%d profiles included",
+        diaryReminderRemembranceNote: "Remembrances are always left out of these nudges.",
+        diaryReminderExcludeTitle: "Exclude from diary reminders",
+        diaryReminderExcludeCaption: "This profile will no longer be mentioned in the nudges.",
+        diaryReminderOffNote: "Diary reminders are switched off in the notification settings.",
+        diaryNudgeTitle: "Kudao diary",
+        diaryNudgeVariantOne: "Noticed something about someone special today? Write it in Kudao.",
+        diaryNudgeVariantTwo: "A detail, a taste, an idea: note it now, thank yourself later.",
+        diaryNudgeVariantThree: "Keep the profiles of the people who matter up to date.",
+        diaryNudgePersonFormatOne: "Have you learned anything about %@ lately?",
+        diaryNudgePersonFormatTwo: "Two lines about %@: future you will be grateful.",
+        quickNoteTitle: "Quick note",
+        quickNoteCaption: "Pick the person and write: a few words are enough.",
+        quickNoteEmptyMessage: "No profile available for a note yet. Create one and come back.",
+        quickNoteSaveAction: "Save"
     )
 
     static let french = Strings(
@@ -2325,7 +2409,33 @@ extension Strings {
         applyToExistingFormat: "Appliquer aux %d profils existants",
         appliedToExistingLabel: "Appliqu\u{00E9}",
         resetToShippedAction: "Valeurs recommand\u{00E9}es",
-        noProfilesInCategoryLabel: "Aucun profil de ce type pour l\u{2019}instant."
+        noProfilesInCategoryLabel: "Aucun profil de ce type pour l\u{2019}instant.",
+        galleryAutoOrderNote: "Tri automatique : les souvenirs les plus r\u{00E9}cents en haut.",
+        diaryReminderSectionTitle: "Rappels du journal",
+        diaryReminderToggleTitle: "Rappels du journal",
+        diaryReminderCaption: "Une invitation discr\u{00E8}te \u{00E0} noter quelque chose, m\u{00EA}me loin de la date.",
+        diaryFrequencyLabel: "Fr\u{00E9}quence",
+        diaryCadenceDaily: "Quotidienne",
+        diaryCadenceEveryThreeDays: "Tous les 3 jours",
+        diaryCadenceWeekly: "Hebdomadaire",
+        diaryCadenceNever: "Jamais",
+        diaryReminderTimeLabel: "Heure du rappel",
+        diaryReminderNextFormat: "Prochain rappel : %@",
+        diaryReminderPeopleFormat: "%d profils concern\u{00E9}s",
+        diaryReminderRemembranceNote: "Les comm\u{00E9}morations restent toujours en dehors de ces rappels.",
+        diaryReminderExcludeTitle: "Exclure des rappels du journal",
+        diaryReminderExcludeCaption: "Ce profil ne sera plus mentionn\u{00E9} dans les rappels.",
+        diaryReminderOffNote: "Les rappels du journal sont d\u{00E9}sactiv\u{00E9}s dans les r\u{00E9}glages de notification.",
+        diaryNudgeTitle: "Journal Kudao",
+        diaryNudgeVariantOne: "Vous avez remarqu\u{00E9} quelque chose sur quelqu\u{2019}un aujourd\u{2019}hui ? Notez-le dans Kudao.",
+        diaryNudgeVariantTwo: "Un d\u{00E9}tail, un go\u{00FB}t, une id\u{00E9}e : notez-le maintenant, \u{00E7}a servira plus tard.",
+        diaryNudgeVariantThree: "Gardez \u{00E0} jour les profils des personnes qui comptent.",
+        diaryNudgePersonFormatOne: "Vous avez appris quelque chose sur %@ derni\u{00E8}rement ?",
+        diaryNudgePersonFormatTwo: "Deux lignes sur %@ : votre futur vous dira merci.",
+        quickNoteTitle: "Note rapide",
+        quickNoteCaption: "Choisissez la personne et \u{00E9}crivez : quelques mots suffisent.",
+        quickNoteEmptyMessage: "Aucun profil disponible pour une note. Cr\u{00E9}ez-en un et revenez.",
+        quickNoteSaveAction: "Enregistrer"
     )
 
     static let spanish = Strings(
@@ -2897,6 +3007,32 @@ extension Strings {
         applyToExistingFormat: "Aplicar a %d perfiles existentes",
         appliedToExistingLabel: "Aplicado",
         resetToShippedAction: "Valores recomendados",
-        noProfilesInCategoryLabel: "Todav\u{00ED}a no hay perfiles de este tipo."
+        noProfilesInCategoryLabel: "Todav\u{00ED}a no hay perfiles de este tipo.",
+        galleryAutoOrderNote: "Orden autom\u{00E1}tico: los recuerdos m\u{00E1}s recientes arriba.",
+        diaryReminderSectionTitle: "Recordatorios del diario",
+        diaryReminderToggleTitle: "Recordatorios del diario",
+        diaryReminderCaption: "Una invitaci\u{00F3}n amable a anotar algo, aunque la fecha est\u{00E9} lejos.",
+        diaryFrequencyLabel: "Frecuencia",
+        diaryCadenceDaily: "Diaria",
+        diaryCadenceEveryThreeDays: "Cada 3 d\u{00ED}as",
+        diaryCadenceWeekly: "Semanal",
+        diaryCadenceNever: "Nunca",
+        diaryReminderTimeLabel: "Hora del recordatorio",
+        diaryReminderNextFormat: "Pr\u{00F3}ximo aviso: %@",
+        diaryReminderPeopleFormat: "%d perfiles incluidos",
+        diaryReminderRemembranceNote: "Las conmemoraciones siempre quedan fuera de estos avisos.",
+        diaryReminderExcludeTitle: "Excluir de los recordatorios del diario",
+        diaryReminderExcludeCaption: "Este perfil ya no se mencionar\u{00E1} en los avisos.",
+        diaryReminderOffNote: "Los recordatorios del diario est\u{00E1}n desactivados en los ajustes de notificaciones.",
+        diaryNudgeTitle: "Diario Kudao",
+        diaryNudgeVariantOne: "\u{00BF}Has notado algo sobre alguien especial hoy? Escr\u{00ED}belo en Kudao.",
+        diaryNudgeVariantTwo: "Un detalle, un gusto, una idea: an\u{00F3}talo ahora, te servir\u{00E1} despu\u{00E9}s.",
+        diaryNudgeVariantThree: "Mant\u{00E9}n al d\u{00ED}a los perfiles de las personas que importan.",
+        diaryNudgePersonFormatOne: "\u{00BF}Has descubierto algo sobre %@ \u{00FA}ltimamente?",
+        diaryNudgePersonFormatTwo: "Dos l\u{00ED}neas sobre %@: tu yo del futuro lo agradecer\u{00E1}.",
+        quickNoteTitle: "Nota r\u{00E1}pida",
+        quickNoteCaption: "Elige a la persona y escribe: bastan unas pocas palabras.",
+        quickNoteEmptyMessage: "Todav\u{00ED}a no hay perfiles para una nota. Crea uno y vuelve.",
+        quickNoteSaveAction: "Guardar"
     )
 }

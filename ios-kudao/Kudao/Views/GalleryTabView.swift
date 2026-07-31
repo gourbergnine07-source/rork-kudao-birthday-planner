@@ -42,9 +42,12 @@ struct GalleryTabView: View {
     private var items: [GalleryItem] {
         // `revision` keeps this recomputed after every merge or upload.
         _ = gallery.revision
-        return settings.gallerySortOrder.sorted(
-            gallery.items(for: profile, context: modelContext)
-        )
+        return GalleryTimeline.ordered(gallery.items(for: profile, context: modelContext))
+    }
+
+    /// The same memories split into days, most recent day first.
+    private var sections: [GalleryDaySection] {
+        GalleryTimeline.sections(items)
     }
 
     /// Memories already collected keep the gallery reachable long after the party.
@@ -81,7 +84,7 @@ struct GalleryTabView: View {
         )
         .fullScreenCover(isPresented: $isCapturing) {
             CameraCaptureView { media in
-                prepareDrafts([media])
+                prepareDrafts([PickedMediaEntry(media: media, capturedAt: Date())])
             }
             .ignoresSafeArea()
         }
@@ -157,18 +160,25 @@ struct GalleryTabView: View {
 
             addButton
         } else {
-            LazyVGrid(columns: Self.columns, spacing: 3) {
-                ForEach(items) { item in
-                    cell(item)
+            LazyVGrid(columns: Self.columns, spacing: 3, pinnedViews: [.sectionHeaders]) {
+                ForEach(sections) { section in
+                    Section {
+                        ForEach(section.items) { item in
+                            cell(item)
+                        }
+                    } header: {
+                        dayHeader(section)
+                    }
                 }
             }
-            .animation(reduceMotion ? nil : .smooth(duration: 0.32), value: settings.gallerySortOrder)
+            .animation(reduceMotion ? nil : .smooth(duration: 0.32), value: items.count)
 
             HStack(spacing: 5) {
-                Image(systemName: settings.gallerySortOrder.symbolName)
+                Image(systemName: "arrow.down.to.line")
                     .font(.system(size: 9, weight: .black))
-                Text(settings.gallerySortOrder.title(strings))
+                Text(strings.galleryAutoOrderNote)
                     .font(.system(.caption2, design: .rounded, weight: .semibold))
+                    .fixedSize(horizontal: false, vertical: true)
                 Spacer(minLength: 0)
             }
             .foregroundStyle(.tertiary)
@@ -203,8 +213,6 @@ struct GalleryTabView: View {
                     .font(.system(.caption, design: .rounded, weight: .semibold))
                     .foregroundStyle(.secondary)
 
-                sortButton
-
                 addMenu {
                     Image(systemName: "plus")
                         .font(.system(size: 14, weight: .heavy))
@@ -217,42 +225,38 @@ struct GalleryTabView: View {
         }
     }
 
-    /// One tap flips the gallery between newest-first and oldest-first.
-    private var sortButton: some View {
-        let order = settings.gallerySortOrder
-        let isOldest = order == .oldestFirst
+    /// Sticky date divider: "Oggi · 4 ricordi".
+    private func dayHeader(_ section: GalleryDaySection) -> some View {
+        HStack(spacing: 7) {
+            Text(dayTitle(section.id))
+                .font(.system(.caption, design: .rounded, weight: .heavy))
+                .foregroundStyle(.primary)
 
-        return Button {
-            withAnimation(reduceMotion ? nil : .smooth(duration: 0.32)) {
-                settings.gallerySortOrder = isOldest ? .newestFirst : .oldestFirst
-            }
-        } label: {
-            Image(systemName: "arrow.up.arrow.down")
-                .font(.system(size: 12, weight: .heavy))
-                .foregroundStyle(isOldest ? Color.white : Palette.violet)
-                .rotationEffect(.degrees(isOldest ? 180 : 0))
-                .frame(width: 32, height: 32)
-                .background(
-                    Circle().fill(isOldest ? AnyShapeStyle(Palette.violet) : AnyShapeStyle(Palette.violet.opacity(0.14)))
-                )
+            Text(String(format: strings.galleryCountFormat, section.count))
+                .font(.system(.caption2, design: .rounded, weight: .semibold))
+                .foregroundStyle(.secondary)
+
+            Spacer(minLength: 0)
         }
-        .buttonStyle(PressableCardStyle())
-        .accessibilityLabel("\(strings.gallerySortLabel): \(order.title(strings))")
-        .sensoryFeedback(.selection, trigger: order)
-        .contextMenu {
-            Picker(strings.gallerySortLabel, selection: sortBinding) {
-                ForEach(GallerySortOrder.allCases) { candidate in
-                    Label(candidate.title(strings), systemImage: candidate.symbolName).tag(candidate)
-                }
-            }
-        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 6)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            Capsule().fill(.ultraThinMaterial)
+        )
+        .padding(.top, 8)
+        .padding(.bottom, 4)
+        .gridCellColumns(Self.columns.count)
+        .accessibilityAddTraits(.isHeader)
     }
 
-    private var sortBinding: Binding<GallerySortOrder> {
-        Binding(
-            get: { settings.gallerySortOrder },
-            set: { settings.gallerySortOrder = $0 }
-        )
+    /// "Oggi", "Ieri", then the full weekday and date.
+    private func dayTitle(_ date: Date) -> String {
+        let calendar = Calendar.current
+        if calendar.isDateInToday(date) { return strings.todayLabel }
+        if calendar.isDateInYesterday(date) { return strings.yesterdayLabel }
+        let full = settings.weekdayDayMonth(date)
+        return full.prefix(1).uppercased() + full.dropFirst()
     }
 
     private var addButton: some View {
@@ -566,19 +570,29 @@ struct GalleryTabView: View {
     }
 
     /// Loads what the picker returned, then asks for captions.
+    ///
+    /// The library also tells us when each asset was shot, which is what the
+    /// timeline is built on — an import of last month's photos slots into last
+    /// month instead of jumping to the top.
     private func load(_ selection: [PhotosPickerItem]) {
         picked = []
         isPreparingDrafts = true
 
         Task {
-            var media: [PickedMedia] = []
+            let identifiers = selection.compactMap(\.itemIdentifier)
+            let captureDates = await Task.detached(priority: .userInitiated) {
+                PhotoLibraryDates.captureDates(for: identifiers)
+            }.value
+
+            var media: [PickedMediaEntry] = []
             for entry in selection {
+                let capturedAt = entry.itemIdentifier.flatMap { captureDates[$0] }
                 if entry.supportedContentTypes.contains(where: { $0.conforms(to: .movie) }) {
                     if let movie = try? await entry.loadTransferable(type: PickedMovie.self) {
-                        media.append(.video(movie.url))
+                        media.append(PickedMediaEntry(media: .video(movie.url), capturedAt: capturedAt))
                     }
                 } else if let data = try? await entry.loadTransferable(type: Data.self) {
-                    media.append(.photo(data))
+                    media.append(PickedMediaEntry(media: .photo(data), capturedAt: capturedAt))
                 }
             }
             prepareDrafts(media)
@@ -586,7 +600,7 @@ struct GalleryTabView: View {
     }
 
     /// Builds the caption sheet: every memory with a small preview beside its field.
-    private func prepareDrafts(_ media: [PickedMedia]) {
+    private func prepareDrafts(_ media: [PickedMediaEntry]) {
         guard !media.isEmpty else {
             isPreparingDrafts = false
             return
@@ -596,8 +610,14 @@ struct GalleryTabView: View {
         Task {
             var uploads: [PendingUpload] = []
             for entry in media {
-                let preview = await GalleryMediaPreparer.previewThumbnail(for: entry)
-                uploads.append(PendingUpload(media: entry, previewData: preview))
+                let preview = await GalleryMediaPreparer.previewThumbnail(for: entry.media)
+                uploads.append(
+                    PendingUpload(
+                        media: entry.media,
+                        previewData: preview,
+                        capturedAt: entry.capturedAt
+                    )
+                )
             }
             isPreparingDrafts = false
             draft = UploadDraft(uploads: uploads)

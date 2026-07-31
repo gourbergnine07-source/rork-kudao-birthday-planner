@@ -36,6 +36,13 @@ nonisolated enum ReminderKind: String, Sendable, CaseIterable {
     case message
     /// The morning after the party: time to upload the photos and videos.
     case gallery
+    /// The recurring invitation to write something in a diary.
+    case diary
+
+    /// Kinds that belong to a single profile and are cancelled with it.
+    static var profileBound: [ReminderKind] {
+        allCases.filter { $0 != .diary }
+    }
 }
 
 /// Schedules the local birthday and gift reminders and routes notification taps.
@@ -63,6 +70,8 @@ final class NotificationService {
     var pendingMessageProfileID: UUID?
     /// Set when the user taps an upload-your-memories reminder: the gallery tab opens.
     var pendingGalleryProfileID: UUID?
+    /// Set when the user taps a diary invitation: the quick-note screen opens.
+    var pendingDiaryProfileID: UUID?
 
     private init() {}
 
@@ -98,14 +107,18 @@ final class NotificationService {
     }
 
     /// Rebuilds the full set of pending reminders for the given profiles.
+    ///
+    /// The diary invitations are rebuilt in the same pass: they share the Kudao
+    /// prefix, so leaving them out would make this sweep delete them.
     func sync(
         profiles: [BirthdayProfile],
         strings: Strings,
-        privacy: ReminderPrivacy = .revealing
+        privacy: ReminderPrivacy = .revealing,
+        diary: DiaryNudgePlan
     ) async {
         let reminders = profiles.flatMap {
             Self.reminders(for: $0, strings: strings, privacy: privacy)
-        }
+        } + Self.diaryReminders(plan: diary, strings: strings)
 
         guard await requestAuthorization() else {
             center.removeAllPendingNotificationRequests()
@@ -148,6 +161,26 @@ final class NotificationService {
         }
     }
 
+    /// Rebuilds only the diary invitations, leaving the occasion reminders alone.
+    func syncDiaryReminders(plan: DiaryNudgePlan, strings: Strings) async {
+        let reminders = Self.diaryReminders(plan: plan, strings: strings)
+        let wanted = Set(reminders.map(\.id))
+        let pending = await center.pendingNotificationRequests()
+        let stale = pending
+            .map(\.identifier)
+            .filter { $0.hasPrefix(Self.diaryPrefix) && !wanted.contains($0) }
+
+        if !stale.isEmpty {
+            center.removePendingNotificationRequests(withIdentifiers: stale)
+        }
+
+        guard !reminders.isEmpty, await requestAuthorization() else { return }
+
+        for reminder in reminders {
+            await schedule(reminder)
+        }
+    }
+
     /// Drops every reminder belonging to a profile, used when it gets deleted.
     func cancelReminders(for profileID: UUID) {
         center.removePendingNotificationRequests(withIdentifiers: Self.identifiers(for: profileID))
@@ -168,6 +201,10 @@ final class NotificationService {
 
     func consumePendingGallery() {
         pendingGalleryProfileID = nil
+    }
+
+    func consumePendingDiary() {
+        pendingDiaryProfileID = nil
     }
 
     // MARK: - Scheduling
@@ -203,7 +240,64 @@ final class NotificationService {
 
     /// Every request identifier Kudao may own for a profile.
     private static func identifiers(for profileID: UUID) -> [String] {
-        ReminderKind.allCases.map { identifier(kind: $0, profileID: profileID) }
+        ReminderKind.profileBound.map { identifier(kind: $0, profileID: profileID) }
+    }
+
+    // MARK: - Diary invitations
+
+    /// Namespace of the recurring diary invitations, which belong to no single profile.
+    private static let diaryPrefix = prefix + "diary.slot."
+
+    /// The next few invitations to write something down.
+    ///
+    /// Each slot picks its own wording so the notification never reads like a
+    /// loop, and roughly every other one names a profile — unless the only
+    /// candidates are surprises, whose names stay off the lock screen.
+    static func diaryReminders(plan: DiaryNudgePlan, strings: Strings) -> [ScheduledReminder] {
+        let dates = plan.upcomingDates()
+        guard !dates.isEmpty else { return [] }
+
+        let generic = [
+            strings.diaryNudgeVariantOne,
+            strings.diaryNudgeVariantTwo,
+            strings.diaryNudgeVariantThree,
+        ]
+        let personal = [
+            strings.diaryNudgePersonFormatOne,
+            strings.diaryNudgePersonFormatTwo,
+        ]
+        let namable = plan.namablePeople
+        var lastBody = ""
+        var result: [ScheduledReminder] = []
+
+        for (index, date) in dates.enumerated() {
+            // A named line every other slot keeps the nudge personal without
+            // turning into a nag about the same person.
+            let wantsName = !namable.isEmpty && (index % 2 == 1 || namable.count == 1)
+            let person = wantsName ? namable.randomElement() : nil
+
+            var body = person.map { String(format: personal.randomElement() ?? personal[0], $0.name) }
+                ?? (generic.randomElement() ?? generic[0])
+            if body == lastBody, let alternative = generic.first(where: { $0 != lastBody }) {
+                body = alternative
+            }
+            lastBody = body
+
+            guard let target = person?.id ?? plan.people.first?.id else { continue }
+
+            result.append(
+                ScheduledReminder(
+                    id: "\(diaryPrefix)\(index)",
+                    title: strings.diaryNudgeTitle,
+                    body: body,
+                    fireDate: date,
+                    profileID: target,
+                    kind: .diary
+                )
+            )
+        }
+
+        return result
     }
 
     /// Builds the reminders a profile currently deserves.
@@ -342,6 +436,8 @@ final class NotificationRouter: NSObject, UNUserNotificationCenterDelegate {
                 NotificationService.shared.pendingMessageProfileID = profileID
             case .gallery:
                 NotificationService.shared.pendingGalleryProfileID = profileID
+            case .diary:
+                NotificationService.shared.pendingDiaryProfileID = profileID
             case .birthday, .gift:
                 NotificationService.shared.pendingReviewProfileID = profileID
             }

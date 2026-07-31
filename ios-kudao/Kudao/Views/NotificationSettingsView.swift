@@ -34,6 +34,7 @@ struct NotificationSettingsView: View {
                     VStack(spacing: 18) {
                         permissionCard
                         timeCard
+                        diaryCard
 
                         ForEach(OccasionKind.allCases) { occasion in
                             occasionCard(occasion)
@@ -166,6 +167,137 @@ struct NotificationSettingsView: View {
                 .font(.system(.caption2, design: .rounded))
                 .foregroundStyle(.tertiary)
                 .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+
+    // MARK: - Diary invitations
+
+    /// The recurring nudge to keep the profiles fed between one date and the next.
+    private var diaryCard: some View {
+        @Bindable var bindable = settings
+
+        return NotificationCard(
+            title: strings.diaryReminderSectionTitle,
+            systemImage: "book.closed.fill",
+            tint: Palette.amber
+        ) {
+            Toggle(isOn: $bindable.wantsDiaryReminders) {
+                Text(strings.diaryReminderToggleTitle)
+                    .font(.system(.body, design: .rounded, weight: .semibold))
+            }
+            .tint(Palette.amber)
+
+            Text(strings.diaryReminderCaption)
+                .font(.system(.footnote, design: .rounded))
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+
+            if settings.wantsDiaryReminders {
+                Divider().overlay(Palette.hairline)
+
+                VStack(alignment: .leading, spacing: 9) {
+                    Text(strings.diaryFrequencyLabel)
+                        .font(.system(.caption, design: .rounded, weight: .semibold))
+                        .foregroundStyle(.secondary)
+
+                    LazyVGrid(
+                        columns: [GridItem(.flexible(), spacing: 8), GridItem(.flexible(), spacing: 8)],
+                        spacing: 8
+                    ) {
+                        ForEach(DiaryReminderCadence.allCases) { cadence in
+                            cadenceChip(cadence)
+                        }
+                    }
+                }
+
+                if settings.diaryReminderCadence.isActive {
+                    Divider().overlay(Palette.hairline)
+
+                    HStack(spacing: 10) {
+                        Image(systemName: "clock.fill")
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundStyle(Palette.amber)
+                            .frame(width: 22)
+
+                        Text(strings.diaryReminderTimeLabel)
+                            .font(.system(.body, design: .rounded, weight: .semibold))
+
+                        Spacer(minLength: 0)
+
+                        DatePicker(
+                            strings.diaryReminderTimeLabel,
+                            selection: $bindable.diaryReminderTime,
+                            displayedComponents: .hourAndMinute
+                        )
+                        .labelsHidden()
+                        .tint(Palette.amber)
+                    }
+
+                    diarySummary
+                }
+            }
+
+            Label(strings.diaryReminderRemembranceNote, systemImage: "leaf.fill")
+                .font(.system(.caption2, design: .rounded))
+                .foregroundStyle(.tertiary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .animation(.smooth(duration: 0.25), value: settings.wantsDiaryReminders)
+        .animation(.smooth(duration: 0.25), value: settings.diaryReminderCadence)
+    }
+
+    private func cadenceChip(_ cadence: DiaryReminderCadence) -> some View {
+        let isActive = settings.diaryReminderCadence == cadence
+
+        return Button {
+            settings.diaryReminderCadence = cadence
+        } label: {
+            HStack(spacing: 6) {
+                Image(systemName: cadence.symbolName)
+                    .font(.system(size: 11, weight: .bold))
+                Text(cadence.title(strings))
+                    .font(.system(.caption, design: .rounded, weight: .bold))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+            }
+            .foregroundStyle(isActive ? .white : .secondary)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 10)
+            .background(
+                Capsule().fill(isActive ? AnyShapeStyle(Palette.amber) : AnyShapeStyle(Palette.surfaceRaised))
+            )
+        }
+        .buttonStyle(PressableCardStyle())
+        .accessibilityAddTraits(isActive ? [.isSelected] : [])
+        .sensoryFeedback(.selection, trigger: settings.diaryReminderCadence)
+    }
+
+    /// When the next invitation lands and how many profiles it can talk about.
+    @ViewBuilder
+    private var diarySummary: some View {
+        let plan = DiaryNudgePlan.make(settings: settings, profiles: profiles)
+        let eligible = profiles.filter(\.wantsDiaryNudges).count
+
+        VStack(alignment: .leading, spacing: 6) {
+            if let next = plan.upcomingDates(limit: 1).first {
+                Label(
+                    String(
+                        format: strings.diaryReminderNextFormat,
+                        "\(settings.weekdayDayMonth(next)), \(settings.diaryReminderTimeLabel)"
+                    ),
+                    systemImage: "clock.badge.checkmark"
+                )
+                .font(.system(.caption, design: .rounded, weight: .medium))
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+            }
+
+            Label(
+                String(format: strings.diaryReminderPeopleFormat, eligible),
+                systemImage: "person.2.fill"
+            )
+            .font(.system(.caption, design: .rounded, weight: .semibold))
+            .foregroundStyle(.tertiary)
         }
     }
 
@@ -326,9 +458,10 @@ struct NotificationSettingsView: View {
         let all = profiles
         let strings = self.strings
         let privacy = ReminderPrivacy(hidesSurprisePreviews: settings.hidesSurpriseNotificationPreviews)
+        let diary = DiaryNudgePlan.make(settings: settings, profiles: profiles)
 
         Task {
-            await notifications.sync(profiles: all, strings: strings, privacy: privacy)
+            await notifications.sync(profiles: all, strings: strings, privacy: privacy, diary: diary)
         }
     }
 }

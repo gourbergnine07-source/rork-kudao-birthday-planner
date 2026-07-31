@@ -345,7 +345,8 @@ struct CloudBackupView: View {
     /// Restored profiles need their reminders and the widget rebuilt.
     private func refreshDerivedState() async {
         let privacy = ReminderPrivacy(hidesSurprisePreviews: settings.hidesSurpriseNotificationPreviews)
-        await notifications.sync(profiles: profiles, strings: strings, privacy: privacy)
+        let diary = DiaryNudgePlan.make(settings: settings, profiles: profiles)
+        await notifications.sync(profiles: profiles, strings: strings, privacy: privacy, diary: diary)
         WidgetBridge.publish(profiles: profiles, settings: settings)
     }
 

@@ -15,6 +15,9 @@ struct ProfileSettingsView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
 
+    /// Every profile, needed to rebuild the shared diary invitations.
+    @Query private var allProfiles: [BirthdayProfile]
+
     @State private var exportingFormat: DiaryExportFormat?
     @State private var exportedFile: ExportedFile?
     @State private var exportFailed: Bool = false
@@ -28,6 +31,7 @@ struct ProfileSettingsView: View {
             String(profile.reminderDaysBefore),
             profile.isGiftReminderEnabled ? "1" : "0",
             String(profile.giftReminderDaysBefore),
+            profile.isDiaryNudgeExcluded ? "1" : "0",
         ].joined(separator: "|")
     }
 
@@ -44,6 +48,7 @@ struct ProfileSettingsView: View {
 
                         birthdayReminderCard
                         giftReminderCard
+                        diaryNudgeCard
                         exportCard
                     }
                     .padding(.horizontal, 20)
@@ -159,6 +164,44 @@ struct ProfileSettingsView: View {
             }
         }
         .opacity(profile.isReminderEnabled ? 1 : 0.55)
+    }
+
+    /// Opt this one profile out of the recurring "write something down" invitations.
+    @ViewBuilder
+    private var diaryNudgeCard: some View {
+        @Bindable var bindable = profile
+
+        SettingsCard(
+            title: strings.diaryReminderSectionTitle,
+            systemImage: "book.closed.fill",
+            tint: Palette.amber
+        ) {
+            if profile.occasion == .remembrance {
+                Label(strings.diaryReminderRemembranceNote, systemImage: "leaf.fill")
+                    .font(.system(.footnote, design: .rounded))
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            } else {
+                Toggle(isOn: $bindable.isDiaryNudgeExcluded) {
+                    Text(strings.diaryReminderExcludeTitle)
+                        .font(.system(.body, design: .rounded, weight: .semibold))
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .tint(Palette.amber)
+
+                Text(strings.diaryReminderExcludeCaption)
+                    .font(.system(.footnote, design: .rounded))
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                if !settings.wantsDiaryReminders || !settings.diaryReminderCadence.isActive {
+                    Label(strings.diaryReminderOffNote, systemImage: "bell.slash.fill")
+                        .font(.system(.caption2, design: .rounded, weight: .medium))
+                        .foregroundStyle(.tertiary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+        }
     }
 
     @ViewBuilder
@@ -307,8 +350,11 @@ struct ProfileSettingsView: View {
         try? modelContext.save()
         let strings = self.strings
         let privacy = ReminderPrivacy(hidesSurprisePreviews: settings.hidesSurpriseNotificationPreviews)
+        let diary = DiaryNudgePlan.make(settings: settings, profiles: allProfiles)
+
         Task {
             await notifications.sync(profile: profile, strings: strings, privacy: privacy)
+            await notifications.syncDiaryReminders(plan: diary, strings: strings)
         }
     }
 }

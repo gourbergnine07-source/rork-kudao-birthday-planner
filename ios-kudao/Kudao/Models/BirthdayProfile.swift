@@ -56,6 +56,8 @@ final class BirthdayProfile {
     /// Optional earlier notification dedicated to buying the gift.
     var isGiftReminderEnabled: Bool = true
     var giftReminderDaysBefore: Int = 10
+    /// Keeps this profile out of the recurring "write something down" invitations.
+    var isDiaryNudgeExcluded: Bool = false
 
     @Relationship(deleteRule: .cascade, inverse: \DiaryEntry.profile)
     var diaryEntries: [DiaryEntry] = []
@@ -228,6 +230,16 @@ final class BirthdayProfile {
 
     /// Only the original owner edits the profile data, the plan and the reminders.
     var isOwnedByMe: Bool { !isSharedMirror }
+
+    /// True when this profile may appear in the recurring diary invitations.
+    ///
+    /// Remembrances never do: a periodic prompt to write about somebody who is
+    /// gone would be the wrong tone. Read-only guests are left out too, since
+    /// they cannot add a note anyway.
+    var wantsDiaryNudges: Bool {
+        guard !isDiaryNudgeExcluded, occasion != .remembrance else { return false }
+        return canContribute
+    }
 
     /// True when at least one contact field is filled in.
     var hasContactDetails: Bool {

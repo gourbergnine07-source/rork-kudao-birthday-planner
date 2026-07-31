@@ -12,7 +12,10 @@ final class AppSettings {
     private static let languageKey = "kudao.language"
     private static let biometricLockKey = "kudao.surprise.biometricLock"
     private static let hidePreviewsKey = "kudao.surprise.hideNotificationPreviews"
-    private static let gallerySortKey = "kudao.gallery.sortOrder"
+    private static let diaryRemindersKey = "kudao.diary.remindersEnabled"
+    private static let diaryCadenceKey = "kudao.diary.cadence"
+    private static let diaryHourKey = "kudao.diary.hour"
+    private static let diaryMinuteKey = "kudao.diary.minute"
 
     var language: AppLanguage {
         didSet {
@@ -39,12 +42,52 @@ final class AppSettings {
         }
     }
 
-    /// Chronological order of every party gallery, remembered between launches.
-    var gallerySortOrder: GallerySortOrder {
+    // MARK: - Diary nudges
+
+    /// Gentle invitations to write something down between one occasion and the next.
+    var wantsDiaryReminders: Bool {
         didSet {
-            guard gallerySortOrder != oldValue else { return }
-            UserDefaults.standard.set(gallerySortOrder.rawValue, forKey: Self.gallerySortKey)
+            guard wantsDiaryReminders != oldValue else { return }
+            UserDefaults.standard.set(wantsDiaryReminders, forKey: Self.diaryRemindersKey)
         }
+    }
+
+    /// How often those invitations arrive.
+    var diaryReminderCadence: DiaryReminderCadence {
+        didSet {
+            guard diaryReminderCadence != oldValue else { return }
+            UserDefaults.standard.set(diaryReminderCadence.rawValue, forKey: Self.diaryCadenceKey)
+        }
+    }
+
+    /// Time of day the diary invitation arrives, local time. Defaults to 20:00.
+    var diaryReminderTime: Date {
+        didSet {
+            let parts = Calendar.current.dateComponents([.hour, .minute], from: diaryReminderTime)
+            let hour = parts.hour ?? DiaryReminderCadence.defaultHour
+            let minute = parts.minute ?? 0
+            guard hour != Calendar.current.component(.hour, from: oldValue)
+                || minute != Calendar.current.component(.minute, from: oldValue) else { return }
+            UserDefaults.standard.set(hour, forKey: Self.diaryHourKey)
+            UserDefaults.standard.set(minute, forKey: Self.diaryMinuteKey)
+        }
+    }
+
+    var diaryReminderHour: Int {
+        Calendar.current.component(.hour, from: diaryReminderTime)
+    }
+
+    var diaryReminderMinute: Int {
+        Calendar.current.component(.minute, from: diaryReminderTime)
+    }
+
+    /// "20:00" style label of the diary invitation time.
+    var diaryReminderTimeLabel: String {
+        diaryReminderTime.formatted(
+            Date.FormatStyle(locale: locale)
+                .hour(.defaultDigits(amPM: .abbreviated))
+                .minute(.twoDigits)
+        )
     }
 
     /// Lead time of the main reminder, one value per category of occasion.
@@ -79,7 +122,16 @@ final class AppSettings {
             language = AppLanguage.detectedFromDevice()
         }
 
-        gallerySortOrder = GallerySortOrder.parse(defaults.string(forKey: Self.gallerySortKey))
+        // Diary nudges are on out of the box: the app is only useful if it is fed.
+        wantsDiaryReminders = defaults.object(forKey: Self.diaryRemindersKey) as? Bool ?? true
+        diaryReminderCadence = DiaryReminderCadence.parse(defaults.string(forKey: Self.diaryCadenceKey))
+        diaryReminderTime = Calendar.current.date(
+            bySettingHour: defaults.object(forKey: Self.diaryHourKey) as? Int ?? DiaryReminderCadence.defaultHour,
+            minute: defaults.object(forKey: Self.diaryMinuteKey) as? Int ?? 0,
+            second: 0,
+            of: Date()
+        ) ?? Date()
+
         reminderDaysByOccasion = Dictionary(
             uniqueKeysWithValues: OccasionKind.allCases.map {
                 ($0.rawValue, ReminderDefaults.daysBefore(for: $0))

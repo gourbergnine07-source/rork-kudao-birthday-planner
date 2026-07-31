@@ -125,6 +125,7 @@ final class GalleryService {
                 try await store(
                     prepared,
                     caption: source.cleanCaption,
+                    capturedAt: source.capturedAt,
                     profile: profile,
                     identity: identity,
                     strings: strings,
@@ -158,13 +159,15 @@ final class GalleryService {
     private func store(
         _ prepared: PreparedMedia,
         caption: String,
+        capturedAt: Date? = nil,
         profile: BirthdayProfile,
         identity: KudaoIdentity,
         strings: Strings,
         context: ModelContext
     ) async throws {
         let remoteID = UUID().uuidString
-        let createdAt = Date()
+        // A memory belongs to the moment it was taken, not to the moment it was imported.
+        let createdAt = min(capturedAt ?? Date(), Date())
 
         let item = GalleryItem(
             remoteID: remoteID,

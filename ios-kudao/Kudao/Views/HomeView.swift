@@ -99,6 +99,11 @@ enum OccasionFilter: Hashable, Identifiable {
     }
 }
 
+/// Profile a diary invitation pointed at, wrapped so a sheet can key off it.
+struct QuickNoteTarget: Identifiable {
+    let id: UUID
+}
+
 /// Root screen: the countdown list of saved celebrations.
 struct HomeView: View {
     @Environment(AppSettings.self) private var settings
@@ -121,6 +126,8 @@ struct HomeView: View {
     @State private var messageProfileID: UUID?
     /// Profile that must open straight on the gallery after the party reminder.
     @State private var galleryProfileID: UUID?
+    /// Profile named by a diary invitation, opened straight in the quick composer.
+    @State private var quickNoteTarget: QuickNoteTarget?
     @State private var isShowingSettings: Bool = false
     @State private var isShowingMyProfile: Bool = false
     @State private var isJoiningShare: Bool = false
@@ -235,6 +242,9 @@ struct HomeView: View {
             .sheet(isPresented: $isJoiningShare) {
                 JoinShareView()
             }
+            .sheet(item: $quickNoteTarget) { target in
+                DiaryQuickNoteView(suggestedProfileID: target.id)
+            }
             .alert(strings.unlockFailedTitle, isPresented: $unlockFailed) {
                 Button(strings.doneAction, role: .cancel) {}
             } message: {
@@ -269,10 +279,17 @@ struct HomeView: View {
         .onChange(of: notifications.pendingGalleryProfileID) { _, pending in
             handleGalleryTap(pending)
         }
+        .onChange(of: notifications.pendingDiaryProfileID) { _, pending in
+            handleDiaryTap(pending)
+        }
+        .onChange(of: diarySignature) { _, _ in
+            Task { await syncDiaryReminders() }
+        }
         .onAppear {
             handleReminderTap(notifications.pendingReviewProfileID)
             handleMessageTap(notifications.pendingMessageProfileID)
             handleGalleryTap(notifications.pendingGalleryProfileID)
+            handleDiaryTap(notifications.pendingDiaryProfileID)
         }
     }
 
@@ -283,9 +300,29 @@ struct HomeView: View {
         await notifications.sync(
             profiles: profiles,
             strings: strings,
-            privacy: ReminderPrivacy(hidesSurprisePreviews: settings.hidesSurpriseNotificationPreviews)
+            privacy: ReminderPrivacy(hidesSurprisePreviews: settings.hidesSurpriseNotificationPreviews),
+            diary: DiaryNudgePlan.make(settings: settings, profiles: profiles)
         )
         WidgetBridge.publish(profiles: profiles, settings: settings)
+    }
+
+    /// Reschedules only the diary invitations after a preference changes.
+    private func syncDiaryReminders() async {
+        await notifications.syncDiaryReminders(
+            plan: DiaryNudgePlan.make(settings: settings, profiles: profiles),
+            strings: strings
+        )
+    }
+
+    /// Everything that changes when, or whether, a diary invitation should fire.
+    private var diarySignature: String {
+        [
+            settings.wantsDiaryReminders ? "1" : "0",
+            settings.diaryReminderCadence.rawValue,
+            String(settings.diaryReminderHour),
+            String(settings.diaryReminderMinute),
+            String(profiles.filter(\.wantsDiaryNudges).count),
+        ].joined(separator: "|")
     }
 
     /// Changes that must be mirrored into the scheduled notifications and the widget.
@@ -328,6 +365,20 @@ struct HomeView: View {
             galleryProfileID = match.id
             path = [match]
         }
+    }
+
+    /// A tapped diary invitation opens the quick composer, skipping the home list.
+    private func handleDiaryTap(_ pending: UUID?) {
+        guard let pending else { return }
+        notifications.consumePendingDiary()
+
+        guard let match = profiles.first(where: { $0.id == pending }) else {
+            quickNoteTarget = QuickNoteTarget(id: pending)
+            return
+        }
+
+        path = []
+        open(match) { quickNoteTarget = QuickNoteTarget(id: match.id) }
     }
 
     private func openSuggestions(for profile: BirthdayProfile) {
