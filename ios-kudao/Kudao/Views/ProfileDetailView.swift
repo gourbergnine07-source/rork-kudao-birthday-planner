@@ -1,0 +1,368 @@
+//
+//  ProfileDetailView.swift
+//  Kudao
+//
+
+import SwiftUI
+import SwiftData
+
+/// Full profile screen: header with countdown, diary and suggestions tabs.
+struct ProfileDetailView: View {
+    let profile: BirthdayProfile
+
+    @Environment(AppSettings.self) private var settings
+    @Environment(\.modelContext) private var modelContext
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    @State private var selectedTab: ProfileTab = .diary
+    @State private var isEditing: Bool = false
+    @State private var isConfirmingDelete: Bool = false
+    @State private var pendingDeletion: Bool = false
+    @Namespace private var tabNamespace
+
+    private var strings: Strings { settings.strings }
+    private var countdown: BirthdayCountdown { profile.countdown }
+
+    enum ProfileTab: String, CaseIterable, Identifiable {
+        case diary
+        case suggestions
+
+        var id: String { rawValue }
+
+        var symbolName: String {
+            switch self {
+            case .diary: "book.closed.fill"
+            case .suggestions: "sparkles"
+            }
+        }
+
+        func title(_ strings: Strings) -> String {
+            switch self {
+            case .diary: strings.diaryTab
+            case .suggestions: strings.suggestionsTab
+            }
+        }
+    }
+
+    var body: some View {
+        ZStack {
+            WarmBackdrop()
+
+            ScrollView {
+                VStack(spacing: 20) {
+                    header
+                    statsRow
+                    tabSelector
+                    tabContent
+                        .padding(.bottom, 32)
+                }
+                .padding(.horizontal, 20)
+            }
+            .scrollIndicators(.hidden)
+        }
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                Text(profile.name)
+                    .font(.system(.headline, design: .rounded, weight: .semibold))
+            }
+            ToolbarItem(placement: .topBarTrailing) {
+                Menu {
+                    Button {
+                        isEditing = true
+                    } label: {
+                        Label(strings.editData, systemImage: "pencil")
+                    }
+                    Button(role: .destructive) {
+                        isConfirmingDelete = true
+                    } label: {
+                        Label(strings.deleteProfile, systemImage: "trash")
+                    }
+                } label: {
+                    Image(systemName: "gearshape.fill")
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(Palette.coral)
+                }
+                .accessibilityLabel(strings.profileSettings)
+            }
+        }
+        .sheet(isPresented: $isEditing) {
+            ProfileFormView(profile: profile)
+        }
+        .alert(strings.deleteConfirmTitle, isPresented: $isConfirmingDelete) {
+            Button(strings.cancelAction, role: .cancel) {}
+            Button(strings.deleteAction, role: .destructive) {
+                pendingDeletion = true
+                dismiss()
+            }
+        } message: {
+            Text(String(format: strings.deleteConfirmMessageFormat, profile.name))
+        }
+        .onDisappear {
+            guard pendingDeletion else { return }
+            modelContext.delete(profile)
+        }
+        .environment(\.locale, settings.locale)
+        .tint(Palette.coral)
+    }
+
+    // MARK: - Header
+
+    private var header: some View {
+        ZStack(alignment: .bottomLeading) {
+            RoundedRectangle(cornerRadius: 30, style: .continuous)
+                .fill(Palette.warmGradient)
+
+            if let photoData = profile.photoData, let image = UIImage(data: photoData) {
+                Image(uiImage: image)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .allowsHitTesting(false)
+                    .clipShape(.rect(cornerRadius: 30, style: .continuous))
+                    .overlay {
+                        LinearGradient(
+                            colors: [.clear, .black.opacity(0.25), .black.opacity(0.75)],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                        .clipShape(.rect(cornerRadius: 30, style: .continuous))
+                    }
+            }
+
+            if countdown.isToday {
+                ConfettiView()
+                    .clipShape(.rect(cornerRadius: 30, style: .continuous))
+            }
+
+            VStack(alignment: .leading, spacing: 12) {
+                Spacer(minLength: 0)
+
+                if profile.photoData == nil {
+                    AvatarView(
+                        name: profile.name,
+                        photoData: nil,
+                        size: 66,
+                        ringColor: .white.opacity(0.5),
+                        ringWidth: 2
+                    )
+                }
+
+                Text(profile.name)
+                    .font(.system(size: 30, weight: .heavy, design: .rounded))
+                    .foregroundStyle(.white)
+                    .lineLimit(2)
+
+                HStack(spacing: 6) {
+                    KudaoChip(
+                        title: profile.relationship.title(strings),
+                        systemImage: profile.relationship.symbolName,
+                        onDark: true
+                    )
+                    if profile.isSurpriseMode {
+                        KudaoChip(title: strings.surpriseBadge, systemImage: "eye.slash.fill", onDark: true)
+                    }
+                }
+
+                countdownBanner
+            }
+            .padding(20)
+        }
+        .frame(height: 300)
+        .clipShape(.rect(cornerRadius: 30, style: .continuous))
+        .shadow(color: Palette.coral.opacity(0.28), radius: 20, y: 12)
+    }
+
+    private var countdownBanner: some View {
+        HStack(spacing: 10) {
+            Image(systemName: countdown.isToday ? "party.popper.fill" : "hourglass")
+                .font(.system(size: 15, weight: .bold))
+                .symbolEffect(.bounce, options: reduceMotion ? .nonRepeating : .repeat(.periodic(delay: 2.5)))
+
+            if countdown.isToday {
+                Text(strings.todayTitle)
+                    .font(.system(.headline, design: .rounded, weight: .bold))
+            } else if countdown.isTomorrow {
+                Text(strings.tomorrowLabel)
+                    .font(.system(.headline, design: .rounded, weight: .bold))
+            } else {
+                HStack(alignment: .firstTextBaseline, spacing: 5) {
+                    Text("\(countdown.daysRemaining)")
+                        .font(.system(size: 24, weight: .heavy, design: .rounded))
+                        .contentTransition(.numericText())
+                    Text("\(countdown.daysRemaining == 1 ? strings.dayUnit : strings.daysUnit) \(strings.daysToGo)")
+                        .font(.system(.subheadline, design: .rounded, weight: .semibold))
+                }
+            }
+        }
+        .foregroundStyle(.white)
+        .padding(.horizontal, 14)
+        .padding(.vertical, 10)
+        .background(Capsule().fill(.ultraThinMaterial.opacity(0.85)))
+        .overlay(Capsule().strokeBorder(.white.opacity(0.3), lineWidth: 1))
+    }
+
+    private var statsRow: some View {
+        HStack(spacing: 12) {
+            StatTile(
+                icon: "calendar",
+                caption: strings.nextBirthdayLabel,
+                value: settings.dayMonth(countdown.nextDate),
+                tint: Palette.coral
+            )
+            StatTile(
+                icon: "birthday.cake.fill",
+                caption: settings.dayMonthYear(profile.birthDate),
+                value: String(format: strings.ageNowFormat, countdown.turningAge),
+                tint: Palette.berry
+            )
+        }
+    }
+
+    // MARK: - Tabs
+
+    private var tabSelector: some View {
+        HStack(spacing: 6) {
+            ForEach(ProfileTab.allCases) { tab in
+                let isSelected = tab == selectedTab
+                Button {
+                    withAnimation(reduceMotion ? nil : .spring(response: 0.35, dampingFraction: 0.8)) {
+                        selectedTab = tab
+                    }
+                } label: {
+                    HStack(spacing: 6) {
+                        Image(systemName: tab.symbolName)
+                            .font(.system(size: 12, weight: .bold))
+                        Text(tab.title(strings))
+                            .font(.system(.subheadline, design: .rounded, weight: .semibold))
+                    }
+                    .foregroundStyle(isSelected ? .white : .secondary)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 11)
+                    .background {
+                        if isSelected {
+                            Capsule()
+                                .fill(Palette.warmGradient)
+                                .matchedGeometryEffect(id: "tabHighlight", in: tabNamespace)
+                        }
+                    }
+                    .contentShape(Capsule())
+                }
+                .buttonStyle(.plain)
+            }
+        }
+        .padding(5)
+        .background(Capsule().fill(Palette.surface))
+        .overlay(Capsule().strokeBorder(Palette.hairline, lineWidth: 1))
+        .sensoryFeedback(.selection, trigger: selectedTab)
+    }
+
+    @ViewBuilder
+    private var tabContent: some View {
+        switch selectedTab {
+        case .diary:
+            PlaceholderPanel(
+                icon: "book.closed.fill",
+                title: strings.diaryEmptyTitle,
+                message: strings.diaryEmptyMessage,
+                badge: strings.comingSoon,
+                tint: Palette.coral
+            )
+            .transition(.opacity.combined(with: .offset(y: 8)))
+        case .suggestions:
+            PlaceholderPanel(
+                icon: "sparkles",
+                title: strings.suggestionsEmptyTitle,
+                message: strings.suggestionsEmptyMessage,
+                badge: strings.comingSoon,
+                tint: Palette.berry
+            )
+            .transition(.opacity.combined(with: .offset(y: 8)))
+        }
+    }
+}
+
+/// Small metric card shown under the profile header.
+private struct StatTile: View {
+    let icon: String
+    let caption: String
+    let value: String
+    let tint: Color
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Image(systemName: icon)
+                .font(.system(size: 14, weight: .bold))
+                .foregroundStyle(tint)
+            Text(value)
+                .font(.system(.headline, design: .rounded, weight: .bold))
+                .foregroundStyle(.primary)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+            Text(caption)
+                .font(.system(.caption, design: .rounded))
+                .foregroundStyle(.secondary)
+                .lineLimit(2)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(14)
+        .background(
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .fill(Palette.surface)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .strokeBorder(Palette.hairline, lineWidth: 1)
+        )
+    }
+}
+
+/// Empty placeholder for the tabs that arrive in a later step.
+private struct PlaceholderPanel: View {
+    let icon: String
+    let title: String
+    let message: String
+    let badge: String
+    let tint: Color
+
+    var body: some View {
+        VStack(spacing: 14) {
+            ZStack {
+                Circle()
+                    .fill(tint.opacity(0.14))
+                    .frame(width: 72, height: 72)
+                Image(systemName: icon)
+                    .font(.system(size: 28, weight: .medium))
+                    .foregroundStyle(tint)
+            }
+
+            Text(title)
+                .font(.system(.headline, design: .rounded, weight: .bold))
+
+            Text(message)
+                .font(.system(.subheadline, design: .rounded))
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+
+            Text(badge.uppercased())
+                .font(.system(.caption2, design: .rounded, weight: .bold))
+                .tracking(1)
+                .foregroundStyle(tint)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 5)
+                .background(Capsule().fill(tint.opacity(0.12)))
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 36)
+        .padding(.horizontal, 24)
+        .background(
+            RoundedRectangle(cornerRadius: 26, style: .continuous)
+                .fill(Palette.surface)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 26, style: .continuous)
+                .strokeBorder(Palette.hairline, lineWidth: 1)
+        )
+    }
+}

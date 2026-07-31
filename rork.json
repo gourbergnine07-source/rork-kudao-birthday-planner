@@ -1,0 +1,10 @@
+{
+  "apps": [
+    {
+      "name": "Kudao",
+      "path": "ios-kudao",
+      "framework": "swift"
+    }
+  ],
+  "$schema": "https://rork.com/schema/rork.json"
+}
