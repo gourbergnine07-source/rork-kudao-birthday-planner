@@ -6,7 +6,8 @@
 import SwiftUI
 import SwiftData
 
-/// App-wide settings: language, sharing, surprise-mode protections and widget hint.
+/// App-wide settings: notifications, sharing, backup, surprise-mode protections
+/// and widget hint. Language lives in the globe menu on Home.
 struct AppSettingsView: View {
     @Environment(AppSettings.self) private var settings
     @Environment(BiometricGate.self) private var gate
@@ -33,7 +34,6 @@ struct AppSettingsView: View {
                         collaborationCard
                         backupCard
                         surpriseCard
-                        languageCard
                         widgetCard
                     }
                     .padding(.horizontal, 20)
@@ -326,26 +326,6 @@ struct AppSettingsView: View {
             RoundedRectangle(cornerRadius: 16, style: .continuous)
                 .fill(Palette.surfaceRaised)
         )
-    }
-
-    // MARK: - Language
-
-    private var languageCard: some View {
-        @Bindable var bindable = settings
-
-        return AppSettingsCard(
-            title: strings.settingsLanguageSection,
-            systemImage: "globe",
-            tint: Palette.coral
-        ) {
-            Picker(strings.languageLabel, selection: $bindable.language) {
-                ForEach(AppLanguage.allCases) { language in
-                    Text("\(language.flag)  \(language.displayName)").tag(language)
-                }
-            }
-            .pickerStyle(.inline)
-            .labelsHidden()
-        }
     }
 
     // MARK: - Widget
