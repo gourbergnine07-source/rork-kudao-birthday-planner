@@ -6,6 +6,55 @@
 import SwiftUI
 import SwiftData
 
+/// Ways the birthday list can be ordered. Closest birthday is the default.
+enum ProfileSortOrder: String, CaseIterable, Identifiable {
+    case nearestBirthday
+    case name
+    case recentlyAdded
+
+    var id: String { rawValue }
+
+    var symbolName: String {
+        switch self {
+        case .nearestBirthday: "calendar.badge.clock"
+        case .name: "textformat.abc"
+        case .recentlyAdded: "clock.arrow.circlepath"
+        }
+    }
+
+    func title(_ strings: Strings) -> String {
+        switch self {
+        case .nearestBirthday: strings.sortNearest
+        case .name: strings.sortAlphabetical
+        case .recentlyAdded: strings.sortRecentlyAdded
+        }
+    }
+
+    /// Sorts the profiles, always falling back to the name for a stable order.
+    func sorted(_ profiles: [BirthdayProfile]) -> [BirthdayProfile] {
+        switch self {
+        case .nearestBirthday:
+            return profiles.sorted { lhs, rhs in
+                let left = lhs.countdown.daysRemaining
+                let right = rhs.countdown.daysRemaining
+                if left == right {
+                    return lhs.name.localizedStandardCompare(rhs.name) == .orderedAscending
+                }
+                return left < right
+            }
+        case .name:
+            return profiles.sorted { $0.name.localizedStandardCompare($1.name) == .orderedAscending }
+        case .recentlyAdded:
+            return profiles.sorted { lhs, rhs in
+                if lhs.createdAt == rhs.createdAt {
+                    return lhs.name.localizedStandardCompare(rhs.name) == .orderedAscending
+                }
+                return lhs.createdAt > rhs.createdAt
+            }
+        }
+    }
+}
+
 /// Root screen: every celebration profile ordered by how close the birthday is.
 struct HomeView: View {
     @Environment(AppSettings.self) private var settings
@@ -15,6 +64,7 @@ struct HomeView: View {
     @State private var path: [BirthdayProfile] = []
     @State private var appeared: Bool = false
     @State private var searchText: String = ""
+    @State private var sortOrder: ProfileSortOrder = .nearestBirthday
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
@@ -33,14 +83,12 @@ struct HomeView: View {
     }
 
     private var ordered: [BirthdayProfile] {
-        profiles.sorted { lhs, rhs in
-            let left = lhs.countdown
-            let right = rhs.countdown
-            if left.daysRemaining == right.daysRemaining {
-                return lhs.name.localizedStandardCompare(rhs.name) == .orderedAscending
-            }
-            return left.daysRemaining < right.daysRemaining
-        }
+        sortOrder.sorted(profiles)
+    }
+
+    /// The closest birthday always leads the hero card, whatever the list order is.
+    private var nextUp: BirthdayProfile? {
+        ProfileSortOrder.nearestBirthday.sorted(profiles).first
     }
 
     var body: some View {
@@ -91,11 +139,14 @@ struct HomeView: View {
             VStack(alignment: .leading, spacing: 18) {
                 header
 
-                SearchField(
-                    placeholder: strings.searchPlaceholder,
-                    clearLabel: strings.searchClear,
-                    text: $searchText
-                )
+                HStack(spacing: 10) {
+                    SearchField(
+                        placeholder: strings.searchPlaceholder,
+                        clearLabel: strings.searchClear,
+                        text: $searchText
+                    )
+                    sortMenu
+                }
 
                 if isSearching {
                     searchResults
@@ -137,9 +188,33 @@ struct HomeView: View {
         }
     }
 
+    private var sortMenu: some View {
+        Menu {
+            Picker(strings.sortLabel, selection: $sortOrder) {
+                ForEach(ProfileSortOrder.allCases) { order in
+                    Label(order.title(strings), systemImage: order.symbolName).tag(order)
+                }
+            }
+        } label: {
+            Image(systemName: "arrow.up.arrow.down")
+                .font(.system(size: 15, weight: .bold))
+                .foregroundStyle(sortOrder == .nearestBirthday ? Color.secondary : Palette.coral)
+                .frame(width: 44, height: 44)
+                .background(Circle().fill(Palette.surface))
+                .overlay(
+                    Circle().strokeBorder(
+                        sortOrder == .nearestBirthday ? Palette.hairline : Palette.coral.opacity(0.5),
+                        lineWidth: 1
+                    )
+                )
+        }
+        .accessibilityLabel("\(strings.sortLabel): \(sortOrder.title(strings))")
+        .sensoryFeedback(.selection, trigger: sortOrder)
+    }
+
     @ViewBuilder
     private var upcomingSections: some View {
-        if let hero = ordered.first {
+        if let hero = nextUp {
             Text(strings.upNext.uppercased())
                 .font(.system(.caption, design: .rounded, weight: .bold))
                 .tracking(1.1)
@@ -151,15 +226,23 @@ struct HomeView: View {
             .buttonStyle(PressableCardStyle())
         }
 
-        if ordered.count > 1 {
-            Text(strings.othersSection.uppercased())
-                .font(.system(.caption, design: .rounded, weight: .bold))
-                .tracking(1.1)
-                .foregroundStyle(.secondary)
-                .padding(.top, 6)
+        let rest = ordered.filter { $0.id != nextUp?.id }
+
+        if !rest.isEmpty {
+            HStack(spacing: 6) {
+                Text(strings.othersSection.uppercased())
+                    .font(.system(.caption, design: .rounded, weight: .bold))
+                    .tracking(1.1)
+                Text("·")
+                    .font(.system(.caption, design: .rounded, weight: .bold))
+                Text(sortOrder.title(strings))
+                    .font(.system(.caption, design: .rounded, weight: .medium))
+            }
+            .foregroundStyle(.secondary)
+            .padding(.top, 6)
 
             VStack(spacing: 12) {
-                ForEach(Array(ordered.dropFirst().enumerated()), id: \.element.id) { index, profile in
+                ForEach(Array(rest.enumerated()), id: \.element.id) { index, profile in
                     NavigationLink(value: profile) {
                         ProfileRowCard(profile: profile, settings: settings)
                     }
@@ -271,5 +354,8 @@ struct PressableCardStyle: ButtonStyle {
 #Preview {
     HomeView()
         .environment(AppSettings())
-        .modelContainer(for: [BirthdayProfile.self, DiaryEntry.self, DiaryTag.self], inMemory: true)
+        .modelContainer(
+            for: [BirthdayProfile.self, DiaryEntry.self, DiaryTag.self, PartyPlan.self],
+            inMemory: true
+        )
 }

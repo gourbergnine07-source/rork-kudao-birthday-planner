@@ -21,6 +21,10 @@ nonisolated struct Strings: Sendable {
     let resultsSection: String
     let noResultsTitle: String
     let noResultsMessageFormat: String
+    let sortLabel: String
+    let sortNearest: String
+    let sortAlphabetical: String
+    let sortRecentlyAdded: String
 
     let newProfileTitle: String
     let editProfileTitle: String
@@ -82,6 +86,38 @@ nonisolated struct Strings: Sendable {
     let removeTagHint: String
     let removeTagAction: String
 
+    let planTitleFormat: String
+    let suggestionsGeneratingTitle: String
+    let suggestionsGeneratingMessage: String
+    let suggestionsNoTagsTitle: String
+    let suggestionsNoTagsMessage: String
+    let suggestionsErrorTitle: String
+    let generateAction: String
+    let regenerateAction: String
+    let regenerateAllAction: String
+    let giftCardTitle: String
+    let cakeCardTitle: String
+    let venueCardTitle: String
+    let guestsCardTitle: String
+    let reasonLabel: String
+    let priceBandLabel: String
+    let priceLow: String
+    let priceMedium: String
+    let priceHigh: String
+    let confidenceLabel: String
+    let confidenceLow: String
+    let confidenceMedium: String
+    let confidenceHigh: String
+    let lowConfidenceBanner: String
+    let confirmAllAction: String
+    let confirmedAtFormat: String
+    let unconfirmedChanges: String
+    let editSuggestionTitle: String
+    let editedBadge: String
+    let guestsUnitFormat: String
+    let basedOnTagsFormat: String
+    let doneAction: String
+
     let catFood: String
     let catTravel: String
     let catShopping: String
@@ -114,6 +150,10 @@ extension Strings {
         resultsSection: "Risultati",
         noResultsTitle: "Nessun risultato",
         noResultsMessageFormat: "Nessun profilo corrisponde a «%@».",
+        sortLabel: "Ordina",
+        sortNearest: "Compleanno più vicino",
+        sortAlphabetical: "Nome (A-Z)",
+        sortRecentlyAdded: "Aggiunti di recente",
         newProfileTitle: "Nuovo profilo",
         editProfileTitle: "Modifica profilo",
         nameLabel: "Nome",
@@ -168,6 +208,37 @@ extension Strings {
         tagsSection: "Parole chiave",
         removeTagHint: "Tocca la × per rimuovere una parola chiave sbagliata.",
         removeTagAction: "Rimuovi parola chiave",
+        planTitleFormat: "Piano festa per %@",
+        suggestionsGeneratingTitle: "Sto pensando…",
+        suggestionsGeneratingMessage: "Leggo le preferenze raccolte e preparo il piano.",
+        suggestionsNoTagsTitle: "Serve almeno una nota",
+        suggestionsNoTagsMessage: "Scrivi qualche nota nel diario: i suggerimenti nascono dalle preferenze estratte.",
+        suggestionsErrorTitle: "Suggerimenti non disponibili",
+        generateAction: "Genera suggerimenti",
+        regenerateAction: "Rigenera",
+        regenerateAllAction: "Rigenera tutto",
+        giftCardTitle: "Regalo",
+        cakeCardTitle: "Torta",
+        venueCardTitle: "Locale",
+        guestsCardTitle: "Invitati",
+        reasonLabel: "Perché",
+        priceBandLabel: "Fascia di prezzo",
+        priceLow: "Fascia bassa",
+        priceMedium: "Fascia media",
+        priceHigh: "Fascia alta",
+        confidenceLabel: "Confidenza",
+        confidenceLow: "bassa",
+        confidenceMedium: "media",
+        confidenceHigh: "alta",
+        lowConfidenceBanner: "Scrivi più note nel diario per suggerimenti più precisi.",
+        confirmAllAction: "Conferma tutto",
+        confirmedAtFormat: "Piano confermato il %@",
+        unconfirmedChanges: "Modifiche da confermare",
+        editSuggestionTitle: "Modifica suggerimento",
+        editedBadge: "Modificato",
+        guestsUnitFormat: "%d persone",
+        basedOnTagsFormat: "Basato su %d parole chiave",
+        doneAction: "Fine",
         catFood: "Cibo",
         catTravel: "Viaggi",
         catShopping: "Shopping",
@@ -197,6 +268,10 @@ extension Strings {
         resultsSection: "Results",
         noResultsTitle: "No results",
         noResultsMessageFormat: "No profile matches “%@”.",
+        sortLabel: "Sort",
+        sortNearest: "Closest birthday",
+        sortAlphabetical: "Name (A-Z)",
+        sortRecentlyAdded: "Recently added",
         newProfileTitle: "New profile",
         editProfileTitle: "Edit profile",
         nameLabel: "Name",
@@ -251,6 +326,37 @@ extension Strings {
         tagsSection: "Keywords",
         removeTagHint: "Tap × to remove a keyword that got it wrong.",
         removeTagAction: "Remove keyword",
+        planTitleFormat: "Party plan for %@",
+        suggestionsGeneratingTitle: "Thinking…",
+        suggestionsGeneratingMessage: "Reading the collected preferences and drafting the plan.",
+        suggestionsNoTagsTitle: "One note needed first",
+        suggestionsNoTagsMessage: "Write a few diary notes: suggestions are built from the extracted preferences.",
+        suggestionsErrorTitle: "Suggestions unavailable",
+        generateAction: "Generate suggestions",
+        regenerateAction: "Regenerate",
+        regenerateAllAction: "Regenerate all",
+        giftCardTitle: "Gift",
+        cakeCardTitle: "Cake",
+        venueCardTitle: "Venue",
+        guestsCardTitle: "Guests",
+        reasonLabel: "Why",
+        priceBandLabel: "Price range",
+        priceLow: "Low range",
+        priceMedium: "Mid range",
+        priceHigh: "High range",
+        confidenceLabel: "Confidence",
+        confidenceLow: "low",
+        confidenceMedium: "medium",
+        confidenceHigh: "high",
+        lowConfidenceBanner: "Write more diary notes for sharper suggestions.",
+        confirmAllAction: "Confirm all",
+        confirmedAtFormat: "Plan confirmed on %@",
+        unconfirmedChanges: "Unconfirmed changes",
+        editSuggestionTitle: "Edit suggestion",
+        editedBadge: "Edited",
+        guestsUnitFormat: "%d people",
+        basedOnTagsFormat: "Based on %d keywords",
+        doneAction: "Done",
         catFood: "Food",
         catTravel: "Travel",
         catShopping: "Shopping",
@@ -280,6 +386,10 @@ extension Strings {
         resultsSection: "Résultats",
         noResultsTitle: "Aucun résultat",
         noResultsMessageFormat: "Aucun profil ne correspond à « %@ ».",
+        sortLabel: "Trier",
+        sortNearest: "Anniversaire le plus proche",
+        sortAlphabetical: "Nom (A-Z)",
+        sortRecentlyAdded: "Ajoutés récemment",
         newProfileTitle: "Nouveau profil",
         editProfileTitle: "Modifier le profil",
         nameLabel: "Nom",
@@ -334,6 +444,37 @@ extension Strings {
         tagsSection: "Mots-clés",
         removeTagHint: "Touchez × pour retirer un mot-clé mal extrait.",
         removeTagAction: "Retirer le mot-clé",
+        planTitleFormat: "Plan de fête pour %@",
+        suggestionsGeneratingTitle: "Je réfléchis…",
+        suggestionsGeneratingMessage: "Je lis les préférences réunies et je prépare le plan.",
+        suggestionsNoTagsTitle: "Il faut d'abord une note",
+        suggestionsNoTagsMessage: "Écrivez quelques notes : les suggestions viennent des préférences extraites.",
+        suggestionsErrorTitle: "Suggestions indisponibles",
+        generateAction: "Générer les suggestions",
+        regenerateAction: "Régénérer",
+        regenerateAllAction: "Tout régénérer",
+        giftCardTitle: "Cadeau",
+        cakeCardTitle: "Gâteau",
+        venueCardTitle: "Lieu",
+        guestsCardTitle: "Invités",
+        reasonLabel: "Pourquoi",
+        priceBandLabel: "Budget",
+        priceLow: "Petit budget",
+        priceMedium: "Budget moyen",
+        priceHigh: "Gros budget",
+        confidenceLabel: "Confiance",
+        confidenceLow: "faible",
+        confidenceMedium: "moyenne",
+        confidenceHigh: "élevée",
+        lowConfidenceBanner: "Écrivez plus de notes pour des suggestions plus précises.",
+        confirmAllAction: "Tout confirmer",
+        confirmedAtFormat: "Plan confirmé le %@",
+        unconfirmedChanges: "Modifications à confirmer",
+        editSuggestionTitle: "Modifier la suggestion",
+        editedBadge: "Modifié",
+        guestsUnitFormat: "%d personnes",
+        basedOnTagsFormat: "Basé sur %d mots-clés",
+        doneAction: "Terminé",
         catFood: "Cuisine",
         catTravel: "Voyages",
         catShopping: "Shopping",
@@ -363,6 +504,10 @@ extension Strings {
         resultsSection: "Resultados",
         noResultsTitle: "Sin resultados",
         noResultsMessageFormat: "Ningún perfil coincide con «%@».",
+        sortLabel: "Ordenar",
+        sortNearest: "Cumpleaños más cercano",
+        sortAlphabetical: "Nombre (A-Z)",
+        sortRecentlyAdded: "Añadidos recientemente",
         newProfileTitle: "Nuevo perfil",
         editProfileTitle: "Editar perfil",
         nameLabel: "Nombre",
@@ -417,6 +562,37 @@ extension Strings {
         tagsSection: "Palabras clave",
         removeTagHint: "Toca × para quitar una palabra clave equivocada.",
         removeTagAction: "Quitar palabra clave",
+        planTitleFormat: "Plan de fiesta para %@",
+        suggestionsGeneratingTitle: "Estoy pensando…",
+        suggestionsGeneratingMessage: "Leo las preferencias recogidas y preparo el plan.",
+        suggestionsNoTagsTitle: "Hace falta una nota",
+        suggestionsNoTagsMessage: "Escribe algunas notas: las sugerencias nacen de las preferencias extraídas.",
+        suggestionsErrorTitle: "Sugerencias no disponibles",
+        generateAction: "Generar sugerencias",
+        regenerateAction: "Regenerar",
+        regenerateAllAction: "Regenerar todo",
+        giftCardTitle: "Regalo",
+        cakeCardTitle: "Tarta",
+        venueCardTitle: "Local",
+        guestsCardTitle: "Invitados",
+        reasonLabel: "Por qué",
+        priceBandLabel: "Rango de precio",
+        priceLow: "Rango bajo",
+        priceMedium: "Rango medio",
+        priceHigh: "Rango alto",
+        confidenceLabel: "Confianza",
+        confidenceLow: "baja",
+        confidenceMedium: "media",
+        confidenceHigh: "alta",
+        lowConfidenceBanner: "Escribe más notas en el diario para sugerencias más precisas.",
+        confirmAllAction: "Confirmar todo",
+        confirmedAtFormat: "Plan confirmado el %@",
+        unconfirmedChanges: "Cambios sin confirmar",
+        editSuggestionTitle: "Editar sugerencia",
+        editedBadge: "Editado",
+        guestsUnitFormat: "%d personas",
+        basedOnTagsFormat: "Basado en %d palabras clave",
+        doneAction: "Hecho",
         catFood: "Comida",
         catTravel: "Viajes",
         catShopping: "Compras",

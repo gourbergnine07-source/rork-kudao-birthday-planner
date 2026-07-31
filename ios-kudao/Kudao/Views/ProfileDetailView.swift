@@ -20,6 +20,7 @@ struct ProfileDetailView: View {
     @State private var isConfirmingDelete: Bool = false
     @State private var pendingDeletion: Bool = false
     @State private var analyzer = DiaryAnalyzer()
+    @State private var suggestionEngine = SuggestionEngine()
     @Namespace private var tabNamespace
 
     private var strings: Strings { settings.strings }
@@ -278,14 +279,8 @@ struct ProfileDetailView: View {
             PreferencesTabView(profile: profile)
                 .transition(.opacity.combined(with: .offset(y: 8)))
         case .suggestions:
-            PlaceholderPanel(
-                icon: "sparkles",
-                title: strings.suggestionsEmptyTitle,
-                message: strings.suggestionsEmptyMessage,
-                badge: strings.comingSoon,
-                tint: Palette.berry
-            )
-            .transition(.opacity.combined(with: .offset(y: 8)))
+            SuggestionsTabView(profile: profile, engine: suggestionEngine)
+                .transition(.opacity.combined(with: .offset(y: 8)))
         }
     }
 }

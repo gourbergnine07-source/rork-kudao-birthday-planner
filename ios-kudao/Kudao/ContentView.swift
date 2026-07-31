@@ -15,5 +15,8 @@ struct ContentView: View {
 #Preview {
     ContentView()
         .environment(AppSettings())
-        .modelContainer(for: [BirthdayProfile.self, DiaryEntry.self, DiaryTag.self], inMemory: true)
+        .modelContainer(
+            for: [BirthdayProfile.self, DiaryEntry.self, DiaryTag.self, PartyPlan.self],
+            inMemory: true
+        )
 }

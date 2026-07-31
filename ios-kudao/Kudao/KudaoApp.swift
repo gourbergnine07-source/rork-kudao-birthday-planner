@@ -16,6 +16,6 @@ struct KudaoApp: App {
                 .environment(settings)
                 .environment(\.locale, settings.locale)
         }
-        .modelContainer(for: [BirthdayProfile.self, DiaryEntry.self, DiaryTag.self])
+        .modelContainer(for: [BirthdayProfile.self, DiaryEntry.self, DiaryTag.self, PartyPlan.self])
     }
 }
