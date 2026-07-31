@@ -20,6 +20,79 @@ nonisolated enum ReminderDefaults {
     static let daysBefore: Int = 7
     static let giftDaysBefore: Int = 10
 
+    /// How early each kind of occasion is announced out of the box.
+    ///
+    /// A remembrance lands on the morning of the day itself, which is how Kudao
+    /// has always behaved; the others get a week (a birthday, an anniversary) or
+    /// three days (a generic event) of warning.
+    static func shippedDaysBefore(_ occasion: OccasionKind) -> Int {
+        switch occasion {
+        case .birthday: 7
+        case .wedding: 7
+        case .remembrance: 0
+        case .other: 3
+        }
+    }
+
+    /// How early the separate "buy the present" nudge fires, per occasion.
+    static func shippedGiftDaysBefore(_ occasion: OccasionKind) -> Int {
+        switch occasion {
+        case .birthday: 10
+        case .wedding: 14
+        case .remembrance: 0
+        case .other: 7
+        }
+    }
+
+    /// Range the main lead time can be dragged through. Zero means "on the day".
+    static let daysRange: ClosedRange<Int> = 0...60
+    static let giftDaysRange: ClosedRange<Int> = 1...120
+
+    static func daysBeforeKey(_ occasion: OccasionKind) -> String {
+        "\(daysBeforeKey).\(occasion.rawValue)"
+    }
+
+    static func giftDaysBeforeKey(_ occasion: OccasionKind) -> String {
+        "\(giftDaysBeforeKey).\(occasion.rawValue)"
+    }
+
+    /// Lead time chosen for an occasion, falling back to the legacy global value.
+    ///
+    /// The pre-occasion builds stored a single number; reading it as the birthday
+    /// fallback means an upgrade keeps the user's own choice instead of resetting it.
+    static func daysBefore(for occasion: OccasionKind) -> Int {
+        let legacy = occasion == .birthday
+            ? stored(daysBeforeKey, fallback: shippedDaysBefore(occasion), range: daysRange)
+            : shippedDaysBefore(occasion)
+        return stored(daysBeforeKey(occasion), fallback: legacy, range: daysRange)
+    }
+
+    static func giftDaysBefore(for occasion: OccasionKind) -> Int {
+        let legacy = occasion == .birthday
+            ? stored(giftDaysBeforeKey, fallback: shippedGiftDaysBefore(occasion), range: giftDaysRange)
+            : shippedGiftDaysBefore(occasion)
+        return stored(giftDaysBeforeKey(occasion), fallback: legacy, range: giftDaysRange)
+    }
+
+    private static let leadTimeMigrationKey = "kudao.migration.occasionLeadTimes"
+
+    /// Keeps remembrance profiles firing on the day, as they did before lead
+    /// times became per-occasion.
+    ///
+    /// Until now the schedule ignored the stored number for a remembrance and
+    /// always used zero; writing that zero into the profiles preserves exactly
+    /// what those users were already getting. Runs once.
+    @MainActor
+    static func migrateLeadTimes(_ profiles: [BirthdayProfile]) {
+        let defaults = UserDefaults.standard
+        guard !defaults.bool(forKey: leadTimeMigrationKey) else { return }
+        defaults.set(true, forKey: leadTimeMigrationKey)
+
+        for profile in profiles where profile.occasion == .remembrance {
+            profile.reminderDaysBefore = 0
+        }
+    }
+
     /// Reads a stored default, falling back to the shipped value.
     static func stored(_ key: String, fallback: Int, range: ClosedRange<Int>) -> Int {
         guard let value = UserDefaults.standard.object(forKey: key) as? Int else { return fallback }
@@ -75,11 +148,11 @@ extension BirthdayProfile {
 
     /// Fire date of the main reminder, when enabled.
     ///
-    /// A remembrance is never a countdown: its reminder lands on the morning of
-    /// the anniversary itself, not days ahead of it.
+    /// The lead time is the profile's own, which starts life as the default the
+    /// user picked for that category of occasion in the notification settings.
     var birthdayReminderDate: Date? {
         guard isReminderEnabled else { return nil }
-        return reminderFireDate(daysBefore: occasion.remindsOnTheDay ? 0 : reminderDaysBefore)
+        return reminderFireDate(daysBefore: max(0, reminderDaysBefore))
     }
 
     /// Fire date of the separate gift reminder, when enabled.

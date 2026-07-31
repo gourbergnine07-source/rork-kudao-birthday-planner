@@ -599,6 +599,16 @@ nonisolated struct Strings: Sendable {
     let authRateLimitMessage: String
     let authOfflineMessage: String
     let authGenericErrorMessage: String
+
+    let notificationSettingsMenuTitle: String
+    let notificationSettingsCaption: String
+    let notificationsActiveLabel: String
+    let enableNotificationsAction: String
+    let mainReminderLabel: String
+    let applyToExistingFormat: String
+    let appliedToExistingLabel: String
+    let resetToShippedAction: String
+    let noProfilesInCategoryLabel: String
 }
 
 extension Strings {
@@ -1161,7 +1171,17 @@ extension Strings {
         authEmailTakenMessage: "Esiste gi\u{00E0} un account con questa email. Prova ad accedere.",
         authRateLimitMessage: "Troppi tentativi. Riprova tra qualche minuto.",
         authOfflineMessage: "Sembri offline. Controlla la connessione e riprova.",
-        authGenericErrorMessage: "Qualcosa \u{00E8} andato storto. Riprova tra poco."
+        authGenericErrorMessage: "Qualcosa \u{00E8} andato storto. Riprova tra poco.",
+
+        notificationSettingsMenuTitle: "Notifiche",
+        notificationSettingsCaption: "Scegli con quanto anticipo vuoi essere avvisato, per ogni tipo di occasione.",
+        notificationsActiveLabel: "Notifiche attive",
+        enableNotificationsAction: "Attiva le notifiche",
+        mainReminderLabel: "Avviso principale",
+        applyToExistingFormat: "Applica ai %d profili esistenti",
+        appliedToExistingLabel: "Applicato",
+        resetToShippedAction: "Valori consigliati",
+        noProfilesInCategoryLabel: "Nessun profilo di questo tipo, per ora."
     )
 
     static let english = Strings(
@@ -1723,7 +1743,17 @@ extension Strings {
         authEmailTakenMessage: "An account already exists with this email. Try signing in.",
         authRateLimitMessage: "Too many attempts. Try again in a few minutes.",
         authOfflineMessage: "You seem offline. Check your connection and try again.",
-        authGenericErrorMessage: "Something went wrong. Try again shortly."
+        authGenericErrorMessage: "Something went wrong. Try again shortly.",
+
+        notificationSettingsMenuTitle: "Notifications",
+        notificationSettingsCaption: "Choose how early you want to be told, for every kind of occasion.",
+        notificationsActiveLabel: "Notifications are on",
+        enableNotificationsAction: "Turn notifications on",
+        mainReminderLabel: "Main reminder",
+        applyToExistingFormat: "Apply to %d existing profiles",
+        appliedToExistingLabel: "Applied",
+        resetToShippedAction: "Recommended values",
+        noProfilesInCategoryLabel: "No profile of this kind yet."
     )
 
     static let french = Strings(
@@ -2285,7 +2315,17 @@ extension Strings {
         authEmailTakenMessage: "Un compte existe d\u{00E9}j\u{00E0} avec cet e-mail. Essaie de te connecter.",
         authRateLimitMessage: "Trop de tentatives. R\u{00E9}essaie dans quelques minutes.",
         authOfflineMessage: "Tu sembles hors ligne. V\u{00E9}rifie ta connexion et r\u{00E9}essaie.",
-        authGenericErrorMessage: "Un probl\u{00E8}me est survenu. R\u{00E9}essaie dans un instant."
+        authGenericErrorMessage: "Un probl\u{00E8}me est survenu. R\u{00E9}essaie dans un instant.",
+
+        notificationSettingsMenuTitle: "Notifications",
+        notificationSettingsCaption: "Choisis combien de temps \u{00E0} l\u{2019}avance tu veux \u{00EA}tre pr\u{00E9}venu, pour chaque type d\u{2019}occasion.",
+        notificationsActiveLabel: "Notifications activ\u{00E9}es",
+        enableNotificationsAction: "Activer les notifications",
+        mainReminderLabel: "Rappel principal",
+        applyToExistingFormat: "Appliquer aux %d profils existants",
+        appliedToExistingLabel: "Appliqu\u{00E9}",
+        resetToShippedAction: "Valeurs recommand\u{00E9}es",
+        noProfilesInCategoryLabel: "Aucun profil de ce type pour l\u{2019}instant."
     )
 
     static let spanish = Strings(
@@ -2847,6 +2887,16 @@ extension Strings {
         authEmailTakenMessage: "Ya existe una cuenta con este correo. Prueba a entrar.",
         authRateLimitMessage: "Demasiados intentos. Prueba dentro de unos minutos.",
         authOfflineMessage: "Pareces estar sin conexi\u{00F3}n. Comprueba la red y vuelve a intentarlo.",
-        authGenericErrorMessage: "Algo ha ido mal. Int\u{00E9}ntalo dentro de un momento."
+        authGenericErrorMessage: "Algo ha ido mal. Int\u{00E9}ntalo dentro de un momento.",
+
+        notificationSettingsMenuTitle: "Notificaciones",
+        notificationSettingsCaption: "Elige con cu\u{00E1}nta antelaci\u{00F3}n quieres el aviso, para cada tipo de ocasi\u{00F3}n.",
+        notificationsActiveLabel: "Notificaciones activas",
+        enableNotificationsAction: "Activar las notificaciones",
+        mainReminderLabel: "Aviso principal",
+        applyToExistingFormat: "Aplicar a %d perfiles existentes",
+        appliedToExistingLabel: "Aplicado",
+        resetToShippedAction: "Valores recomendados",
+        noProfilesInCategoryLabel: "Todav\u{00ED}a no hay perfiles de este tipo."
     )
 }

@@ -106,7 +106,7 @@ struct ProfileSettingsView: View {
                 DaysStepper(
                     label: strings.reminderDaysTitle,
                     value: $bindable.reminderDaysBefore,
-                    range: 1...60,
+                    range: ReminderDefaults.daysRange,
                     tint: Palette.coral,
                     strings: strings
                 )
@@ -352,7 +352,8 @@ private struct DaysStepper: View {
     let strings: Strings
 
     private var formatted: String {
-        String(format: value == 1 ? strings.dayBeforeFormat : strings.daysBeforeFormat, value)
+        guard value > 0 else { return strings.reminderOnTheDayLabel }
+        return String(format: value == 1 ? strings.dayBeforeFormat : strings.daysBeforeFormat, value)
     }
 
     var body: some View {

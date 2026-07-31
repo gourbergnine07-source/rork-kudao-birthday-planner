@@ -18,6 +18,7 @@ struct AppSettingsView: View {
     @State private var isJoining: Bool = false
     @State private var isManagingBackup: Bool = false
     @State private var isShowingMyProfile: Bool = false
+    @State private var isEditingNotifications: Bool = false
 
     private var strings: Strings { settings.strings }
 
@@ -28,6 +29,7 @@ struct AppSettingsView: View {
 
                 ScrollView {
                     VStack(spacing: 18) {
+                        notificationsCard
                         collaborationCard
                         backupCard
                         surpriseCard
@@ -58,8 +60,76 @@ struct AppSettingsView: View {
             .sheet(isPresented: $isShowingMyProfile) {
                 MyProfileView()
             }
+            .sheet(isPresented: $isEditingNotifications) {
+                NotificationSettingsView()
+            }
         }
         .tint(Palette.coral)
+    }
+
+    // MARK: - Notifications
+
+    /// Lead times per category of occasion, summarised as pills.
+    private var notificationsCard: some View {
+        AppSettingsCard(
+            title: strings.notificationSettingsMenuTitle,
+            systemImage: "bell.badge.fill",
+            tint: Palette.coral
+        ) {
+            Button {
+                isEditingNotifications = true
+            } label: {
+                HStack(spacing: 10) {
+                    Image(systemName: "calendar.badge.clock")
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(Palette.coral)
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(strings.notificationSettingsMenuTitle)
+                            .font(.system(.body, design: .rounded, weight: .semibold))
+                            .foregroundStyle(.primary)
+                        Text(strings.notificationSettingsCaption)
+                            .font(.system(.caption2, design: .rounded))
+                            .foregroundStyle(.tertiary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+
+                    Spacer(minLength: 0)
+
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 11, weight: .heavy))
+                        .foregroundStyle(.tertiary)
+                }
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+
+            HStack(spacing: 6) {
+                ForEach(OccasionKind.allCases) { occasion in
+                    leadTimePill(occasion)
+                }
+                Spacer(minLength: 0)
+            }
+        }
+    }
+
+    private func leadTimePill(_ occasion: OccasionKind) -> some View {
+        let days = settings.reminderDays(for: occasion)
+        let label = days == 0
+            ? strings.reminderOnTheDayLabel
+            : String(format: days == 1 ? strings.dayBeforeFormat : strings.daysBeforeFormat, days)
+
+        return HStack(spacing: 4) {
+            Image(systemName: occasion.symbolName)
+                .font(.system(size: 9, weight: .bold))
+            Text(days == 0 ? "0" : "\(days)")
+                .font(.system(size: 11, weight: .heavy, design: .rounded))
+        }
+        .foregroundStyle(occasion.accent)
+        .padding(.horizontal, 8)
+        .padding(.vertical, 5)
+        .background(Capsule().fill(occasion.accent.opacity(0.12)))
+        .accessibilityLabel("\(occasion.title(strings)) \(label)")
     }
 
     // MARK: - Sharing

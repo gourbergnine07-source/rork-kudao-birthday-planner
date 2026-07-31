@@ -279,6 +279,7 @@ struct HomeView: View {
     // MARK: - Reminders
 
     private func syncReminders() async {
+        ReminderDefaults.migrateLeadTimes(profiles)
         await notifications.sync(
             profiles: profiles,
             strings: strings,

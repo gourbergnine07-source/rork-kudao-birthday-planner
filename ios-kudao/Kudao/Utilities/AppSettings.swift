@@ -47,31 +47,15 @@ final class AppSettings {
         }
     }
 
-    /// Days before the birthday a brand new profile is reminded on.
-    var defaultReminderDaysBefore: Int {
-        didSet {
-            let clamped = min(max(defaultReminderDaysBefore, 1), 60)
-            if clamped != defaultReminderDaysBefore {
-                defaultReminderDaysBefore = clamped
-                return
-            }
-            guard clamped != oldValue else { return }
-            UserDefaults.standard.set(clamped, forKey: ReminderDefaults.daysBeforeKey)
-        }
-    }
+    /// Lead time of the main reminder, one value per category of occasion.
+    ///
+    /// Kept as a dictionary keyed by the occasion raw value so the whole set is a
+    /// single observable property: a stepper in the notification settings redraws
+    /// every dependent label at once.
+    private var reminderDaysByOccasion: [String: Int]
 
-    /// Days before the birthday the separate gift nudge fires on for a new profile.
-    var defaultGiftReminderDaysBefore: Int {
-        didSet {
-            let clamped = min(max(defaultGiftReminderDaysBefore, 1), 90)
-            if clamped != defaultGiftReminderDaysBefore {
-                defaultGiftReminderDaysBefore = clamped
-                return
-            }
-            guard clamped != oldValue else { return }
-            UserDefaults.standard.set(clamped, forKey: ReminderDefaults.giftDaysBeforeKey)
-        }
-    }
+    /// Lead time of the separate gift nudge, one value per category of occasion.
+    private var giftDaysByOccasion: [String: Int]
 
     /// Time of day every reminder fires at, local time.
     var reminderTime: Date {
@@ -96,15 +80,15 @@ final class AppSettings {
         }
 
         gallerySortOrder = GallerySortOrder.parse(defaults.string(forKey: Self.gallerySortKey))
-        defaultReminderDaysBefore = ReminderDefaults.stored(
-            ReminderDefaults.daysBeforeKey,
-            fallback: ReminderDefaults.daysBefore,
-            range: 1...60
+        reminderDaysByOccasion = Dictionary(
+            uniqueKeysWithValues: OccasionKind.allCases.map {
+                ($0.rawValue, ReminderDefaults.daysBefore(for: $0))
+            }
         )
-        defaultGiftReminderDaysBefore = ReminderDefaults.stored(
-            ReminderDefaults.giftDaysBeforeKey,
-            fallback: ReminderDefaults.giftDaysBefore,
-            range: 1...90
+        giftDaysByOccasion = Dictionary(
+            uniqueKeysWithValues: OccasionKind.allCases.map {
+                ($0.rawValue, ReminderDefaults.giftDaysBefore(for: $0))
+            }
         )
         reminderTime = Calendar.current.date(
             bySettingHour: BirthdayProfile.reminderHour,
@@ -116,6 +100,48 @@ final class AppSettings {
         protectsSurpriseProfiles = defaults.bool(forKey: Self.biometricLockKey)
         // Surprises stay private by default.
         hidesSurpriseNotificationPreviews = defaults.object(forKey: Self.hidePreviewsKey) as? Bool ?? true
+    }
+
+    // MARK: - Reminder defaults
+
+    /// How many days before the date a new profile of this occasion is announced.
+    func reminderDays(for occasion: OccasionKind) -> Int {
+        reminderDaysByOccasion[occasion.rawValue] ?? ReminderDefaults.shippedDaysBefore(occasion)
+    }
+
+    func setReminderDays(_ value: Int, for occasion: OccasionKind) {
+        let clamped = min(max(value, ReminderDefaults.daysRange.lowerBound), ReminderDefaults.daysRange.upperBound)
+        guard reminderDaysByOccasion[occasion.rawValue] != clamped else { return }
+        reminderDaysByOccasion[occasion.rawValue] = clamped
+        UserDefaults.standard.set(clamped, forKey: ReminderDefaults.daysBeforeKey(occasion))
+    }
+
+    /// How many days before the date the gift nudge fires for this occasion.
+    func giftReminderDays(for occasion: OccasionKind) -> Int {
+        giftDaysByOccasion[occasion.rawValue] ?? ReminderDefaults.shippedGiftDaysBefore(occasion)
+    }
+
+    func setGiftReminderDays(_ value: Int, for occasion: OccasionKind) {
+        let clamped = min(
+            max(value, ReminderDefaults.giftDaysRange.lowerBound),
+            ReminderDefaults.giftDaysRange.upperBound
+        )
+        guard giftDaysByOccasion[occasion.rawValue] != clamped else { return }
+        giftDaysByOccasion[occasion.rawValue] = clamped
+        UserDefaults.standard.set(clamped, forKey: ReminderDefaults.giftDaysBeforeKey(occasion))
+    }
+
+    /// Puts a category back to the value Kudao ships with.
+    func resetReminderDefaults(for occasion: OccasionKind) {
+        setReminderDays(ReminderDefaults.shippedDaysBefore(occasion), for: occasion)
+        setGiftReminderDays(ReminderDefaults.shippedGiftDaysBefore(occasion), for: occasion)
+    }
+
+    /// True when a category no longer matches the shipped lead times.
+    func hasCustomReminderDefaults(for occasion: OccasionKind) -> Bool {
+        reminderDays(for: occasion) != ReminderDefaults.shippedDaysBefore(occasion)
+            || (occasion.wantsSuggestions
+                && giftReminderDays(for: occasion) != ReminderDefaults.shippedGiftDaysBefore(occasion))
     }
 
     /// True when a profile's details must be unlocked before being shown.

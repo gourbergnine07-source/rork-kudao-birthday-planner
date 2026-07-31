@@ -785,7 +785,7 @@ struct ProfileDetailView: View {
                     .foregroundStyle(.primary)
 
                 if profile.isReminderEnabled {
-                    if occasion.remindsOnTheDay {
+                    if profile.reminderDaysBefore <= 0 {
                         Text(strings.reminderOnTheDayLabel)
                             .font(.system(.footnote, design: .rounded, weight: .semibold))
                             .foregroundStyle(.secondary)

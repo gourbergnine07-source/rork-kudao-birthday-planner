@@ -22,6 +22,7 @@ struct MyProfileView: View {
 
     @State private var isManagingBackup: Bool = false
     @State private var isManagingAccount: Bool = false
+    @State private var isEditingNotifications: Bool = false
     @State private var isConfirmingSignOut: Bool = false
 
     private var strings: Strings { settings.strings }
@@ -68,6 +69,9 @@ struct MyProfileView: View {
             }
             .sheet(isPresented: $isManagingAccount) {
                 AccountView()
+            }
+            .sheet(isPresented: $isEditingNotifications) {
+                NotificationSettingsView()
             }
             .alert(strings.accountSignOutTitle, isPresented: $isConfirmingSignOut) {
                 Button(strings.cancelAction, role: .cancel) {}
@@ -158,21 +162,36 @@ struct MyProfileView: View {
 
             Divider().overlay(Palette.hairline)
 
-            defaultStepper(
-                title: strings.defaultReminderDaysLabel,
-                icon: "calendar.badge.clock",
-                value: $bindable.defaultReminderDaysBefore,
-                range: 1...60
-            )
+            Button {
+                isEditingNotifications = true
+            } label: {
+                HStack(spacing: 10) {
+                    Image(systemName: "calendar.badge.clock")
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundStyle(Palette.coral)
+                        .frame(width: 22)
 
-            Divider().overlay(Palette.hairline)
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(strings.notificationSettingsMenuTitle)
+                            .font(.system(.body, design: .rounded, weight: .semibold))
+                            .foregroundStyle(.primary)
 
-            defaultStepper(
-                title: strings.defaultGiftDaysLabel,
-                icon: "gift.fill",
-                value: $bindable.defaultGiftReminderDaysBefore,
-                range: 1...90
-            )
+                        HStack(spacing: 5) {
+                            ForEach(OccasionKind.allCases) { occasion in
+                                leadTimeChip(occasion)
+                            }
+                        }
+                    }
+
+                    Spacer(minLength: 0)
+
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 11, weight: .heavy))
+                        .foregroundStyle(.tertiary)
+                }
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
 
             Divider().overlay(Palette.hairline)
 
@@ -201,6 +220,24 @@ struct MyProfileView: View {
                 .foregroundStyle(.tertiary)
                 .fixedSize(horizontal: false, vertical: true)
         }
+    }
+
+    /// Compact "🎂 7" pill summarising a category's lead time.
+    private func leadTimeChip(_ occasion: OccasionKind) -> some View {
+        let days = settings.reminderDays(for: occasion)
+
+        return HStack(spacing: 3) {
+            Image(systemName: occasion.symbolName)
+                .font(.system(size: 9, weight: .bold))
+            Text(days == 0 ? "0" : "\(days)")
+                .font(.system(size: 11, weight: .heavy, design: .rounded))
+                .contentTransition(.numericText())
+        }
+        .foregroundStyle(occasion.accent)
+        .padding(.horizontal, 7)
+        .padding(.vertical, 4)
+        .background(Capsule().fill(occasion.accent.opacity(0.12)))
+        .accessibilityLabel("\(occasion.title(strings)) \(daysLabel(days))")
     }
 
     private func defaultStepper(
@@ -234,7 +271,8 @@ struct MyProfileView: View {
     }
 
     private func daysLabel(_ value: Int) -> String {
-        String(format: value == 1 ? strings.dayBeforeFormat : strings.daysBeforeFormat, value)
+        guard value > 0 else { return strings.reminderOnTheDayLabel }
+        return String(format: value == 1 ? strings.dayBeforeFormat : strings.daysBeforeFormat, value)
     }
 
     // MARK: - Privacy

@@ -660,9 +660,9 @@ struct ProfileFormView: View {
                 isSelfProfile: isSelfProfile,
                 bond: bond
             )
-            // A new celebration inherits the reminder preferences from "My profile".
-            newProfile.reminderDaysBefore = settings.defaultReminderDaysBefore
-            newProfile.giftReminderDaysBefore = settings.defaultGiftReminderDaysBefore
+            // A new celebration inherits the lead times chosen for its category.
+            newProfile.reminderDaysBefore = settings.reminderDays(for: occasion)
+            newProfile.giftReminderDaysBefore = settings.giftReminderDays(for: occasion)
             // Nothing to buy for a remembrance, so the gift nudge starts off.
             newProfile.isGiftReminderEnabled = occasion.wantsSuggestions
             modelContext.insert(newProfile)
