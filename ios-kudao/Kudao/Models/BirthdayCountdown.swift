@@ -43,6 +43,16 @@ nonisolated struct BirthdayCountdown: Sendable, Equatable {
     var isToday: Bool { daysRemaining == 0 }
     var isTomorrow: Bool { daysRemaining == 1 }
 
+    /// True when the birthday happens today or within the next seven days.
+    var isThisWeek: Bool { daysRemaining <= 7 }
+
+    /// Short human label for the imminent badge: "Today", "Tomorrow" or "In N days".
+    func imminentLabel(_ strings: Strings) -> String {
+        if isToday { return strings.todayLabel }
+        if isTomorrow { return strings.tomorrowLabel }
+        return String(format: strings.imminentDaysFormat, daysRemaining)
+    }
+
     /// 0 right after the birthday, approaching 1 as the next one gets closer.
     var yearProgress: Double {
         let clamped = min(Double(daysRemaining), 365)

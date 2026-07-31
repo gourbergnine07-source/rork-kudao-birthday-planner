@@ -61,6 +61,8 @@ nonisolated struct Strings: Sendable {
     let turnsFormat: String
     let turnsTodayFormat: String
     let nextBirthdayLabel: String
+    let imminentBadge: String
+    let imminentDaysFormat: String
 
     let diaryTab: String
     let preferencesTab: String
@@ -233,6 +235,8 @@ extension Strings {
         turnsFormat: "Compie %d anni",
         turnsTodayFormat: "Compie %d anni oggi",
         nextBirthdayLabel: "Prossimo compleanno",
+        imminentBadge: "Questa settimana",
+        imminentDaysFormat: "Tra %d giorni",
         diaryTab: "Diario",
         preferencesTab: "Preferenze",
         suggestionsTab: "Suggerimenti",
@@ -395,6 +399,8 @@ extension Strings {
         turnsFormat: "Turning %d",
         turnsTodayFormat: "Turning %d today",
         nextBirthdayLabel: "Next birthday",
+        imminentBadge: "This week",
+        imminentDaysFormat: "In %d days",
         diaryTab: "Diary",
         preferencesTab: "Preferences",
         suggestionsTab: "Suggestions",
@@ -557,6 +563,8 @@ extension Strings {
         turnsFormat: "Fête ses %d ans",
         turnsTodayFormat: "Fête ses %d ans aujourd'hui",
         nextBirthdayLabel: "Prochain anniversaire",
+        imminentBadge: "Cette semaine",
+        imminentDaysFormat: "Dans %d jours",
         diaryTab: "Journal",
         preferencesTab: "Préférences",
         suggestionsTab: "Suggestions",
@@ -719,6 +727,8 @@ extension Strings {
         turnsFormat: "Cumple %d años",
         turnsTodayFormat: "Cumple %d años hoy",
         nextBirthdayLabel: "Próximo cumpleaños",
+        imminentBadge: "Esta semana",
+        imminentDaysFormat: "En %d días",
         diaryTab: "Diario",
         preferencesTab: "Preferencias",
         suggestionsTab: "Sugerencias",

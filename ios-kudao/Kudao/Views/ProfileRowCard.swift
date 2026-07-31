@@ -18,6 +18,11 @@ struct ProfileRowCard: View {
         return countdown.daysRemaining == 1 ? strings.dayUnit : strings.daysUnit
     }
 
+    /// Birthdays inside the next seven days get a warm, unmistakable treatment.
+    private var isImminent: Bool { countdown.isThisWeek }
+
+    private var accent: Color { isImminent ? Palette.coral : profile.relationship.accent }
+
     var body: some View {
         HStack(spacing: 14) {
             AvatarView(name: profile.name, photoData: profile.photoData, size: 52)
@@ -26,7 +31,7 @@ struct ProfileRowCard: View {
                         Circle()
                             .fill(Color.red)
                             .frame(width: 13, height: 13)
-                            .overlay(Circle().strokeBorder(Palette.surface, lineWidth: 2.5))
+                            .overlay(Circle().strokeBorder(cardFill, lineWidth: 2.5))
                             .offset(x: 2, y: -1)
                             .accessibilityLabel(strings.pendingBadgeLabel)
                     }
@@ -55,6 +60,16 @@ struct ProfileRowCard: View {
                         .font(.system(.subheadline, design: .rounded))
                         .foregroundStyle(.secondary)
                 }
+
+                if isImminent {
+                    KudaoChip(
+                        title: countdown.imminentLabel(strings),
+                        systemImage: countdown.isToday ? "party.popper.fill" : "flame.fill",
+                        tint: Palette.coral
+                    )
+                    .padding(.top, 1)
+                    .accessibilityLabel("\(strings.imminentBadge), \(countdown.imminentLabel(strings))")
+                }
             }
 
             Spacer(minLength: 8)
@@ -63,20 +78,41 @@ struct ProfileRowCard: View {
                 progress: countdown.yearProgress,
                 value: "\(countdown.daysRemaining)",
                 caption: ringCaption,
-                tint: profile.relationship.accent,
+                tint: accent,
                 size: 58
             )
         }
         .padding(14)
         .background(
             RoundedRectangle(cornerRadius: 22, style: .continuous)
-                .fill(Palette.surface)
+                .fill(cardFill)
         )
+        .overlay(alignment: .leading) {
+            if isImminent {
+                Capsule()
+                    .fill(Palette.warmGradient)
+                    .frame(width: 4)
+                    .padding(.vertical, 14)
+                    .padding(.leading, 3)
+            }
+        }
         .overlay(
             RoundedRectangle(cornerRadius: 22, style: .continuous)
-                .strokeBorder(Palette.hairline, lineWidth: 1)
+                .strokeBorder(
+                    isImminent ? Palette.coral.opacity(0.42) : Palette.hairline,
+                    lineWidth: isImminent ? 1.5 : 1
+                )
         )
-        .shadow(color: Color.black.opacity(0.05), radius: 10, x: 0, y: 6)
+        .shadow(
+            color: isImminent ? Palette.coral.opacity(0.18) : Color.black.opacity(0.05),
+            radius: isImminent ? 14 : 10,
+            x: 0,
+            y: 6
+        )
         .accessibilityElement(children: .combine)
+    }
+
+    private var cardFill: Color {
+        isImminent ? Palette.surfaceRaised : Palette.surface
     }
 }
