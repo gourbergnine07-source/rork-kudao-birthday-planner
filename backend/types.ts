@@ -176,6 +176,63 @@ export type Database = {
           },
         ]
       }
+      gallery_items: {
+        Row: {
+          byte_size: number
+          caption: string | null
+          committed: boolean
+          created_at: number
+          duration: number
+          id: string
+          inserted_at: string
+          item_id: string
+          media_type: string
+          mime: string
+          room_id: string
+          storage_path: string
+          thumbnail_base64: string | null
+          updated_at: string
+          uploaded_by: string
+          uploader_name: string
+        }
+        Insert: {
+          byte_size?: number
+          caption?: string | null
+          committed?: boolean
+          created_at: number
+          duration?: number
+          id?: string
+          inserted_at?: string
+          item_id: string
+          media_type?: string
+          mime?: string
+          room_id: string
+          storage_path: string
+          thumbnail_base64?: string | null
+          updated_at?: string
+          uploaded_by: string
+          uploader_name?: string
+        }
+        Update: {
+          byte_size?: number
+          caption?: string | null
+          committed?: boolean
+          created_at?: number
+          duration?: number
+          id?: string
+          inserted_at?: string
+          item_id?: string
+          media_type?: string
+          mime?: string
+          room_id?: string
+          storage_path?: string
+          thumbnail_base64?: string | null
+          updated_at?: string
+          uploaded_by?: string
+          uploader_name?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

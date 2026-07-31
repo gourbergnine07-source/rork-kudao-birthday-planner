@@ -17,6 +17,7 @@ struct AppSettingsView: View {
 
     @State private var isJoining: Bool = false
     @State private var isManagingBackup: Bool = false
+    @State private var isShowingMyProfile: Bool = false
 
     private var strings: Strings { settings.strings }
 
@@ -53,6 +54,9 @@ struct AppSettingsView: View {
             }
             .sheet(isPresented: $isManagingBackup) {
                 CloudBackupView()
+            }
+            .sheet(isPresented: $isShowingMyProfile) {
+                MyProfileView()
             }
         }
         .tint(Palette.coral)
@@ -147,57 +151,52 @@ struct AppSettingsView: View {
 
     // MARK: - Surprise mode
 
+    /// The switches themselves live in "My profile"; this is the shortcut to them.
     private var surpriseCard: some View {
-        @Bindable var bindable = settings
-        let kind = gate.biometryKind
-
-        return AppSettingsCard(
+        AppSettingsCard(
             title: strings.settingsSurpriseSection,
             systemImage: "eye.slash.fill",
             tint: Palette.berry
         ) {
-            Toggle(isOn: $bindable.protectsSurpriseProfiles) {
-                HStack(spacing: 8) {
-                    Image(systemName: kind.symbolName)
+            Button {
+                isShowingMyProfile = true
+            } label: {
+                HStack(spacing: 10) {
+                    Image(systemName: gate.biometryKind.symbolName)
                         .font(.system(size: 15, weight: .semibold))
                         .foregroundStyle(Palette.berry)
-                    Text(strings.faceIDToggleTitle)
-                        .font(.system(.body, design: .rounded, weight: .semibold))
-                        .fixedSize(horizontal: false, vertical: true)
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(strings.privacySectionTitle)
+                            .font(.system(.body, design: .rounded, weight: .semibold))
+                            .foregroundStyle(.primary)
+                        Text(strings.privacyMovedCaption)
+                            .font(.system(.caption2, design: .rounded))
+                            .foregroundStyle(.tertiary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+
+                    Spacer(minLength: 0)
+
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 11, weight: .heavy))
+                        .foregroundStyle(.tertiary)
                 }
+                .contentShape(Rectangle())
             }
-            .tint(Palette.berry)
+            .buttonStyle(.plain)
 
-            Text(strings.faceIDToggleDescription)
-                .font(.system(.footnote, design: .rounded))
-                .foregroundStyle(.secondary)
-                .fixedSize(horizontal: false, vertical: true)
-
-            if settings.protectsSurpriseProfiles && !kind.isBiometric {
-                Label(strings.biometryUnavailableNote, systemImage: "info.circle.fill")
-                    .font(.system(.caption, design: .rounded, weight: .medium))
-                    .foregroundStyle(Palette.amber)
-                    .fixedSize(horizontal: false, vertical: true)
+            HStack(spacing: 8) {
+                statusChip(
+                    title: strings.faceIDToggleTitle,
+                    isOn: settings.protectsSurpriseProfiles
+                )
+                statusChip(
+                    title: strings.hidePreviewsToggleTitle,
+                    isOn: settings.hidesSurpriseNotificationPreviews
+                )
+                Spacer(minLength: 0)
             }
-
-            Divider().overlay(Palette.hairline)
-
-            Toggle(isOn: $bindable.hidesSurpriseNotificationPreviews) {
-                HStack(spacing: 8) {
-                    Image(systemName: "bell.slash.fill")
-                        .font(.system(size: 15, weight: .semibold))
-                        .foregroundStyle(Palette.berry)
-                    Text(strings.hidePreviewsToggleTitle)
-                        .font(.system(.body, design: .rounded, weight: .semibold))
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-            }
-            .tint(Palette.berry)
-
-            Text(strings.hidePreviewsToggleDescription)
-                .font(.system(.footnote, design: .rounded))
-                .foregroundStyle(.secondary)
-                .fixedSize(horizontal: false, vertical: true)
 
             if settings.hidesSurpriseNotificationPreviews {
                 previewSample
@@ -209,12 +208,24 @@ struct AppSettingsView: View {
                 .font(.system(.caption, design: .rounded, weight: .medium))
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
-
-            Text(strings.settingsSurpriseFooter)
-                .font(.system(.caption2, design: .rounded))
-                .foregroundStyle(.tertiary)
-                .fixedSize(horizontal: false, vertical: true)
         }
+    }
+
+    /// Compact on/off pill mirroring a privacy switch.
+    private func statusChip(title: String, isOn: Bool) -> some View {
+        HStack(spacing: 4) {
+            Image(systemName: isOn ? "checkmark.circle.fill" : "circle")
+                .font(.system(size: 9, weight: .black))
+            Text(title)
+                .font(.system(size: 11, weight: .bold, design: .rounded))
+                .lineLimit(1)
+        }
+        .foregroundStyle(isOn ? Palette.berry : Color.secondary)
+        .padding(.horizontal, 9)
+        .padding(.vertical, 5)
+        .background(
+            Capsule().fill(isOn ? Palette.berry.opacity(0.12) : Palette.surfaceRaised)
+        )
     }
 
     /// Live preview of the discreet notification so the effect is obvious.

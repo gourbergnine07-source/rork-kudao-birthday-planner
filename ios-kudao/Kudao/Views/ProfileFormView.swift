@@ -357,6 +357,9 @@ struct ProfileFormView: View {
                 photoData: photoData,
                 isSurpriseMode: isSurpriseMode
             )
+            // A new celebration inherits the reminder preferences from "My profile".
+            newProfile.reminderDaysBefore = settings.defaultReminderDaysBefore
+            newProfile.giftReminderDaysBefore = settings.defaultGiftReminderDaysBefore
             modelContext.insert(newProfile)
             saved = newProfile
         }

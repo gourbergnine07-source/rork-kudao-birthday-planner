@@ -1,6 +1,5 @@
 export { ShareRoom } from "./share-room";
 export { ShareDirectory } from "./share-directory";
-export { GalleryRoom } from "./gallery-room";
 
 type Env = { DO: Fetcher };
 
@@ -53,40 +52,6 @@ function directory(env: Env, path: string, method: string, body?: unknown): Prom
   return callDO(env, "ShareDirectory", "global", path, method, body);
 }
 
-function gallery(env: Env, profileId: string, path: string, method: string, body?: unknown): Promise<Response> {
-  return callDO(env, "GalleryRoom", profileId, path, method, body);
-}
-
-/** Forwards a binary payload (one media chunk) to the gallery object untouched. */
-function galleryBinary(env: Env, profileId: string, path: string, body: ArrayBuffer): Promise<Response> {
-  return env.DO.fetch(
-    new Request(`https://internal${path}`, {
-      method: "POST",
-      headers: new Headers({
-        "X-Rork-DO-Class": "GalleryRoom",
-        "X-Rork-DO-Id": profileId,
-        "Content-Type": "application/octet-stream",
-      }),
-      body,
-    }),
-  );
-}
-
-type GalleryAccess = { isMember: boolean; isOwner: boolean };
-
-/**
- * The gallery reuses the share room as its guest list: owner plus everyone who
- * claimed an invite. Profiles that were never shared stay private to their owner.
- */
-async function galleryAccess(env: Env, profileId: string, userId: string): Promise<GalleryAccess> {
-  if (!userId) return { isMember: false, isOwner: false };
-
-  const response = await room(env, profileId, `/access?userId=${encodeURIComponent(userId)}`, "GET");
-  if (!response.ok) return { isMember: false, isOwner: false };
-
-  const access = (await response.json()) as { isMember?: boolean; isOwner?: boolean };
-  return { isMember: access.isMember === true, isOwner: access.isOwner === true };
-}
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
@@ -158,60 +123,16 @@ export default {
         const profileId = decodeURIComponent(segments[1]);
         const rest = segments.slice(2);
 
-        // /rooms/:profileId/gallery[...] — party photos and videos.
-        if (rest[0] === "gallery") {
-          const action = rest[1] ?? "";
+        // GET /rooms/:profileId/access — guest list check used by the party gallery.
+        //
+        // The gallery itself lives in Supabase (Postgres + Storage); this route is
+        // how it asks the share room whether a Kudao user may see that gallery.
+        if (request.method === "GET" && rest.length === 1 && rest[0] === "access") {
           const userId = url.searchParams.get("userId") ?? "";
+          if (!userId) return json({ isMember: false, isOwner: false });
 
-          if (request.method === "GET" && (action === "" || action === "media")) {
-            const access = await galleryAccess(env, profileId, userId);
-            if (!access.isMember) return json({ error: "not_participant" }, 403);
-
-            if (action === "media") {
-              const itemId = url.searchParams.get("itemId") ?? "";
-              const media = await gallery(
-                env,
-                profileId,
-                `/media?itemId=${encodeURIComponent(itemId)}`,
-                "GET",
-              );
-              return new Response(media.body, { status: media.status, headers: media.headers });
-            }
-
-            const items = await gallery(env, profileId, "/items", "GET");
-            return new Response(items.body, { status: items.status, headers: items.headers });
-          }
-
-          if (request.method === "POST" && action === "chunk") {
-            const access = await galleryAccess(env, profileId, userId);
-            if (!access.isMember) return json({ error: "not_participant" }, 403);
-
-            const itemId = url.searchParams.get("itemId") ?? "";
-            const index = url.searchParams.get("index") ?? "";
-            const forwarded = await galleryBinary(
-              env,
-              profileId,
-              `/chunk?itemId=${encodeURIComponent(itemId)}&index=${encodeURIComponent(index)}` +
-                `&userId=${encodeURIComponent(userId)}`,
-              await request.arrayBuffer(),
-            );
-            return new Response(forwarded.body, { status: forwarded.status, headers: forwarded.headers });
-          }
-
-          if (
-            request.method === "POST" &&
-            (action === "begin" || action === "commit" || action === "delete" || action === "caption")
-          ) {
-            const body = (await request.json()) as { userId?: string };
-            const access = await galleryAccess(env, profileId, (body.userId ?? "").trim());
-            if (!access.isMember) return json({ error: "not_participant" }, 403);
-
-            const payload = action === "delete" ? { ...body, isOwner: access.isOwner } : body;
-            const result = await gallery(env, profileId, `/${action}`, "POST", payload);
-            return new Response(result.body, { status: result.status, headers: result.headers });
-          }
-
-          return json({ error: "not_found" }, 404);
+          const access = await room(env, profileId, `/access?userId=${encodeURIComponent(userId)}`, "GET");
+          return new Response(access.body, { status: access.status, headers: access.headers });
         }
 
         if (request.method === "GET" && rest.length === 0) {

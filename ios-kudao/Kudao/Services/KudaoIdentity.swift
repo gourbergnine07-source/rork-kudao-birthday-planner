@@ -17,6 +17,7 @@ final class KudaoIdentity {
 
     private static let userIDKey = "kudao.identity.userID"
     private static let displayNameKey = "kudao.identity.displayName"
+    private static let photoFileName = "kudao-me.jpg"
 
     /// Stable, anonymous id for this device.
     let userID: String
@@ -27,6 +28,11 @@ final class KudaoIdentity {
             guard cleaned != oldValue.trimmingCharacters(in: .whitespacesAndNewlines) else { return }
             UserDefaults.standard.set(cleaned, forKey: Self.displayNameKey)
         }
+    }
+
+    /// The user's own avatar, kept as a compressed JPEG next to the app data.
+    var photoData: Data? {
+        didSet { Self.persist(photoData) }
     }
 
     init() {
@@ -41,6 +47,28 @@ final class KudaoIdentity {
         }
 
         displayName = defaults.string(forKey: Self.displayNameKey) ?? ""
+        photoData = Self.photoURL.flatMap { try? Data(contentsOf: $0) }
+    }
+
+    // MARK: - Avatar storage
+
+    private static var photoURL: URL? {
+        let directory = try? FileManager.default.url(
+            for: .applicationSupportDirectory,
+            in: .userDomainMask,
+            appropriateFor: nil,
+            create: true
+        )
+        return directory?.appendingPathComponent(photoFileName)
+    }
+
+    private static func persist(_ data: Data?) {
+        guard let url = photoURL else { return }
+        if let data {
+            try? data.write(to: url, options: .atomic)
+        } else {
+            try? FileManager.default.removeItem(at: url)
+        }
     }
 
     var trimmedName: String {

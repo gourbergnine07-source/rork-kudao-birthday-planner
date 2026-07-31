@@ -42,7 +42,9 @@ struct GalleryTabView: View {
     private var items: [GalleryItem] {
         // `revision` keeps this recomputed after every merge or upload.
         _ = gallery.revision
-        return gallery.items(for: profile, context: modelContext)
+        return settings.gallerySortOrder.sorted(
+            gallery.items(for: profile, context: modelContext)
+        )
     }
 
     /// Memories already collected keep the gallery reachable long after the party.
@@ -160,6 +162,16 @@ struct GalleryTabView: View {
                     cell(item)
                 }
             }
+            .animation(reduceMotion ? nil : .smooth(duration: 0.32), value: settings.gallerySortOrder)
+
+            HStack(spacing: 5) {
+                Image(systemName: settings.gallerySortOrder.symbolName)
+                    .font(.system(size: 9, weight: .black))
+                Text(settings.gallerySortOrder.title(strings))
+                    .font(.system(.caption2, design: .rounded, weight: .semibold))
+                Spacer(minLength: 0)
+            }
+            .foregroundStyle(.tertiary)
 
             HStack(spacing: 7) {
                 Image(systemName: "lock.shield.fill")
@@ -191,6 +203,8 @@ struct GalleryTabView: View {
                     .font(.system(.caption, design: .rounded, weight: .semibold))
                     .foregroundStyle(.secondary)
 
+                sortButton
+
                 addMenu {
                     Image(systemName: "plus")
                         .font(.system(size: 14, weight: .heavy))
@@ -201,6 +215,44 @@ struct GalleryTabView: View {
                 }
             }
         }
+    }
+
+    /// One tap flips the gallery between newest-first and oldest-first.
+    private var sortButton: some View {
+        let order = settings.gallerySortOrder
+        let isOldest = order == .oldestFirst
+
+        return Button {
+            withAnimation(reduceMotion ? nil : .smooth(duration: 0.32)) {
+                settings.gallerySortOrder = isOldest ? .newestFirst : .oldestFirst
+            }
+        } label: {
+            Image(systemName: "arrow.up.arrow.down")
+                .font(.system(size: 12, weight: .heavy))
+                .foregroundStyle(isOldest ? Color.white : Palette.violet)
+                .rotationEffect(.degrees(isOldest ? 180 : 0))
+                .frame(width: 32, height: 32)
+                .background(
+                    Circle().fill(isOldest ? AnyShapeStyle(Palette.violet) : AnyShapeStyle(Palette.violet.opacity(0.14)))
+                )
+        }
+        .buttonStyle(PressableCardStyle())
+        .accessibilityLabel("\(strings.gallerySortLabel): \(order.title(strings))")
+        .sensoryFeedback(.selection, trigger: order)
+        .contextMenu {
+            Picker(strings.gallerySortLabel, selection: sortBinding) {
+                ForEach(GallerySortOrder.allCases) { candidate in
+                    Label(candidate.title(strings), systemImage: candidate.symbolName).tag(candidate)
+                }
+            }
+        }
+    }
+
+    private var sortBinding: Binding<GallerySortOrder> {
+        Binding(
+            get: { settings.gallerySortOrder },
+            set: { settings.gallerySortOrder = $0 }
+        )
     }
 
     private var addButton: some View {

@@ -60,6 +60,7 @@ struct HomeView: View {
     @Environment(AppSettings.self) private var settings
     @Environment(NotificationService.self) private var notifications
     @Environment(BiometricGate.self) private var gate
+    @Environment(KudaoIdentity.self) private var identity
     @Query private var profiles: [BirthdayProfile]
 
     @State private var isCreatingProfile: Bool = false
@@ -75,6 +76,7 @@ struct HomeView: View {
     /// Profile that must open straight on the gallery after the party reminder.
     @State private var galleryProfileID: UUID?
     @State private var isShowingSettings: Bool = false
+    @State private var isShowingMyProfile: Bool = false
     @State private var unlockFailed: Bool = false
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -122,12 +124,18 @@ struct HomeView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
+                    myProfileButton
+                }
+                ToolbarItem(placement: .principal) {
                     Text("Kudao")
                         .font(.system(.title3, design: .rounded, weight: .heavy))
                         .foregroundStyle(Palette.coral)
                 }
                 ToolbarItem(placement: .topBarTrailing) {
-                    settingsButton
+                    HStack(spacing: 14) {
+                        languageButton
+                        settingsButton
+                    }
                 }
             }
             .safeAreaInset(edge: .bottom) {
@@ -151,6 +159,9 @@ struct HomeView: View {
             }
             .sheet(isPresented: $isShowingSettings) {
                 AppSettingsView()
+            }
+            .sheet(isPresented: $isShowingMyProfile) {
+                MyProfileView()
             }
             .alert(strings.unlockFailedTitle, isPresented: $unlockFailed) {
                 Button(strings.doneAction, role: .cancel) {}
@@ -568,6 +579,42 @@ struct HomeView: View {
         .accessibilityLabel(strings.newProfileTitle)
     }
 
+    /// The user's own corner of the app: avatar, defaults, privacy, account.
+    private var myProfileButton: some View {
+        Button {
+            isShowingMyProfile = true
+        } label: {
+            AvatarView(
+                name: identity.hasName ? identity.trimmedName : "?",
+                photoData: identity.photoData,
+                size: 32,
+                ringColor: Palette.coral.opacity(0.35),
+                ringWidth: 1.5
+            )
+        }
+        .buttonStyle(PressableCardStyle())
+        .accessibilityLabel(strings.myProfileTitle)
+    }
+
+    /// Quick language switch, kept separate from everything else.
+    private var languageButton: some View {
+        @Bindable var bindable = settings
+
+        return Menu {
+            Picker(strings.languageLabel, selection: $bindable.language) {
+                ForEach(AppLanguage.allCases) { language in
+                    Text("\(language.flag)  \(language.displayName)").tag(language)
+                }
+            }
+        } label: {
+            Image(systemName: "globe")
+                .font(.system(size: 16, weight: .semibold))
+                .foregroundStyle(Palette.coral)
+        }
+        .accessibilityLabel(strings.languageLabel)
+        .sensoryFeedback(.selection, trigger: settings.language)
+    }
+
     private var settingsButton: some View {
         Button {
             isShowingSettings = true
@@ -604,5 +651,7 @@ struct PressableCardStyle: ButtonStyle {
         .environment(AppSettings())
         .environment(NotificationService.shared)
         .environment(BiometricGate.shared)
+        .environment(KudaoIdentity.shared)
+        .environment(CloudBackupService())
         .modelContainer(KudaoModelContainer.preview())
 }

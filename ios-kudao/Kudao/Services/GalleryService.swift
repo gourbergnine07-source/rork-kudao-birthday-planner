@@ -229,7 +229,8 @@ final class GalleryService {
         revision += 1
     }
 
-    /// begin → chunks → commit, the three steps the gallery room expects.
+    /// begin → upload → commit: the row is reserved, the file goes straight to
+    /// Storage through a one-shot signed URL, then the memory is published.
     private func push(
         _ payload: Data,
         remoteID: String,
@@ -240,10 +241,7 @@ final class GalleryService {
         identity: KudaoIdentity,
         strings: Strings
     ) async throws {
-        let chunkSize = GalleryClient.chunkBytes
-        let chunkCount = max(1, Int(ceil(Double(payload.count) / Double(chunkSize))))
-
-        try await GalleryClient.begin(
+        let uploadURL = try await GalleryClient.begin(
             roomID: profile.roomID,
             start: GalleryUploadStart(
                 itemId: remoteID,
@@ -253,26 +251,13 @@ final class GalleryService {
                 mime: prepared.mediaType.mimeType,
                 createdAt: createdAt.timeIntervalSince1970 * 1000,
                 byteSize: payload.count,
-                chunkCount: chunkCount,
                 duration: prepared.durationSeconds,
                 thumbnailBase64: prepared.thumbnail.base64EncodedString(),
                 caption: caption
             )
         )
 
-        for index in 0..<chunkCount {
-            let start = index * chunkSize
-            let end = min(payload.count, start + chunkSize)
-            let slice = payload.subdata(in: start..<end)
-
-            try await GalleryClient.uploadChunk(
-                roomID: profile.roomID,
-                itemID: remoteID,
-                index: index,
-                userID: identity.userID,
-                bytes: slice
-            )
-        }
+        try await GalleryClient.upload(payload, to: uploadURL, mime: prepared.mediaType.mimeType)
 
         try await GalleryClient.commit(
             roomID: profile.roomID,

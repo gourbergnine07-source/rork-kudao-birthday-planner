@@ -5,10 +5,39 @@
 
 import Foundation
 
+/// Where the user's default reminder preferences live.
+///
+/// The schedule math and the profile form both read these, so changing the
+/// defaults in "My profile" moves every future reminder at once.
+nonisolated enum ReminderDefaults {
+    static let hourKey = "kudao.defaults.reminderHour"
+    static let minuteKey = "kudao.defaults.reminderMinute"
+    static let daysBeforeKey = "kudao.defaults.reminderDays"
+    static let giftDaysBeforeKey = "kudao.defaults.giftReminderDays"
+
+    static let hour: Int = 9
+    static let minute: Int = 0
+    static let daysBefore: Int = 7
+    static let giftDaysBefore: Int = 10
+
+    /// Reads a stored default, falling back to the shipped value.
+    static func stored(_ key: String, fallback: Int, range: ClosedRange<Int>) -> Int {
+        guard let value = UserDefaults.standard.object(forKey: key) as? Int else { return fallback }
+        return min(max(value, range.lowerBound), range.upperBound)
+    }
+}
+
 /// Calendar math for the local reminder fire dates of a profile.
 extension BirthdayProfile {
     /// Hour of the day every reminder fires at, local time.
-    static let reminderHour: Int = 9
+    static var reminderHour: Int {
+        ReminderDefaults.stored(ReminderDefaults.hourKey, fallback: ReminderDefaults.hour, range: 0...23)
+    }
+
+    /// Minute of the hour every reminder fires at, local time.
+    static var reminderMinute: Int {
+        ReminderDefaults.stored(ReminderDefaults.minuteKey, fallback: ReminderDefaults.minute, range: 0...59)
+    }
 
     /// The next fire date for a reminder placed `daysBefore` the birthday.
     ///
@@ -32,7 +61,7 @@ extension BirthdayProfile {
                   let shifted = calendar.date(byAdding: .day, value: -max(0, daysBefore), to: occurrence),
                   let fire = calendar.date(
                       bySettingHour: Self.reminderHour,
-                      minute: 0,
+                      minute: Self.reminderMinute,
                       second: 0,
                       of: shifted
                   ),
@@ -74,7 +103,7 @@ extension BirthdayProfile {
                   let dayAfter = calendar.date(byAdding: .day, value: 1, to: occurrence),
                   let fire = calendar.date(
                       bySettingHour: Self.reminderHour,
-                      minute: 0,
+                      minute: Self.reminderMinute,
                       second: 0,
                       of: dayAfter
                   ),

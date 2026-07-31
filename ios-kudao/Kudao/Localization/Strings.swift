@@ -434,6 +434,30 @@ nonisolated struct Strings: Sendable {
     let cloudInvalidCodeMessage: String
     let cloudUnknownCodeMessage: String
     let cloudGenericErrorMessage: String
+    let gallerySortLabel: String
+    let gallerySortNewest: String
+    let gallerySortOldest: String
+    let myProfileTitle: String
+    let myProfileSubtitle: String
+    let notificationDefaultsTitle: String
+    let notificationDefaultsCaption: String
+    let defaultReminderDaysLabel: String
+    let defaultGiftDaysLabel: String
+    let defaultReminderTimeLabel: String
+    let defaultsAppliedNote: String
+    let privacySectionTitle: String
+    let privacyMovedCaption: String
+    let accountSectionTitle: String
+    let accountNoLoginTitle: String
+    let accountNoLoginCaption: String
+    let accountVaultCaption: String
+    let accountSignOutAction: String
+    let accountSignOutTitle: String
+    let accountSignOutMessage: String
+    let appInfoTitle: String
+    let appVersionLabel: String
+    let appSupportAction: String
+    let appSupportCaption: String
     let galleryPreparingTitle: String
     let galleryUploadAction: String
     let galleryCaptionSheetTitle: String
@@ -855,6 +879,30 @@ extension Strings {
         cloudInvalidCodeMessage: "Codice non valido: controlla di averlo copiato per intero.",
         cloudUnknownCodeMessage: "Nessun backup trovato con questo codice.",
         cloudGenericErrorMessage: "Non riesco a raggiungere il backup: controlla la connessione e riprova.",
+        gallerySortLabel: "Ordine",
+        gallerySortNewest: "Dai pi\u{00F9} recenti",
+        gallerySortOldest: "Dai pi\u{00F9} vecchi",
+        myProfileTitle: "Il mio profilo",
+        myProfileSubtitle: "Foto e nome che vedono le persone con cui condividi un festeggiato.",
+        notificationDefaultsTitle: "Impostazioni notifiche",
+        notificationDefaultsCaption: "Valori usati per ogni nuovo festeggiato. Puoi sempre cambiarli sul singolo profilo.",
+        defaultReminderDaysLabel: "Promemoria compleanno",
+        defaultGiftDaysLabel: "Promemoria regalo",
+        defaultReminderTimeLabel: "Orario",
+        defaultsAppliedNote: "L\u{2019}orario vale per tutti i promemoria gi\u{00E0} programmati.",
+        privacySectionTitle: "Privacy",
+        privacyMovedCaption: "Face ID e anteprime discrete si gestiscono da Il mio profilo.",
+        accountSectionTitle: "Account",
+        accountNoLoginTitle: "Nessun accesso richiesto",
+        accountNoLoginCaption: "Kudao funziona senza email n\u{00E9} password: i dati restano su questo iPhone.",
+        accountVaultCaption: "Recuperabile con il tuo codice di ripristino.",
+        accountSignOutAction: "Esci dal backup",
+        accountSignOutTitle: "Uscire dal backup?",
+        accountSignOutMessage: "Questo iPhone smette di salvare nel cloud. I dati restano qui e la copia salvata non viene toccata: puoi rientrare con il codice di ripristino.",
+        appInfoTitle: "Info app",
+        appVersionLabel: "Versione",
+        appSupportAction: "Scrivi al supporto",
+        appSupportCaption: "Rispondiamo di solito entro un paio di giorni lavorativi.",
         galleryPreparingTitle: "Preparo i ricordi\u{2026}",
         galleryUploadAction: "Carica i ricordi",
         galleryCaptionSheetTitle: "Nuovi ricordi",
@@ -1275,6 +1323,30 @@ extension Strings {
         cloudInvalidCodeMessage: "That code looks incomplete: please check it and try again.",
         cloudUnknownCodeMessage: "No backup was found for this code.",
         cloudGenericErrorMessage: "Cannot reach the backup right now: check your connection and try again.",
+        gallerySortLabel: "Order",
+        gallerySortNewest: "Newest first",
+        gallerySortOldest: "Oldest first",
+        myProfileTitle: "My profile",
+        myProfileSubtitle: "The photo and name people see when you share a celebration.",
+        notificationDefaultsTitle: "Notification settings",
+        notificationDefaultsCaption: "Used for every new celebration. You can still change them profile by profile.",
+        defaultReminderDaysLabel: "Birthday reminder",
+        defaultGiftDaysLabel: "Gift reminder",
+        defaultReminderTimeLabel: "Time",
+        defaultsAppliedNote: "The time applies to every reminder already scheduled.",
+        privacySectionTitle: "Privacy",
+        privacyMovedCaption: "Face ID and discreet previews live in My profile.",
+        accountSectionTitle: "Account",
+        accountNoLoginTitle: "No sign-in needed",
+        accountNoLoginCaption: "Kudao works with no email and no password: your data stays on this iPhone.",
+        accountVaultCaption: "Recoverable with your recovery code.",
+        accountSignOutAction: "Sign out of backup",
+        accountSignOutTitle: "Sign out of backup?",
+        accountSignOutMessage: "This iPhone stops saving to the cloud. Your data stays here and the saved copy is untouched: you can come back with your recovery code.",
+        appInfoTitle: "App info",
+        appVersionLabel: "Version",
+        appSupportAction: "Contact support",
+        appSupportCaption: "We usually reply within a couple of working days.",
         galleryPreparingTitle: "Getting the memories ready\u{2026}",
         galleryUploadAction: "Upload memories",
         galleryCaptionSheetTitle: "New memories",
@@ -1695,6 +1767,30 @@ extension Strings {
         cloudInvalidCodeMessage: "Code incomplet : v\u{00E9}rifie-le et r\u{00E9}essaie.",
         cloudUnknownCodeMessage: "Aucune sauvegarde trouv\u{00E9}e pour ce code.",
         cloudGenericErrorMessage: "Impossible de joindre la sauvegarde : v\u{00E9}rifie ta connexion et r\u{00E9}essaie.",
+        gallerySortLabel: "Ordre",
+        gallerySortNewest: "Les plus r\u{00E9}cents d\u{2019}abord",
+        gallerySortOldest: "Les plus anciens d\u{2019}abord",
+        myProfileTitle: "Mon profil",
+        myProfileSubtitle: "La photo et le nom que voient les personnes avec qui tu partages un anniversaire.",
+        notificationDefaultsTitle: "R\u{00E9}glages des notifications",
+        notificationDefaultsCaption: "Utilis\u{00E9}s pour chaque nouvel anniversaire. Tu peux toujours les changer profil par profil.",
+        defaultReminderDaysLabel: "Rappel anniversaire",
+        defaultGiftDaysLabel: "Rappel cadeau",
+        defaultReminderTimeLabel: "Heure",
+        defaultsAppliedNote: "L\u{2019}heure s\u{2019}applique \u{00E0} tous les rappels d\u{00E9}j\u{00E0} programm\u{00E9}s.",
+        privacySectionTitle: "Confidentialit\u{00E9}",
+        privacyMovedCaption: "Face ID et aper\u{00E7}us discrets se g\u{00E8}rent dans Mon profil.",
+        accountSectionTitle: "Compte",
+        accountNoLoginTitle: "Aucune connexion requise",
+        accountNoLoginCaption: "Kudao fonctionne sans e-mail ni mot de passe : tes donn\u{00E9}es restent sur cet iPhone.",
+        accountVaultCaption: "R\u{00E9}cup\u{00E9}rable avec ton code de restauration.",
+        accountSignOutAction: "Se d\u{00E9}connecter de la sauvegarde",
+        accountSignOutTitle: "Se d\u{00E9}connecter de la sauvegarde ?",
+        accountSignOutMessage: "Cet iPhone cesse d\u{2019}enregistrer dans le cloud. Tes donn\u{00E9}es restent ici et la copie enregistr\u{00E9}e n\u{2019}est pas touch\u{00E9}e : tu peux revenir avec ton code de restauration.",
+        appInfoTitle: "\u{00C0} propos",
+        appVersionLabel: "Version",
+        appSupportAction: "Contacter le support",
+        appSupportCaption: "Nous r\u{00E9}pondons g\u{00E9}n\u{00E9}ralement sous deux jours ouvr\u{00E9}s.",
         galleryPreparingTitle: "Pr\u{00E9}paration des souvenirs\u{2026}",
         galleryUploadAction: "Envoyer les souvenirs",
         galleryCaptionSheetTitle: "Nouveaux souvenirs",
@@ -2115,6 +2211,30 @@ extension Strings {
         cloudInvalidCodeMessage: "El c\u{00F3}digo parece incompleto: rev\u{00ED}salo e int\u{00E9}ntalo de nuevo.",
         cloudUnknownCodeMessage: "No se ha encontrado ninguna copia con este c\u{00F3}digo.",
         cloudGenericErrorMessage: "No puedo conectar con la copia: revisa la conexi\u{00F3}n e int\u{00E9}ntalo de nuevo.",
+        gallerySortLabel: "Orden",
+        gallerySortNewest: "M\u{00E1}s recientes primero",
+        gallerySortOldest: "M\u{00E1}s antiguos primero",
+        myProfileTitle: "Mi perfil",
+        myProfileSubtitle: "La foto y el nombre que ven las personas con quienes compartes un cumplea\u{00F1}os.",
+        notificationDefaultsTitle: "Ajustes de notificaciones",
+        notificationDefaultsCaption: "Se usan en cada nuevo cumplea\u{00F1}os. Siempre puedes cambiarlos perfil por perfil.",
+        defaultReminderDaysLabel: "Aviso de cumplea\u{00F1}os",
+        defaultGiftDaysLabel: "Aviso de regalo",
+        defaultReminderTimeLabel: "Hora",
+        defaultsAppliedNote: "La hora se aplica a todos los avisos ya programados.",
+        privacySectionTitle: "Privacidad",
+        privacyMovedCaption: "Face ID y las vistas discretas se gestionan en Mi perfil.",
+        accountSectionTitle: "Cuenta",
+        accountNoLoginTitle: "No hace falta iniciar sesi\u{00F3}n",
+        accountNoLoginCaption: "Kudao funciona sin correo ni contrase\u{00F1}a: tus datos se quedan en este iPhone.",
+        accountVaultCaption: "Recuperable con tu c\u{00F3}digo de recuperaci\u{00F3}n.",
+        accountSignOutAction: "Salir de la copia",
+        accountSignOutTitle: "\u{00BF}Salir de la copia?",
+        accountSignOutMessage: "Este iPhone dejar\u{00E1} de guardar en la nube. Tus datos siguen aqu\u{00ED} y la copia guardada no se toca: puedes volver con tu c\u{00F3}digo de recuperaci\u{00F3}n.",
+        appInfoTitle: "Informaci\u{00F3}n",
+        appVersionLabel: "Versi\u{00F3}n",
+        appSupportAction: "Escribir al soporte",
+        appSupportCaption: "Solemos responder en un par de d\u{00ED}as laborables.",
         galleryPreparingTitle: "Preparando los recuerdos\u{2026}",
         galleryUploadAction: "Subir recuerdos",
         galleryCaptionSheetTitle: "Nuevos recuerdos",
