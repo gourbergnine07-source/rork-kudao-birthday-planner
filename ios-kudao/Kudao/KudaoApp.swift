@@ -13,6 +13,7 @@ struct KudaoApp: App {
     @State private var biometricGate = BiometricGate.shared
     @State private var identity = KudaoIdentity.shared
     @State private var collaboration = CollaborationService()
+    @State private var backup = CloudBackupService()
     private let container: ModelContainer = KudaoModelContainer.make()
 
     init() {
@@ -27,6 +28,7 @@ struct KudaoApp: App {
                 .environment(biometricGate)
                 .environment(identity)
                 .environment(collaboration)
+                .environment(backup)
                 .environment(\.locale, settings.locale)
         }
         .modelContainer(container)

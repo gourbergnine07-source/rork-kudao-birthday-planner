@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		XXCB0C833A4E7DDE353CE0XX /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = XX17F496E7391AF4178246XX /* Supabase */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -55,6 +56,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				XXCB0C833A4E7DDE353CE0XX /* Supabase in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -115,6 +117,7 @@
 			);
 			name = Kudao;
 			packageProductDependencies = (
+				XX17F496E7391AF4178246XX /* Supabase */,
 			);
 			productName = Kudao;
 			productReference = 105FC57A2E9EAD3100EA8BCF /* Kudao.app */;
@@ -206,6 +209,9 @@
 				105FC5792E9EAD3100EA8BCF /* Kudao */,
 				105FC5882E9EAD3200EA8BCF /* KudaoTests */,
 				105FC5922E9EAD3200EA8BCF /* KudaoUITests */,
+			);
+			packageReferences = (
+				XXA26CCC1C14E04A80BED3XX /* XCRemoteSwiftPackageReference "supabase-swift" */,
 			);
 		};
 /* End PBXProject section */
@@ -404,7 +410,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
-				INFOPLIST_KEY_NSFaceIDUsageDescription = "Kudao usa Face ID per proteggere i profili in modalit\U00e0 sorpresa.";
+				INFOPLIST_KEY_NSFaceIDUsageDescription = "Kudao usa Face ID per proteggere i profili in modalità sorpresa.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Kudao usa la tua posizione solo per trovare negozi vicini dove comprare il regalo.";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Kudao usa la fotocamera per scattare foto e registrare video della festa da aggiungere alla galleria condivisa.";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Kudao usa il microfono per registrare l'audio dei video della festa.";
@@ -442,7 +448,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
-				INFOPLIST_KEY_NSFaceIDUsageDescription = "Kudao usa Face ID per proteggere i profili in modalit\U00e0 sorpresa.";
+				INFOPLIST_KEY_NSFaceIDUsageDescription = "Kudao usa Face ID per proteggere i profili in modalità sorpresa.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Kudao usa la tua posizione solo per trovare negozi vicini dove comprare il regalo.";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Kudao usa la fotocamera per scattare foto e registrare video della festa da aggiungere alla galleria condivisa.";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Kudao usa il microfono per registrare l'audio dei video della festa.";
@@ -593,6 +599,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		XXA26CCC1C14E04A80BED3XX /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/supabase/supabase-swift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		XX17F496E7391AF4178246XX /* Supabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = XXA26CCC1C14E04A80BED3XX /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Supabase;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 105FC5722E9EAD3100EA8BCF /* Project object */;
 }

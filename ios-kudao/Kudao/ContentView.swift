@@ -19,5 +19,6 @@ struct ContentView: View {
         .environment(BiometricGate.shared)
         .environment(KudaoIdentity.shared)
         .environment(CollaborationService())
+        .environment(CloudBackupService())
         .modelContainer(KudaoModelContainer.preview())
 }

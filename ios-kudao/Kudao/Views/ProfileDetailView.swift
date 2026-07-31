@@ -177,6 +177,7 @@ struct ProfileDetailView: View {
         .onDisappear {
             guard pendingDeletion else { return }
             notifications.cancelReminders(for: profile.id)
+            CloudTombstones.recordProfile(profile.id)
             modelContext.delete(profile)
         }
         .environment(\.locale, settings.locale)

@@ -402,6 +402,38 @@ nonisolated struct Strings: Sendable {
     let galleryTooLargeMessage: String
     let galleryPrepareFailedMessage: String
     let galleryRetryUnavailable: String
+    let cloudSectionTitle: String
+    let cloudSectionCaption: String
+    let cloudManageTitle: String
+    let cloudOnLabel: String
+    let cloudOffLabel: String
+    let cloudOffCaption: String
+    let cloudNeverSynced: String
+    let cloudLastSyncFormat: String
+    let cloudEnableTitle: String
+    let cloudEnableCaption: String
+    let cloudEnableAction: String
+    let cloudCodeLabel: String
+    let cloudCodeCaption: String
+    let cloudCopyAction: String
+    let cloudCopiedLabel: String
+    let cloudActionsTitle: String
+    let cloudSyncNowAction: String
+    let cloudDisableAction: String
+    let cloudDeleteRemoteAction: String
+    let cloudDisableTitle: String
+    let cloudDisableMessage: String
+    let cloudRestoreTitle: String
+    let cloudRestoreHint: String
+    let cloudRestorePlaceholder: String
+    let cloudRestoreAction: String
+    let cloudRestoredFormat: String
+    let cloudBackedUpBanner: String
+    let cloudPrivacyNote: String
+    let cloudUnavailableMessage: String
+    let cloudInvalidCodeMessage: String
+    let cloudUnknownCodeMessage: String
+    let cloudGenericErrorMessage: String
     let galleryPreparingTitle: String
     let galleryUploadAction: String
     let galleryCaptionSheetTitle: String
@@ -791,6 +823,38 @@ extension Strings {
         galleryTooLargeMessage: "Il file \u{00E8} troppo grande: prova con un video pi\u{00F9} corto (max 25 MB).",
         galleryPrepareFailedMessage: "Non riusciamo a preparare questo contenuto. Riprova con un altro file.",
         galleryRetryUnavailable: "Il file originale non \u{00E8} pi\u{00F9} disponibile: caricalo di nuovo.",
+        cloudSectionTitle: "Backup e ripristino",
+        cloudSectionCaption: "Tieni al sicuro profili, diario, piani e messaggi.",
+        cloudManageTitle: "Backup e ripristino",
+        cloudOnLabel: "Backup attivo",
+        cloudOffLabel: "Backup non attivo",
+        cloudOffCaption: "Al momento i tuoi dati vivono solo su questo iPhone.",
+        cloudNeverSynced: "Nessun salvataggio ancora effettuato.",
+        cloudLastSyncFormat: "Ultimo salvataggio: %@",
+        cloudEnableTitle: "Attiva il backup",
+        cloudEnableCaption: "Kudao salva una copia dei tuoi profili, delle note del diario, dei piani festa e dei messaggi. Ricevi un codice di ripristino per rimetterli su un altro iPhone.",
+        cloudEnableAction: "Attiva il backup",
+        cloudCodeLabel: "Il tuo codice di ripristino",
+        cloudCodeCaption: "Conservalo in un posto sicuro: \u{00E8} l\u{2019}unica chiave per recuperare i tuoi dati. Chi ha il codice pu\u{00F2} ripristinarli.",
+        cloudCopyAction: "Copia il codice",
+        cloudCopiedLabel: "Codice copiato",
+        cloudActionsTitle: "Gestione",
+        cloudSyncNowAction: "Salva adesso",
+        cloudDisableAction: "Disattiva il backup",
+        cloudDeleteRemoteAction: "Disattiva ed elimina la copia",
+        cloudDisableTitle: "Disattivare il backup?",
+        cloudDisableMessage: "I dati restano su questo iPhone. Puoi anche eliminare del tutto la copia salvata.",
+        cloudRestoreTitle: "Ripristina su questo iPhone",
+        cloudRestoreHint: "Hai gi\u{00E0} un backup? Inserisci il codice di ripristino per riportare qui tutto.",
+        cloudRestorePlaceholder: "CODICE",
+        cloudRestoreAction: "Ripristina",
+        cloudRestoredFormat: "%d elementi ripristinati",
+        cloudBackedUpBanner: "Tutto salvato",
+        cloudPrivacyNote: "Kudao non chiede email n\u{00E9} password: la copia \u{00E8} legata solo al tuo codice di ripristino, salvato nel portachiavi di iOS. I profili condivisi da altri non vengono salvati qui.",
+        cloudUnavailableMessage: "Il backup non \u{00E8} disponibile in questa versione dell\u{2019}app.",
+        cloudInvalidCodeMessage: "Codice non valido: controlla di averlo copiato per intero.",
+        cloudUnknownCodeMessage: "Nessun backup trovato con questo codice.",
+        cloudGenericErrorMessage: "Non riesco a raggiungere il backup: controlla la connessione e riprova.",
         galleryPreparingTitle: "Preparo i ricordi\u{2026}",
         galleryUploadAction: "Carica i ricordi",
         galleryCaptionSheetTitle: "Nuovi ricordi",
@@ -1179,6 +1243,38 @@ extension Strings {
         galleryTooLargeMessage: "That file is too big: try a shorter video (25 MB max).",
         galleryPrepareFailedMessage: "We can\u{2019}t prepare this content. Try another file.",
         galleryRetryUnavailable: "The original file is gone: please upload it again.",
+        cloudSectionTitle: "Backup & restore",
+        cloudSectionCaption: "Keep profiles, diary, plans and messages safe.",
+        cloudManageTitle: "Backup & restore",
+        cloudOnLabel: "Backup is on",
+        cloudOffLabel: "Backup is off",
+        cloudOffCaption: "Right now your data only lives on this iPhone.",
+        cloudNeverSynced: "Nothing has been saved yet.",
+        cloudLastSyncFormat: "Last saved: %@",
+        cloudEnableTitle: "Turn on backup",
+        cloudEnableCaption: "Kudao keeps a copy of your profiles, diary notes, party plans and messages. You get a recovery code to bring them back on another iPhone.",
+        cloudEnableAction: "Turn on backup",
+        cloudCodeLabel: "Your recovery code",
+        cloudCodeCaption: "Keep it somewhere safe: it is the only key to your data. Anyone with the code can restore it.",
+        cloudCopyAction: "Copy code",
+        cloudCopiedLabel: "Code copied",
+        cloudActionsTitle: "Manage",
+        cloudSyncNowAction: "Save now",
+        cloudDisableAction: "Turn off backup",
+        cloudDeleteRemoteAction: "Turn off and delete the copy",
+        cloudDisableTitle: "Turn off backup?",
+        cloudDisableMessage: "Your data stays on this iPhone. You can also delete the saved copy entirely.",
+        cloudRestoreTitle: "Restore on this iPhone",
+        cloudRestoreHint: "Already have a backup? Enter the recovery code to bring everything back.",
+        cloudRestorePlaceholder: "CODE",
+        cloudRestoreAction: "Restore",
+        cloudRestoredFormat: "%d items restored",
+        cloudBackedUpBanner: "Everything saved",
+        cloudPrivacyNote: "Kudao asks for no email and no password: the copy is tied only to your recovery code, stored in the iOS keychain. Profiles shared with you by others are not saved here.",
+        cloudUnavailableMessage: "Backup is not available in this build of the app.",
+        cloudInvalidCodeMessage: "That code looks incomplete: please check it and try again.",
+        cloudUnknownCodeMessage: "No backup was found for this code.",
+        cloudGenericErrorMessage: "Cannot reach the backup right now: check your connection and try again.",
         galleryPreparingTitle: "Getting the memories ready\u{2026}",
         galleryUploadAction: "Upload memories",
         galleryCaptionSheetTitle: "New memories",
@@ -1567,6 +1663,38 @@ extension Strings {
         galleryTooLargeMessage: "Le fichier est trop lourd : essaie une vid\u{00E9}o plus courte (25 Mo max).",
         galleryPrepareFailedMessage: "Impossible de pr\u{00E9}parer ce contenu. Essaie un autre fichier.",
         galleryRetryUnavailable: "Le fichier d\u{2019}origine n\u{2019}est plus disponible : envoie-le \u{00E0} nouveau.",
+        cloudSectionTitle: "Sauvegarde et restauration",
+        cloudSectionCaption: "Garde profils, journal, plans et messages en s\u{00E9}curit\u{00E9}.",
+        cloudManageTitle: "Sauvegarde",
+        cloudOnLabel: "Sauvegarde activ\u{00E9}e",
+        cloudOffLabel: "Sauvegarde d\u{00E9}sactiv\u{00E9}e",
+        cloudOffCaption: "Pour l\u{2019}instant tes donn\u{00E9}es vivent seulement sur cet iPhone.",
+        cloudNeverSynced: "Aucune sauvegarde effectu\u{00E9}e pour le moment.",
+        cloudLastSyncFormat: "Derni\u{00E8}re sauvegarde : %@",
+        cloudEnableTitle: "Activer la sauvegarde",
+        cloudEnableCaption: "Kudao conserve une copie de tes profils, notes du journal, plans de f\u{00EA}te et messages. Tu re\u{00E7}ois un code de restauration pour tout retrouver sur un autre iPhone.",
+        cloudEnableAction: "Activer la sauvegarde",
+        cloudCodeLabel: "Ton code de restauration",
+        cloudCodeCaption: "Garde-le en lieu s\u{00FB}r : c\u{2019}est la seule cl\u{00E9} vers tes donn\u{00E9}es. Qui poss\u{00E8}de le code peut les restaurer.",
+        cloudCopyAction: "Copier le code",
+        cloudCopiedLabel: "Code copi\u{00E9}",
+        cloudActionsTitle: "G\u{00E9}rer",
+        cloudSyncNowAction: "Sauvegarder maintenant",
+        cloudDisableAction: "D\u{00E9}sactiver la sauvegarde",
+        cloudDeleteRemoteAction: "D\u{00E9}sactiver et supprimer la copie",
+        cloudDisableTitle: "D\u{00E9}sactiver la sauvegarde ?",
+        cloudDisableMessage: "Tes donn\u{00E9}es restent sur cet iPhone. Tu peux aussi supprimer compl\u{00E8}tement la copie enregistr\u{00E9}e.",
+        cloudRestoreTitle: "Restaurer sur cet iPhone",
+        cloudRestoreHint: "Tu as d\u{00E9}j\u{00E0} une sauvegarde ? Saisis le code de restauration pour tout r\u{00E9}cup\u{00E9}rer.",
+        cloudRestorePlaceholder: "CODE",
+        cloudRestoreAction: "Restaurer",
+        cloudRestoredFormat: "%d \u{00E9}l\u{00E9}ments restaur\u{00E9}s",
+        cloudBackedUpBanner: "Tout est sauvegard\u{00E9}",
+        cloudPrivacyNote: "Kudao ne demande ni e-mail ni mot de passe : la copie est li\u{00E9}e uniquement \u{00E0} ton code de restauration, conserv\u{00E9} dans le trousseau iOS. Les profils partag\u{00E9}s par d\u{2019}autres ne sont pas sauvegard\u{00E9}s ici.",
+        cloudUnavailableMessage: "La sauvegarde n\u{2019}est pas disponible dans cette version de l\u{2019}app.",
+        cloudInvalidCodeMessage: "Code incomplet : v\u{00E9}rifie-le et r\u{00E9}essaie.",
+        cloudUnknownCodeMessage: "Aucune sauvegarde trouv\u{00E9}e pour ce code.",
+        cloudGenericErrorMessage: "Impossible de joindre la sauvegarde : v\u{00E9}rifie ta connexion et r\u{00E9}essaie.",
         galleryPreparingTitle: "Pr\u{00E9}paration des souvenirs\u{2026}",
         galleryUploadAction: "Envoyer les souvenirs",
         galleryCaptionSheetTitle: "Nouveaux souvenirs",
@@ -1955,6 +2083,38 @@ extension Strings {
         galleryTooLargeMessage: "El archivo es demasiado grande: prueba con un v\u{00ED}deo m\u{00E1}s corto (m\u{00E1}x. 25 MB).",
         galleryPrepareFailedMessage: "No podemos preparar este contenido. Prueba con otro archivo.",
         galleryRetryUnavailable: "El archivo original ya no est\u{00E1} disponible: vuelve a subirlo.",
+        cloudSectionTitle: "Copia y restauraci\u{00F3}n",
+        cloudSectionCaption: "Mant\u{00E9}n a salvo perfiles, diario, planes y mensajes.",
+        cloudManageTitle: "Copia de seguridad",
+        cloudOnLabel: "Copia activada",
+        cloudOffLabel: "Copia desactivada",
+        cloudOffCaption: "Ahora mismo tus datos solo viven en este iPhone.",
+        cloudNeverSynced: "Todav\u{00ED}a no se ha guardado nada.",
+        cloudLastSyncFormat: "\u{00DA}ltima copia: %@",
+        cloudEnableTitle: "Activar la copia",
+        cloudEnableCaption: "Kudao guarda una copia de tus perfiles, notas del diario, planes de fiesta y mensajes. Recibir\u{00E1}s un c\u{00F3}digo de recuperaci\u{00F3}n para recuperarlos en otro iPhone.",
+        cloudEnableAction: "Activar la copia",
+        cloudCodeLabel: "Tu c\u{00F3}digo de recuperaci\u{00F3}n",
+        cloudCodeCaption: "Gu\u{00E1}rdalo en un lugar seguro: es la \u{00FA}nica llave de tus datos. Quien tenga el c\u{00F3}digo puede restaurarlos.",
+        cloudCopyAction: "Copiar c\u{00F3}digo",
+        cloudCopiedLabel: "C\u{00F3}digo copiado",
+        cloudActionsTitle: "Gestionar",
+        cloudSyncNowAction: "Guardar ahora",
+        cloudDisableAction: "Desactivar la copia",
+        cloudDeleteRemoteAction: "Desactivar y borrar la copia",
+        cloudDisableTitle: "\u{00BF}Desactivar la copia?",
+        cloudDisableMessage: "Tus datos siguen en este iPhone. Tambi\u{00E9}n puedes borrar por completo la copia guardada.",
+        cloudRestoreTitle: "Restaurar en este iPhone",
+        cloudRestoreHint: "\u{00BF}Ya tienes una copia? Escribe el c\u{00F3}digo de recuperaci\u{00F3}n para traerlo todo de vuelta.",
+        cloudRestorePlaceholder: "C\u{00D3}DIGO",
+        cloudRestoreAction: "Restaurar",
+        cloudRestoredFormat: "%d elementos restaurados",
+        cloudBackedUpBanner: "Todo guardado",
+        cloudPrivacyNote: "Kudao no pide correo ni contrase\u{00F1}a: la copia est\u{00E1} ligada solo a tu c\u{00F3}digo de recuperaci\u{00F3}n, guardado en el llavero de iOS. Los perfiles que otros comparten contigo no se guardan aqu\u{00ED}.",
+        cloudUnavailableMessage: "La copia de seguridad no est\u{00E1} disponible en esta versi\u{00F3}n de la app.",
+        cloudInvalidCodeMessage: "El c\u{00F3}digo parece incompleto: rev\u{00ED}salo e int\u{00E9}ntalo de nuevo.",
+        cloudUnknownCodeMessage: "No se ha encontrado ninguna copia con este c\u{00F3}digo.",
+        cloudGenericErrorMessage: "No puedo conectar con la copia: revisa la conexi\u{00F3}n e int\u{00E9}ntalo de nuevo.",
         galleryPreparingTitle: "Preparando los recuerdos\u{2026}",
         galleryUploadAction: "Subir recuerdos",
         galleryCaptionSheetTitle: "Nuevos recuerdos",

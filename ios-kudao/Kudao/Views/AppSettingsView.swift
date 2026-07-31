@@ -13,7 +13,10 @@ struct AppSettingsView: View {
     @Environment(KudaoIdentity.self) private var identity
     @Environment(\.dismiss) private var dismiss
 
+    @Environment(CloudBackupService.self) private var backup
+
     @State private var isJoining: Bool = false
+    @State private var isManagingBackup: Bool = false
 
     private var strings: Strings { settings.strings }
 
@@ -25,6 +28,7 @@ struct AppSettingsView: View {
                 ScrollView {
                     VStack(spacing: 18) {
                         collaborationCard
+                        backupCard
                         surpriseCard
                         languageCard
                         widgetCard
@@ -46,6 +50,9 @@ struct AppSettingsView: View {
             .environment(\.locale, settings.locale)
             .sheet(isPresented: $isJoining) {
                 JoinShareView()
+            }
+            .sheet(isPresented: $isManagingBackup) {
+                CloudBackupView()
             }
         }
         .tint(Palette.coral)
@@ -97,6 +104,44 @@ struct AppSettingsView: View {
                     .foregroundStyle(.tertiary)
                     .fixedSize(horizontal: false, vertical: true)
             }
+        }
+    }
+
+    // MARK: - Cloud backup
+
+    private var backupCard: some View {
+        AppSettingsCard(
+            title: strings.cloudSectionTitle,
+            systemImage: "icloud.fill",
+            tint: Palette.teal
+        ) {
+            Button {
+                isManagingBackup = true
+            } label: {
+                HStack(spacing: 10) {
+                    Image(systemName: backup.isEnabled ? "checkmark.icloud.fill" : "icloud.slash.fill")
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(backup.isEnabled ? Palette.teal : Color.secondary)
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(backup.isEnabled ? strings.cloudOnLabel : strings.cloudOffLabel)
+                            .font(.system(.body, design: .rounded, weight: .semibold))
+                            .foregroundStyle(.primary)
+                        Text(strings.cloudSectionCaption)
+                            .font(.system(.caption2, design: .rounded))
+                            .foregroundStyle(.tertiary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+
+                    Spacer(minLength: 0)
+
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 11, weight: .heavy))
+                        .foregroundStyle(.tertiary)
+                }
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
         }
     }
 
@@ -274,5 +319,7 @@ private struct AppSettingsCard<Content: View>: View {
         .environment(BiometricGate.shared)
         .environment(KudaoIdentity.shared)
         .environment(CollaborationService())
+        .environment(CloudBackupService())
+        .environment(NotificationService.shared)
         .modelContainer(KudaoModelContainer.preview())
 }

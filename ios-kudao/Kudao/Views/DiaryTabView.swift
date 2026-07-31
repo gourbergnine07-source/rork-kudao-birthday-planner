@@ -247,6 +247,7 @@ struct DiaryTabView: View {
     private func delete(_ note: DiaryEntry) {
         let noteID = note.id
         let wasShared = profile.isCollaborative
+        CloudTombstones.recordEntry(noteID, profileID: profile.id)
         modelContext.delete(note)
         try? modelContext.save()
 
