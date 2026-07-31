@@ -308,7 +308,7 @@ struct ProfileSettingsView: View {
         let strings = self.strings
         let privacy = ReminderPrivacy(hidesSurprisePreviews: settings.hidesSurpriseNotificationPreviews)
         Task {
-            await notifications.sync(profiles: [profile], strings: strings, privacy: privacy)
+            await notifications.sync(profile: profile, strings: strings, privacy: privacy)
         }
     }
 }

@@ -70,6 +70,8 @@ struct HomeView: View {
     @State private var reviewProfile: BirthdayProfile?
     /// Profile that must open straight on the suggestions tab after "Edit".
     @State private var suggestionsProfileID: UUID?
+    /// Profile that must open straight on the message tab after a send reminder.
+    @State private var messageProfileID: UUID?
     @State private var isShowingSettings: Bool = false
     @State private var unlockFailed: Bool = false
 
@@ -135,10 +137,7 @@ struct HomeView: View {
                 }
             }
             .navigationDestination(for: BirthdayProfile.self) { profile in
-                ProfileDetailView(
-                    profile: profile,
-                    initialTab: suggestionsProfileID == profile.id ? .suggestions : .diary
-                )
+                ProfileDetailView(profile: profile, initialTab: initialTab(for: profile))
             }
             .sheet(isPresented: $isCreatingProfile) {
                 ProfileFormView(profile: nil)
@@ -179,8 +178,12 @@ struct HomeView: View {
         .onChange(of: notifications.pendingReviewProfileID) { _, pending in
             handleReminderTap(pending)
         }
+        .onChange(of: notifications.pendingMessageProfileID) { _, pending in
+            handleMessageTap(pending)
+        }
         .onAppear {
             handleReminderTap(notifications.pendingReviewProfileID)
+            handleMessageTap(notifications.pendingMessageProfileID)
         }
     }
 
@@ -212,9 +215,29 @@ struct HomeView: View {
         open(match) { reviewProfile = match }
     }
 
+    /// A tapped send reminder opens the profile straight on its ready-to-send message.
+    private func handleMessageTap(_ pending: UUID?) {
+        guard let pending, let match = profiles.first(where: { $0.id == pending }) else { return }
+        notifications.consumePendingMessage()
+        path = []
+        open(match) {
+            suggestionsProfileID = nil
+            messageProfileID = match.id
+            path = [match]
+        }
+    }
+
     private func openSuggestions(for profile: BirthdayProfile) {
+        messageProfileID = nil
         suggestionsProfileID = profile.id
         path = [profile]
+    }
+
+    /// Reminder taps and the plan review decide which tab the detail screen opens on.
+    private func initialTab(for profile: BirthdayProfile) -> ProfileDetailView.ProfileTab {
+        if messageProfileID == profile.id { return .message }
+        if suggestionsProfileID == profile.id { return .suggestions }
+        return .diary
     }
 
     // MARK: - Surprise lock

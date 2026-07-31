@@ -348,6 +348,11 @@ struct ProfileDetailView: View {
                         systemImage: profile.relationship.symbolName,
                         tint: profile.relationship.accent
                     )
+                    KudaoChip(
+                        title: profile.ageBracket.title(strings),
+                        systemImage: profile.ageBracket.symbolName,
+                        tint: Palette.violet
+                    )
                     if profile.isSurpriseMode {
                         KudaoChip(
                             title: strings.surpriseBadge,
@@ -680,7 +685,11 @@ struct ProfileDetailView: View {
             withAnimation(reduceMotion ? nil : .smooth(duration: 0.35)) {
                 selectedTab = .message
             }
-            composer.generateIfNeeded(for: profile, language: settings.language)
+            composer.generateIfNeeded(
+                for: profile,
+                language: settings.language,
+                context: modelContext
+            )
             withAnimation(reduceMotion ? nil : .smooth(duration: 0.45)) {
                 proxy.scrollTo(Self.tabsAnchor, anchor: .top)
             }

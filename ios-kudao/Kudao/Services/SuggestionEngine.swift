@@ -181,6 +181,8 @@ final class SuggestionEngine {
             name: profile.name,
             relationship: profile.relationship.rawValue,
             age: profile.countdown.turningAge,
+            ageBracket: profile.ageBracket,
+            favoriteCharacter: profile.trimmedFavoriteCharacter,
             tagLines: tagLines,
             giftLeads: Array(giftLeads),
             keywordCount: buckets.values.reduce(0) { $0 + $1.count }

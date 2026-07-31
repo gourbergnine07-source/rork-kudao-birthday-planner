@@ -11,6 +11,10 @@ nonisolated struct GreetingInput: Sendable {
     let name: String
     let relationship: String
     let turningAge: Int
+    /// Life stage computed from the birth date; drives how the message is worded.
+    let ageBracket: AgeBracket
+    /// Cartoon or character a child loves, empty for everybody else.
+    let favoriteCharacter: String
     /// One line per diary category, e.g. "cibo: sushi, ramen".
     let tagLines: [String]
     let tone: GreetingTone
@@ -44,14 +48,23 @@ nonisolated enum GreetingService {
         "according to my notes". If there are no keywords, stay warm and generic.
         - Never mention the gift, the party, the surprise or this app.
         - Tone: \(input.tone.promptInstruction).
+        - Register for this age bracket (\(input.ageBracket.rawValue)): \(input.ageBracket.greetingGuidance).
+        - Adapt to the relationship too: informal and direct with friends and peers, warmer and more \
+        affectionate with family and partners, simple and playful with children.
+        - Write in the first person, as if the sender were writing it themselves. Never sign it, \
+        never add a placeholder name at the end.
         - Write in \(language.promptName).
         """
 
         var lines: [String] = [
             "Person: \(input.name)",
             "Relationship to the sender: \(input.relationship)",
-            "Turning age: \(input.turningAge)"
+            "Turning age: \(input.turningAge)",
+            "fascia_eta: \(input.ageBracket.rawValue)"
         ]
+        if !input.favoriteCharacter.isEmpty {
+            lines.append("Favourite character or cartoon: \(input.favoriteCharacter)")
+        }
         if input.tagLines.isEmpty {
             lines.append("Collected keywords: none")
         } else {

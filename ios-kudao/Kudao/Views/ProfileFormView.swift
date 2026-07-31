@@ -23,6 +23,7 @@ struct ProfileFormView: View {
     @State private var email: String = ""
     @State private var birthDate: Date = Calendar.current.date(byAdding: .year, value: -30, to: Date()) ?? Date()
     @State private var relationship: RelationshipKind = .friend
+    @State private var favoriteCharacter: String = ""
     @State private var isSurpriseMode: Bool = false
     @State private var photoData: Data?
     @State private var pickerItem: PhotosPickerItem?
@@ -32,6 +33,12 @@ struct ProfileFormView: View {
     private var strings: Strings { settings.strings }
     private var isEditing: Bool { profile != nil }
     private var canSave: Bool { !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
+
+    /// Life stage of the date currently picked, recomputed as the user scrolls the picker.
+    private var ageBracket: AgeBracket {
+        let years = Calendar.current.dateComponents([.year], from: birthDate, to: Date()).year ?? 0
+        return AgeBracket.forAge(max(0, years))
+    }
 
     var body: some View {
         NavigationStack {
@@ -69,6 +76,24 @@ struct ProfileFormView: View {
                             .datePickerStyle(.compact)
                             .tint(Palette.coral)
                             .frame(maxWidth: .infinity, alignment: .leading)
+
+                            HStack(spacing: 7) {
+                                Text(strings.ageBracketLabel)
+                                    .font(.system(.caption, design: .rounded))
+                                    .foregroundStyle(.secondary)
+                                KudaoChip(
+                                    title: ageBracket.title(strings),
+                                    systemImage: ageBracket.symbolName,
+                                    tint: Palette.violet
+                                )
+                                Spacer(minLength: 0)
+                            }
+                            .animation(.smooth(duration: 0.25), value: ageBracket)
+                        }
+
+                        if ageBracket.wantsFavoriteCharacter {
+                            favoriteCharacterCard
+                                .transition(.opacity.combined(with: .offset(y: -8)))
                         }
 
                         FormCard(title: strings.relationshipLabel, systemImage: "person.2.fill") {
@@ -119,6 +144,7 @@ struct ProfileFormView: View {
                     }
                     .padding(.horizontal, 20)
                     .padding(.bottom, 32)
+                    .animation(.smooth(duration: 0.3), value: ageBracket.wantsFavoriteCharacter)
                 }
                 .scrollIndicators(.hidden)
             }
@@ -195,6 +221,23 @@ struct ProfileFormView: View {
             }
         }
         .padding(.top, 8)
+    }
+
+    // MARK: - Children
+
+    /// Extra hint only children get: a theme for cake and gift ideas.
+    private var favoriteCharacterCard: some View {
+        FormCard(title: strings.favoriteCharacterLabel, systemImage: "sparkles.tv.fill") {
+            TextField(strings.favoriteCharacterPlaceholder, text: $favoriteCharacter)
+                .font(.system(.body, design: .rounded, weight: .medium))
+                .textInputAutocapitalization(.words)
+                .submitLabel(.done)
+
+            Text(strings.favoriteCharacterCaption)
+                .font(.system(.caption2, design: .rounded))
+                .foregroundStyle(.tertiary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
     }
 
     // MARK: - Contacts
@@ -306,6 +349,7 @@ struct ProfileFormView: View {
         email = profile.contactEmail
         birthDate = profile.birthDate
         relationship = profile.relationship
+        favoriteCharacter = profile.favoriteCharacter
         isSurpriseMode = profile.isSurpriseMode
         photoData = profile.photoData
     }
@@ -323,6 +367,7 @@ struct ProfileFormView: View {
             profile.contactEmail = cleaned(email)
             profile.birthDate = birthDate
             profile.relationship = relationship
+            profile.favoriteCharacter = ageBracket.wantsFavoriteCharacter ? cleaned(favoriteCharacter) : ""
             profile.isSurpriseMode = isSurpriseMode
             profile.photoData = photoData
             saved = profile
@@ -335,6 +380,7 @@ struct ProfileFormView: View {
                 address: cleaned(address),
                 contactPhone: cleaned(phone),
                 contactEmail: cleaned(email),
+                favoriteCharacter: ageBracket.wantsFavoriteCharacter ? cleaned(favoriteCharacter) : "",
                 photoData: photoData,
                 isSurpriseMode: isSurpriseMode
             )
@@ -359,7 +405,7 @@ struct ProfileFormView: View {
         let privacy = ReminderPrivacy(hidesSurprisePreviews: settings.hidesSurpriseNotificationPreviews)
         let settings = self.settings
         Task {
-            await notifications.sync(profiles: [profile], strings: strings, privacy: privacy)
+            await notifications.sync(profile: profile, strings: strings, privacy: privacy)
             WidgetBridge.publish(profiles: [profile], settings: settings)
         }
     }

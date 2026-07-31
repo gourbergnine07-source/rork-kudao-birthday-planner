@@ -337,6 +337,43 @@ nonisolated struct Strings: Sendable {
     let votesEmptyLabel: String
     let syncingLabel: String
     let collaborationSectionTitle: String
+
+    let ageBracketLabel: String
+    let ageBracketChild: String
+    let ageBracketTeen: String
+    let ageBracketAdult: String
+    let ageBracketSenior: String
+    let favoriteCharacterLabel: String
+    let favoriteCharacterPlaceholder: String
+    let favoriteCharacterCaption: String
+
+    let messageGenerateAction: String
+    let messageWriteMyselfAction: String
+    let messagePlaceholder: String
+    let messageEditorHint: String
+    let messageSentBadge: String
+    let messageScheduleTitle: String
+    let messageScheduleToggle: String
+    let messageSendDateLabel: String
+    let messageScheduleReadyFormat: String
+    let messagePastDateLabel: String
+    let messageAlreadySentLabel: String
+    let messageMarkSentShortAction: String
+    let messageMarkSentAction: String
+    let messageMarkUnsentAction: String
+    let messageNotYetAction: String
+    let messageSentConfirmTitle: String
+    let messageSentConfirmMessage: String
+    let messageContactTitle: String
+    let messageContactCaption: String
+    let messageNoContactLabel: String
+    let messageNeedsPhoneHint: String
+    let messageWhatsAppAction: String
+    let messageMessagesAction: String
+    let messageOpenFailedTitle: String
+    let messageOpenFailedMessage: String
+    let notificationMessageTitle: String
+    let notificationMessageBodyFormat: String
 }
 
 extension Strings {
@@ -645,7 +682,42 @@ extension Strings {
         voteTallyFormat: "%1$d a favore \u{00B7} %2$d contro",
         votesEmptyLabel: "Ancora nessun voto",
         syncingLabel: "Aggiornamento\u{2026}",
-        collaborationSectionTitle: "Condivisione"
+        collaborationSectionTitle: "Condivisione",
+        ageBracketLabel: "Fascia d\u{2019}et\u{00E0}",
+        ageBracketChild: "Bambino",
+        ageBracketTeen: "Adolescente",
+        ageBracketAdult: "Adulto",
+        ageBracketSenior: "Anziano",
+        favoriteCharacterLabel: "Cartone o personaggio preferito",
+        favoriteCharacterPlaceholder: "Es. Bluey, Spider-Man, Frozen",
+        favoriteCharacterCaption: "Facoltativo: aiuta a scegliere torta e regalo a tema.",
+        messageGenerateAction: "Genera messaggio",
+        messageWriteMyselfAction: "Scrivilo tu",
+        messagePlaceholder: "Scrivi qui i tuoi auguri\u{2026}",
+        messageEditorHint: "Modifica il testo come vuoi: lo inviamo esattamente cos\u{00EC}.",
+        messageSentBadge: "Inviato",
+        messageScheduleTitle: "Programmazione invio",
+        messageScheduleToggle: "Ricordami di inviarlo",
+        messageSendDateLabel: "Invia il",
+        messageScheduleReadyFormat: "Ti avvisiamo il %@",
+        messagePastDateLabel: "Scegli una data futura per ricevere il promemoria.",
+        messageAlreadySentLabel: "Messaggio gi\u{00E0} inviato.",
+        messageMarkSentShortAction: "Segna come inviato",
+        messageMarkSentAction: "S\u{00EC}, l\u{2019}ho inviato",
+        messageMarkUnsentAction: "Segna come da inviare",
+        messageNotYetAction: "Non ancora",
+        messageSentConfirmTitle: "Hai inviato gli auguri?",
+        messageSentConfirmMessage: "Se confermi, non ti ricorderemo pi\u{00F9} di inviare questo messaggio.",
+        messageContactTitle: "Contatto destinatario",
+        messageContactCaption: "Serve per aprire WhatsApp o Messaggi con il testo gi\u{00E0} pronto.",
+        messageNoContactLabel: "Nessun contatto salvato",
+        messageNeedsPhoneHint: "Aggiungi un numero per aprire la chat gi\u{00E0} compilata.",
+        messageWhatsAppAction: "Apri WhatsApp",
+        messageMessagesAction: "Apri Messaggi",
+        messageOpenFailedTitle: "App non disponibile",
+        messageOpenFailedMessage: "Non riusciamo ad aprire l\u{2019}app su questo dispositivo. Il testo \u{00E8} stato copiato negli appunti.",
+        notificationMessageTitle: "Auguri da inviare",
+        notificationMessageBodyFormat: "\u{00C8} il momento di augurare buon compleanno a %@!"
     )
 
     static let english = Strings(
@@ -953,7 +1025,42 @@ extension Strings {
         voteTallyFormat: "%1$d for \u{00B7} %2$d against",
         votesEmptyLabel: "No votes yet",
         syncingLabel: "Refreshing\u{2026}",
-        collaborationSectionTitle: "Sharing"
+        collaborationSectionTitle: "Sharing",
+        ageBracketLabel: "Age group",
+        ageBracketChild: "Child",
+        ageBracketTeen: "Teenager",
+        ageBracketAdult: "Adult",
+        ageBracketSenior: "Senior",
+        favoriteCharacterLabel: "Favourite cartoon or character",
+        favoriteCharacterPlaceholder: "e.g. Bluey, Spider-Man, Frozen",
+        favoriteCharacterCaption: "Optional: helps pick a themed cake and gift.",
+        messageGenerateAction: "Generate message",
+        messageWriteMyselfAction: "Write it myself",
+        messagePlaceholder: "Write your wishes here\u{2026}",
+        messageEditorHint: "Edit the text however you like \u{2014} we send it exactly as it is.",
+        messageSentBadge: "Sent",
+        messageScheduleTitle: "Send schedule",
+        messageScheduleToggle: "Remind me to send it",
+        messageSendDateLabel: "Send on",
+        messageScheduleReadyFormat: "We\u{2019}ll remind you on %@",
+        messagePastDateLabel: "Pick a future date to get the reminder.",
+        messageAlreadySentLabel: "Message already sent.",
+        messageMarkSentShortAction: "Mark as sent",
+        messageMarkSentAction: "Yes, I sent it",
+        messageMarkUnsentAction: "Mark as not sent",
+        messageNotYetAction: "Not yet",
+        messageSentConfirmTitle: "Did you send your wishes?",
+        messageSentConfirmMessage: "If you confirm, we\u{2019}ll stop reminding you about this message.",
+        messageContactTitle: "Recipient contact",
+        messageContactCaption: "Used to open WhatsApp or Messages with the text ready.",
+        messageNoContactLabel: "No contact saved",
+        messageNeedsPhoneHint: "Add a number to open the chat prefilled.",
+        messageWhatsAppAction: "Open WhatsApp",
+        messageMessagesAction: "Open Messages",
+        messageOpenFailedTitle: "App unavailable",
+        messageOpenFailedMessage: "We couldn\u{2019}t open that app on this device. The text has been copied to your clipboard.",
+        notificationMessageTitle: "Wishes to send",
+        notificationMessageBodyFormat: "It\u{2019}s time to wish %@ a happy birthday!"
     )
 
     static let french = Strings(
@@ -1261,7 +1368,42 @@ extension Strings {
         voteTallyFormat: "%1$d pour \u{00B7} %2$d contre",
         votesEmptyLabel: "Aucun vote pour l'instant",
         syncingLabel: "Actualisation\u{2026}",
-        collaborationSectionTitle: "Partage"
+        collaborationSectionTitle: "Partage",
+        ageBracketLabel: "Tranche d\u{2019}\u{00E2}ge",
+        ageBracketChild: "Enfant",
+        ageBracketTeen: "Adolescent",
+        ageBracketAdult: "Adulte",
+        ageBracketSenior: "Senior",
+        favoriteCharacterLabel: "Dessin anim\u{00E9} ou personnage pr\u{00E9}f\u{00E9}r\u{00E9}",
+        favoriteCharacterPlaceholder: "Ex. Bluey, Spider-Man, La Reine des neiges",
+        favoriteCharacterCaption: "Facultatif : aide \u{00E0} choisir un g\u{00E2}teau et un cadeau \u{00E0} th\u{00E8}me.",
+        messageGenerateAction: "G\u{00E9}n\u{00E9}rer le message",
+        messageWriteMyselfAction: "L\u{2019}\u{00E9}crire moi-m\u{00EA}me",
+        messagePlaceholder: "\u{00C9}crivez vos v\u{0153}ux ici\u{2026}",
+        messageEditorHint: "Modifiez le texte comme vous voulez : nous l\u{2019}envoyons tel quel.",
+        messageSentBadge: "Envoy\u{00E9}",
+        messageScheduleTitle: "Programmation de l\u{2019}envoi",
+        messageScheduleToggle: "Me rappeler de l\u{2019}envoyer",
+        messageSendDateLabel: "Envoyer le",
+        messageScheduleReadyFormat: "Rappel le %@",
+        messagePastDateLabel: "Choisissez une date future pour recevoir le rappel.",
+        messageAlreadySentLabel: "Message d\u{00E9}j\u{00E0} envoy\u{00E9}.",
+        messageMarkSentShortAction: "Marquer comme envoy\u{00E9}",
+        messageMarkSentAction: "Oui, je l\u{2019}ai envoy\u{00E9}",
+        messageMarkUnsentAction: "Marquer comme \u{00E0} envoyer",
+        messageNotYetAction: "Pas encore",
+        messageSentConfirmTitle: "Avez-vous envoy\u{00E9} vos v\u{0153}ux ?",
+        messageSentConfirmMessage: "Si vous confirmez, nous ne vous rappellerons plus ce message.",
+        messageContactTitle: "Contact du destinataire",
+        messageContactCaption: "Sert \u{00E0} ouvrir WhatsApp ou Messages avec le texte pr\u{00EA}t.",
+        messageNoContactLabel: "Aucun contact enregistr\u{00E9}",
+        messageNeedsPhoneHint: "Ajoutez un num\u{00E9}ro pour ouvrir la conversation pr\u{00E9}remplie.",
+        messageWhatsAppAction: "Ouvrir WhatsApp",
+        messageMessagesAction: "Ouvrir Messages",
+        messageOpenFailedTitle: "Application indisponible",
+        messageOpenFailedMessage: "Impossible d\u{2019}ouvrir cette application sur cet appareil. Le texte a \u{00E9}t\u{00E9} copi\u{00E9}.",
+        notificationMessageTitle: "V\u{0153}ux \u{00E0} envoyer",
+        notificationMessageBodyFormat: "C\u{2019}est le moment de souhaiter un joyeux anniversaire \u{00E0} %@ !"
     )
 
     static let spanish = Strings(
@@ -1569,6 +1711,41 @@ extension Strings {
         voteTallyFormat: "%1$d a favor \u{00B7} %2$d en contra",
         votesEmptyLabel: "A\u{00FA}n sin votos",
         syncingLabel: "Actualizando\u{2026}",
-        collaborationSectionTitle: "Compartir"
+        collaborationSectionTitle: "Compartir",
+        ageBracketLabel: "Franja de edad",
+        ageBracketChild: "Ni\u{00F1}o",
+        ageBracketTeen: "Adolescente",
+        ageBracketAdult: "Adulto",
+        ageBracketSenior: "Mayor",
+        favoriteCharacterLabel: "Dibujo o personaje favorito",
+        favoriteCharacterPlaceholder: "Ej. Bluey, Spider-Man, Frozen",
+        favoriteCharacterCaption: "Opcional: ayuda a elegir tarta y regalo tem\u{00E1}ticos.",
+        messageGenerateAction: "Generar mensaje",
+        messageWriteMyselfAction: "Escribirlo yo",
+        messagePlaceholder: "Escribe aqu\u{00ED} tu felicitaci\u{00F3}n\u{2026}",
+        messageEditorHint: "Edita el texto como quieras: lo enviamos tal cual.",
+        messageSentBadge: "Enviado",
+        messageScheduleTitle: "Programaci\u{00F3}n del env\u{00ED}o",
+        messageScheduleToggle: "Recu\u{00E9}rdame enviarlo",
+        messageSendDateLabel: "Enviar el",
+        messageScheduleReadyFormat: "Te avisamos el %@",
+        messagePastDateLabel: "Elige una fecha futura para recibir el recordatorio.",
+        messageAlreadySentLabel: "Mensaje ya enviado.",
+        messageMarkSentShortAction: "Marcar como enviado",
+        messageMarkSentAction: "S\u{00ED}, ya lo envi\u{00E9}",
+        messageMarkUnsentAction: "Marcar como pendiente",
+        messageNotYetAction: "Todav\u{00ED}a no",
+        messageSentConfirmTitle: "\u{00BF}Has enviado la felicitaci\u{00F3}n?",
+        messageSentConfirmMessage: "Si lo confirmas, no volveremos a recordarte este mensaje.",
+        messageContactTitle: "Contacto del destinatario",
+        messageContactCaption: "Sirve para abrir WhatsApp o Mensajes con el texto listo.",
+        messageNoContactLabel: "Sin contacto guardado",
+        messageNeedsPhoneHint: "A\u{00F1}ade un n\u{00FA}mero para abrir el chat ya escrito.",
+        messageWhatsAppAction: "Abrir WhatsApp",
+        messageMessagesAction: "Abrir Mensajes",
+        messageOpenFailedTitle: "App no disponible",
+        messageOpenFailedMessage: "No hemos podido abrir esa app en este dispositivo. El texto se ha copiado al portapapeles.",
+        notificationMessageTitle: "Felicitaci\u{00F3}n pendiente",
+        notificationMessageBodyFormat: "\u{00A1}Es el momento de felicitar a %@ por su cumplea\u{00F1}os!"
     )
 }

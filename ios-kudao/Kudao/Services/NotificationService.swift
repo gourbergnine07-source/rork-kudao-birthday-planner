@@ -25,6 +25,15 @@ nonisolated struct ScheduledReminder: Sendable, Identifiable, Equatable {
     let body: String
     let fireDate: Date
     let profileID: UUID
+    /// Which screen the tap should open: the plan review or the ready-to-send message.
+    let kind: ReminderKind
+}
+
+/// The reminders Kudao schedules, in the order they fire before a birthday.
+nonisolated enum ReminderKind: String, Sendable, CaseIterable {
+    case gift
+    case birthday
+    case message
 }
 
 /// Schedules the local birthday and gift reminders and routes notification taps.
@@ -39,6 +48,7 @@ final class NotificationService {
     /// Prefix shared by every request Kudao owns, so foreign requests are never touched.
     private static let prefix = "kudao.reminder."
     static let profileKey = "profileID"
+    static let kindKey = "kind"
 
     private let center = UNUserNotificationCenter.current()
     private let router = NotificationRouter()
@@ -47,6 +57,8 @@ final class NotificationService {
     private(set) var authorizationStatus: UNAuthorizationStatus = .notDetermined
     /// Set when the user taps a reminder: the home screen opens the confirmation sheet.
     var pendingReviewProfileID: UUID?
+    /// Set when the user taps a send-your-wishes reminder: the message tab opens.
+    var pendingMessageProfileID: UUID?
 
     private init() {}
 
@@ -111,12 +123,30 @@ final class NotificationService {
         }
     }
 
+    /// Reschedules only one profile's reminders, leaving every other profile untouched.
+    func sync(
+        profile: BirthdayProfile,
+        strings: Strings,
+        privacy: ReminderPrivacy = .revealing
+    ) async {
+        let reminders = Self.reminders(for: profile, strings: strings, privacy: privacy)
+
+        guard await requestAuthorization() else { return }
+
+        let wanted = Set(reminders.map(\.id))
+        let stale = Self.identifiers(for: profile.id).filter { !wanted.contains($0) }
+        if !stale.isEmpty {
+            center.removePendingNotificationRequests(withIdentifiers: stale)
+        }
+
+        for reminder in reminders {
+            await schedule(reminder)
+        }
+    }
+
     /// Drops every reminder belonging to a profile, used when it gets deleted.
     func cancelReminders(for profileID: UUID) {
-        center.removePendingNotificationRequests(withIdentifiers: [
-            Self.identifier(kind: "birthday", profileID: profileID),
-            Self.identifier(kind: "gift", profileID: profileID),
-        ])
+        center.removePendingNotificationRequests(withIdentifiers: Self.identifiers(for: profileID))
     }
 
     func openSystemSettings() {
@@ -128,6 +158,10 @@ final class NotificationService {
         pendingReviewProfileID = nil
     }
 
+    func consumePendingMessage() {
+        pendingMessageProfileID = nil
+    }
+
     // MARK: - Scheduling
 
     private func schedule(_ reminder: ScheduledReminder) async {
@@ -135,7 +169,10 @@ final class NotificationService {
         content.title = reminder.title
         content.body = reminder.body
         content.sound = .default
-        content.userInfo = [Self.profileKey: reminder.profileID.uuidString]
+        content.userInfo = [
+            Self.profileKey: reminder.profileID.uuidString,
+            Self.kindKey: reminder.kind.rawValue,
+        ]
 
         let components = Calendar.current.dateComponents(
             [.year, .month, .day, .hour, .minute],
@@ -152,8 +189,13 @@ final class NotificationService {
         }
     }
 
-    private static func identifier(kind: String, profileID: UUID) -> String {
-        "\(prefix)\(kind).\(profileID.uuidString)"
+    private static func identifier(kind: ReminderKind, profileID: UUID) -> String {
+        "\(prefix)\(kind.rawValue).\(profileID.uuidString)"
+    }
+
+    /// Every request identifier Kudao may own for a profile.
+    private static func identifiers(for profileID: UUID) -> [String] {
+        ReminderKind.allCases.map { identifier(kind: $0, profileID: profileID) }
     }
 
     /// Builds the reminders a profile currently deserves.
@@ -174,13 +216,14 @@ final class NotificationService {
         if let fireDate = profile.birthdayReminderDate {
             result.append(
                 ScheduledReminder(
-                    id: identifier(kind: "birthday", profileID: profile.id),
+                    id: identifier(kind: .birthday, profileID: profile.id),
                     title: isDiscreet ? strings.notificationGenericTitle : strings.notificationBirthdayTitle,
                     body: isDiscreet
                         ? strings.notificationGenericBody
                         : String(format: strings.notificationBirthdayBodyFormat, name),
                     fireDate: fireDate,
-                    profileID: profile.id
+                    profileID: profile.id,
+                    kind: .birthday
                 )
             )
         }
@@ -193,11 +236,33 @@ final class NotificationService {
 
             result.append(
                 ScheduledReminder(
-                    id: identifier(kind: "gift", profileID: profile.id),
+                    id: identifier(kind: .gift, profileID: profile.id),
                     title: isDiscreet ? strings.notificationGenericTitle : strings.notificationGiftTitle,
                     body: isDiscreet ? strings.notificationGenericBody : revealingBody,
                     fireDate: fireDate,
-                    profileID: profile.id
+                    profileID: profile.id,
+                    kind: .gift
+                )
+            )
+        }
+
+        // The greeting the user scheduled, with a preview of the text they will send.
+        if let message = profile.birthdayMessage,
+           !message.isDeleted,
+           let fireDate = message.reminderFireDate {
+            let revealingBody = [
+                String(format: strings.notificationMessageBodyFormat, name),
+                message.notificationPreview,
+            ].joined(separator: "\n")
+
+            result.append(
+                ScheduledReminder(
+                    id: identifier(kind: .message, profileID: profile.id),
+                    title: isDiscreet ? strings.notificationGenericTitle : strings.notificationMessageTitle,
+                    body: isDiscreet ? strings.notificationGenericBody : revealingBody,
+                    fireDate: fireDate,
+                    profileID: profile.id,
+                    kind: .message
                 )
             )
         }
@@ -220,11 +285,18 @@ final class NotificationRouter: NSObject, UNUserNotificationCenterDelegate {
         _ center: UNUserNotificationCenter,
         didReceive response: UNNotificationResponse
     ) async {
-        let raw = response.notification.request.content.userInfo[NotificationService.profileKey] as? String
+        let info = response.notification.request.content.userInfo
+        let raw = info[NotificationService.profileKey] as? String
         guard let raw, let profileID = UUID(uuidString: raw) else { return }
+        let kind = ReminderKind(rawValue: info[NotificationService.kindKey] as? String ?? "") ?? .birthday
 
         await MainActor.run {
-            NotificationService.shared.pendingReviewProfileID = profileID
+            switch kind {
+            case .message:
+                NotificationService.shared.pendingMessageProfileID = profileID
+            case .birthday, .gift:
+                NotificationService.shared.pendingReviewProfileID = profileID
+            }
         }
     }
 }

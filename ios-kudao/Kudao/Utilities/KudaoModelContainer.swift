@@ -18,6 +18,7 @@ enum KudaoModelContainer {
         DiaryEntry.self,
         DiaryTag.self,
         PartyPlan.self,
+        BirthdayMessage.self,
         ProfileShare.self,
         SuggestionVote.self,
     ])

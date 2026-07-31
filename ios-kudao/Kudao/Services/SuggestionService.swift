@@ -12,6 +12,10 @@ nonisolated struct SuggestionInput: Sendable {
     /// English relationship label, used inside the prompt.
     let relationship: String
     let age: Int
+    /// Life stage computed from the birth date; keeps every card age-appropriate.
+    let ageBracket: AgeBracket
+    /// Cartoon or character a child loves, empty for everybody else.
+    let favoriteCharacter: String
     /// One line per category, e.g. "cibo: sushi, ramen".
     let tagLines: [String]
     /// Short summaries of notes flagged as gift-relevant.
@@ -83,6 +87,10 @@ nonisolated enum SuggestionService {
         a map (e.g. "profumeria", "negozio di giocattoli", "libreria", "negozio di sport"). \
         Never a brand, never a website.
         - "numero_invitati_stimato" is a realistic integer between 2 and 60 for this relationship and age.
+        - The age bracket ("fascia_eta") is binding: gift, cake, venue and guest count must all fit \
+        that life stage. Follow its guidance strictly, even when the keywords pull elsewhere.
+        - When a favourite character is given, it is a strong hint for the cake theme and a good one \
+        for the gift; use it at most once and never force it.
         - "confidenza" reflects how much evidence the keywords give you: few or vague keywords \
         means "bassa", a rich and coherent list means "alta".
         - Write every text value in \(language.promptName). Keep the JSON keys exactly as above, in Italian.
@@ -93,8 +101,13 @@ nonisolated enum SuggestionService {
         var lines: [String] = [
             "Person: \(input.name)",
             "Relationship to the user: \(input.relationship)",
-            "Turning age: \(input.age)"
+            "Turning age: \(input.age)",
+            "fascia_eta: \(input.ageBracket.rawValue)",
+            "Age bracket guidance: \(input.ageBracket.planGuidance)"
         ]
+        if !input.favoriteCharacter.isEmpty {
+            lines.append("Favourite character or cartoon: \(input.favoriteCharacter)")
+        }
         if input.tagLines.isEmpty {
             lines.append("Collected keywords: none")
         } else {

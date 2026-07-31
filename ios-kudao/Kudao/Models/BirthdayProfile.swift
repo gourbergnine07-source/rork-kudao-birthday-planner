@@ -24,6 +24,8 @@ final class BirthdayProfile {
     var contactPhone: String = ""
     var contactEmail: String = ""
     var relationshipRaw: String = RelationshipKind.friend.rawValue
+    /// Only asked for children: cartoon or character they love, used for themed ideas.
+    var favoriteCharacter: String = ""
     var isSurpriseMode: Bool = false
     var createdAt: Date = Date()
 
@@ -45,6 +47,9 @@ final class BirthdayProfile {
 
     @Relationship(deleteRule: .cascade, inverse: \PartyPlan.profile)
     var partyPlan: PartyPlan?
+
+    @Relationship(deleteRule: .cascade, inverse: \BirthdayMessage.profile)
+    var birthdayMessage: BirthdayMessage?
 
     // MARK: Collaboration
 
@@ -69,6 +74,7 @@ final class BirthdayProfile {
         address: String = "",
         contactPhone: String = "",
         contactEmail: String = "",
+        favoriteCharacter: String = "",
         photoData: Data? = nil,
         isSurpriseMode: Bool = false,
         ownerUserID: String? = nil
@@ -81,6 +87,7 @@ final class BirthdayProfile {
         self.contactEmail = contactEmail
         self.birthDate = birthDate
         self.relationshipRaw = relationship.rawValue
+        self.favoriteCharacter = favoriteCharacter
         self.photoData = photoData
         self.isSurpriseMode = isSurpriseMode
         self.ownerUserID = ownerUserID
@@ -110,6 +117,16 @@ final class BirthdayProfile {
     var currentAge: Int {
         let years = Calendar.current.dateComponents([.year], from: birthDate, to: Date()).year ?? 0
         return max(0, years)
+    }
+
+    /// Life stage derived from the birth date; never edited by hand.
+    var ageBracket: AgeBracket {
+        AgeBracket.forAge(currentAge)
+    }
+
+    /// Trimmed favourite character, only meaningful for children.
+    var trimmedFavoriteCharacter: String {
+        favoriteCharacter.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
     // MARK: Collaboration helpers
