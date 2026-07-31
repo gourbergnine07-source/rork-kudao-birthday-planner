@@ -9,6 +9,7 @@ import SwiftData
 @main
 struct KudaoApp: App {
     @State private var settings = AppSettings()
+    private let container: ModelContainer = KudaoModelContainer.make()
 
     var body: some Scene {
         WindowGroup {
@@ -16,6 +17,6 @@ struct KudaoApp: App {
                 .environment(settings)
                 .environment(\.locale, settings.locale)
         }
-        .modelContainer(for: [BirthdayProfile.self, DiaryEntry.self, DiaryTag.self, PartyPlan.self])
+        .modelContainer(container)
     }
 }

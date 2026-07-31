@@ -15,8 +15,5 @@ struct ContentView: View {
 #Preview {
     ContentView()
         .environment(AppSettings())
-        .modelContainer(
-            for: [BirthdayProfile.self, DiaryEntry.self, DiaryTag.self, PartyPlan.self],
-            inMemory: true
-        )
+        .modelContainer(KudaoModelContainer.preview())
 }
