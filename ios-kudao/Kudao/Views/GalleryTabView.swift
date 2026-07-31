@@ -24,6 +24,10 @@ struct GalleryTabView: View {
     @State private var picked: [PhotosPickerItem] = []
     @State private var isPickingMedia: Bool = false
     @State private var isCapturing: Bool = false
+    @State private var isPreparingDrafts: Bool = false
+    @State private var draft: UploadDraft?
+    @State private var captionTarget: GalleryItem?
+    @State private var deniedSource: MediaSource?
     @State private var viewerTarget: ViewerTarget?
     @State private var pendingDeletion: GalleryItem?
 
@@ -75,9 +79,32 @@ struct GalleryTabView: View {
         )
         .fullScreenCover(isPresented: $isCapturing) {
             CameraCaptureView { media in
-                upload([media])
+                prepareDrafts([media])
             }
             .ignoresSafeArea()
+        }
+        .sheet(item: $draft) { pending in
+            GalleryCaptionSheet(uploads: pending.uploads) { ready in
+                upload(ready)
+            }
+        }
+        .sheet(item: $captionTarget) { item in
+            GalleryCaptionEditorView(item: item) { caption in
+                saveCaption(caption, for: item)
+            }
+        }
+        .alert(
+            deniedSource?.deniedTitle(strings) ?? "",
+            isPresented: Binding(
+                get: { deniedSource != nil },
+                set: { if !$0 { deniedSource = nil } }
+            ),
+            presenting: deniedSource
+        ) { _ in
+            Button(strings.openSettingsAction) { MediaPermissions.openSettings() }
+            Button(strings.cancelAction, role: .cancel) {}
+        } message: { source in
+            Text(source.deniedMessage(strings))
         }
         .fullScreenCover(item: $viewerTarget) { target in
             GalleryViewerView(profile: profile, items: items, gallery: gallery, initialID: target.value)
@@ -114,7 +141,7 @@ struct GalleryTabView: View {
             errorBanner(error)
         }
 
-        if gallery.isUploading {
+        if gallery.isUploading || isPreparingDrafts {
             uploadBanner
         }
 
@@ -196,14 +223,14 @@ struct GalleryTabView: View {
     private func addMenu<Content: View>(@ViewBuilder label: () -> Content) -> some View {
         Menu {
             Button {
-                isPickingMedia = true
+                startLibrary()
             } label: {
                 Label(strings.galleryFromLibraryAction, systemImage: "photo.on.rectangle.angled")
             }
 
             if CameraCaptureView.isAvailable {
                 Button {
-                    isCapturing = true
+                    startCamera()
                 } label: {
                     Label(strings.galleryCaptureAction, systemImage: "camera.fill")
                 }
@@ -221,11 +248,13 @@ struct GalleryTabView: View {
                 .tint(Palette.coral)
 
             VStack(alignment: .leading, spacing: 2) {
-                Text(strings.galleryUploadingTitle)
+                Text(isPreparingDrafts ? strings.galleryPreparingTitle : strings.galleryUploadingTitle)
                     .font(.system(.subheadline, design: .rounded, weight: .bold))
-                Text(String(format: strings.galleryUploadingCountFormat, gallery.pendingUploads))
-                    .font(.system(.caption2, design: .rounded))
-                    .foregroundStyle(.secondary)
+                if !isPreparingDrafts {
+                    Text(String(format: strings.galleryUploadingCountFormat, gallery.pendingUploads))
+                        .font(.system(.caption2, design: .rounded))
+                        .foregroundStyle(.secondary)
+                }
             }
 
             Spacer(minLength: 0)
@@ -279,6 +308,17 @@ struct GalleryTabView: View {
         }
         .buttonStyle(PressableCardStyle())
         .contextMenu {
+            if item.isMine(identity.userID), item.uploadState == .uploaded {
+                Button {
+                    captionTarget = item
+                } label: {
+                    Label(
+                        item.hasCaption ? strings.galleryCaptionEditAction : strings.galleryCaptionAddAction,
+                        systemImage: "text.bubble"
+                    )
+                }
+            }
+
             if canDelete(item) {
                 Button(role: .destructive) {
                     pendingDeletion = item
@@ -291,7 +331,14 @@ struct GalleryTabView: View {
 
     @ViewBuilder
     private func badge(_ item: GalleryItem) -> some View {
-        if item.isVideo {
+        if item.hasCaption, !item.isVideo {
+            Image(systemName: "text.bubble.fill")
+                .font(.system(size: 9, weight: .black))
+                .foregroundStyle(.white)
+                .padding(4)
+                .background(Circle().fill(.black.opacity(0.5)))
+                .padding(5)
+        } else if item.isVideo {
             HStack(spacing: 3) {
                 Image(systemName: "play.fill")
                     .font(.system(size: 7, weight: .black))
@@ -308,20 +355,29 @@ struct GalleryTabView: View {
         }
     }
 
-    /// Who brought this memory, and when.
+    /// Who brought this memory, when, and the first words of its caption.
     private func footer(_ item: GalleryItem) -> some View {
-        HStack(spacing: 4) {
-            AvatarView(
-                name: item.uploaderName.isEmpty ? "?" : item.uploaderName,
-                photoData: nil,
-                size: 15
-            )
-            Text(shortDate(item.createdAt))
-                .font(.system(size: 9, weight: .bold, design: .rounded))
-                .foregroundStyle(.white)
-                .lineLimit(1)
-                .minimumScaleFactor(0.8)
-            Spacer(minLength: 0)
+        VStack(alignment: .leading, spacing: 1) {
+            if item.hasCaption {
+                Text(item.caption)
+                    .font(.system(size: 9, weight: .semibold, design: .rounded))
+                    .foregroundStyle(.white)
+                    .lineLimit(1)
+            }
+
+            HStack(spacing: 4) {
+                AvatarView(
+                    name: item.uploaderName.isEmpty ? "?" : item.uploaderName,
+                    photoData: nil,
+                    size: 15
+                )
+                Text(shortDate(item.createdAt))
+                    .font(.system(size: 9, weight: .bold, design: .rounded))
+                    .foregroundStyle(.white)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+                Spacer(minLength: 0)
+            }
         }
         .padding(.horizontal, 5)
         .padding(.bottom, 4)
@@ -436,9 +492,31 @@ struct GalleryTabView: View {
 
     // MARK: - Actions
 
-    /// Loads what the picker returned, then hands it to the upload pipeline.
+    /// Camera and library both need a green light before they open.
+    private func startLibrary() {
+        Task {
+            guard await MediaPermissions.requestPhotoLibrary() else {
+                deniedSource = .photoLibrary
+                return
+            }
+            isPickingMedia = true
+        }
+    }
+
+    private func startCamera() {
+        Task {
+            guard await MediaPermissions.requestCamera() else {
+                deniedSource = .camera
+                return
+            }
+            isCapturing = true
+        }
+    }
+
+    /// Loads what the picker returned, then asks for captions.
     private func load(_ selection: [PhotosPickerItem]) {
         picked = []
+        isPreparingDrafts = true
 
         Task {
             var media: [PickedMedia] = []
@@ -451,15 +529,47 @@ struct GalleryTabView: View {
                     media.append(.photo(data))
                 }
             }
-            upload(media)
+            prepareDrafts(media)
         }
     }
 
-    private func upload(_ media: [PickedMedia]) {
-        guard !media.isEmpty else { return }
+    /// Builds the caption sheet: every memory with a small preview beside its field.
+    private func prepareDrafts(_ media: [PickedMedia]) {
+        guard !media.isEmpty else {
+            isPreparingDrafts = false
+            return
+        }
+
+        isPreparingDrafts = true
+        Task {
+            var uploads: [PendingUpload] = []
+            for entry in media {
+                let preview = await GalleryMediaPreparer.previewThumbnail(for: entry)
+                uploads.append(PendingUpload(media: entry, previewData: preview))
+            }
+            isPreparingDrafts = false
+            draft = UploadDraft(uploads: uploads)
+        }
+    }
+
+    private func upload(_ uploads: [PendingUpload]) {
+        guard !uploads.isEmpty else { return }
         Task {
             await gallery.upload(
-                sources: media,
+                sources: uploads,
+                profile: profile,
+                identity: identity,
+                strings: strings,
+                context: modelContext
+            )
+        }
+    }
+
+    private func saveCaption(_ caption: String, for item: GalleryItem) {
+        Task {
+            await gallery.updateCaption(
+                caption,
+                for: item,
                 profile: profile,
                 identity: identity,
                 strings: strings,
@@ -497,4 +607,10 @@ struct GalleryTabView: View {
 private struct ViewerTarget: Identifiable {
     let value: String
     var id: String { value }
+}
+
+/// Batch of memories waiting in the caption sheet.
+private struct UploadDraft: Identifiable {
+    let id: UUID = UUID()
+    let uploads: [PendingUpload]
 }

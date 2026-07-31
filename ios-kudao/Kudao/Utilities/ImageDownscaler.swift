@@ -7,7 +7,10 @@ import UIKit
 
 /// Keeps stored profile photos small enough for fast list rendering.
 nonisolated enum ImageDownscaler {
-    static func compress(_ data: Data, maxDimension: CGFloat = 900) -> Data? {
+    /// Profile photos never need more than this: it fills any avatar on any device.
+    static let profileMaxDimension: CGFloat = 1_024
+
+    static func compress(_ data: Data, maxDimension: CGFloat = profileMaxDimension) -> Data? {
         guard let image = UIImage(data: data) else { return nil }
         let largestSide = max(image.size.width, image.size.height)
         guard largestSide > 0 else { return nil }
@@ -22,5 +25,11 @@ nonisolated enum ImageDownscaler {
             image.draw(in: CGRect(origin: .zero, size: targetSize))
         }
         return resized.jpegData(compressionQuality: 0.85)
+    }
+
+    /// Same treatment starting from an image already in memory (a crop, a capture).
+    static func compress(_ image: UIImage, maxDimension: CGFloat = profileMaxDimension) -> Data? {
+        guard let data = image.jpegData(compressionQuality: 0.95) else { return nil }
+        return compress(data, maxDimension: maxDimension)
     }
 }

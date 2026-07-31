@@ -14,10 +14,12 @@ struct GalleryViewerView: View {
 
     @Environment(AppSettings.self) private var settings
     @Environment(KudaoIdentity.self) private var identity
+    @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
 
     @State private var selection: String
     @State private var isShowingChrome: Bool = true
+    @State private var captionTarget: GalleryItem?
 
     init(profile: BirthdayProfile, items: [GalleryItem], gallery: GalleryService, initialID: String) {
         self.profile = profile
@@ -60,6 +62,11 @@ struct GalleryViewerView: View {
         .overlay(alignment: .bottom) {
             if isShowingChrome, let current { credits(current) }
         }
+        .sheet(item: $captionTarget) { item in
+            GalleryCaptionEditorView(item: item) { caption in
+                save(caption, for: item)
+            }
+        }
         .statusBarHidden(!isShowingChrome)
         .environment(\.locale, settings.locale)
     }
@@ -93,28 +100,44 @@ struct GalleryViewerView: View {
     }
 
     private func credits(_ item: GalleryItem) -> some View {
-        HStack(spacing: 10) {
-            AvatarView(
-                name: item.uploaderName.isEmpty ? "?" : item.uploaderName,
-                photoData: nil,
-                size: 32
-            )
-
-            VStack(alignment: .leading, spacing: 2) {
-                Text(
-                    item.isMine(identity.userID)
-                        ? strings.participantYou
-                        : (item.uploaderName.isEmpty ? strings.participantUnknown : item.uploaderName)
-                )
-                .font(.system(.subheadline, design: .rounded, weight: .bold))
-                .foregroundStyle(.white)
-
-                Text(settings.noteTimestamp(item.createdAt))
-                    .font(.system(.caption2, design: .rounded, weight: .medium))
-                    .foregroundStyle(.white.opacity(0.75))
+        VStack(alignment: .leading, spacing: 10) {
+            if item.hasCaption {
+                Text(item.caption)
+                    .font(.system(.callout, design: .rounded, weight: .semibold))
+                    .foregroundStyle(.white)
+                    .multilineTextAlignment(.leading)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .transition(.opacity)
             }
 
-            Spacer(minLength: 0)
+            HStack(spacing: 10) {
+                AvatarView(
+                    name: item.uploaderName.isEmpty ? "?" : item.uploaderName,
+                    photoData: nil,
+                    size: 32
+                )
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(
+                        item.isMine(identity.userID)
+                            ? strings.participantYou
+                            : (item.uploaderName.isEmpty ? strings.participantUnknown : item.uploaderName)
+                    )
+                    .font(.system(.subheadline, design: .rounded, weight: .bold))
+                    .foregroundStyle(.white)
+
+                    Text(settings.noteTimestamp(item.createdAt))
+                        .font(.system(.caption2, design: .rounded, weight: .medium))
+                        .foregroundStyle(.white.opacity(0.75))
+                }
+
+                Spacer(minLength: 0)
+
+                if canEditCaption(item) {
+                    captionButton(item)
+                }
+            }
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
@@ -127,6 +150,45 @@ struct GalleryViewerView: View {
             .ignoresSafeArea(edges: .bottom)
         )
         .transition(.opacity)
+        .animation(.smooth(duration: 0.22), value: item.caption)
+    }
+
+    /// Only the person who brought a memory writes the line under it.
+    private func canEditCaption(_ item: GalleryItem) -> Bool {
+        item.isMine(identity.userID) && item.uploadState == .uploaded
+    }
+
+    private func captionButton(_ item: GalleryItem) -> some View {
+        Button {
+            captionTarget = item
+        } label: {
+            HStack(spacing: 6) {
+                Image(systemName: item.hasCaption ? "pencil" : "text.bubble")
+                    .font(.system(size: 11, weight: .heavy))
+                Text(item.hasCaption ? strings.galleryCaptionEditAction : strings.galleryCaptionAddAction)
+                    .font(.system(.caption, design: .rounded, weight: .bold))
+                    .lineLimit(1)
+            }
+            .foregroundStyle(.white)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(Capsule().fill(.white.opacity(0.18)))
+            .overlay(Capsule().strokeBorder(.white.opacity(0.3), lineWidth: 1))
+        }
+        .buttonStyle(PressableCardStyle())
+    }
+
+    private func save(_ caption: String, for item: GalleryItem) {
+        Task {
+            await gallery.updateCaption(
+                caption,
+                for: item,
+                profile: profile,
+                identity: identity,
+                strings: strings,
+                context: modelContext
+            )
+        }
     }
 }
 

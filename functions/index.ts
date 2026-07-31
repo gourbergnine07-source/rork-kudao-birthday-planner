@@ -198,7 +198,10 @@ export default {
             return new Response(forwarded.body, { status: forwarded.status, headers: forwarded.headers });
           }
 
-          if (request.method === "POST" && (action === "begin" || action === "commit" || action === "delete")) {
+          if (
+            request.method === "POST" &&
+            (action === "begin" || action === "commit" || action === "delete" || action === "caption")
+          ) {
             const body = (await request.json()) as { userId?: string };
             const access = await galleryAccess(env, profileId, (body.userId ?? "").trim());
             if (!access.isMember) return json({ error: "not_participant" }, 403);

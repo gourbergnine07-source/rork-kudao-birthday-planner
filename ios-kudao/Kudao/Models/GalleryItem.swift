@@ -30,6 +30,8 @@ final class GalleryItem {
     /// Length of a video in seconds; zero for photos.
     var durationSeconds: Double = 0
     var createdAt: Date = Date()
+    /// Short line the uploader wrote about this memory; empty when none.
+    var caption: String = ""
     @Attribute(.externalStorage) var thumbnailData: Data?
     var uploadStateRaw: String = GalleryUploadState.uploaded.rawValue
 
@@ -44,6 +46,7 @@ final class GalleryItem {
         byteSize: Int,
         durationSeconds: Double = 0,
         createdAt: Date = Date(),
+        caption: String = "",
         thumbnailData: Data? = nil,
         uploadState: GalleryUploadState = .uploaded,
         profile: BirthdayProfile? = nil
@@ -57,6 +60,7 @@ final class GalleryItem {
         self.byteSize = byteSize
         self.durationSeconds = durationSeconds
         self.createdAt = createdAt
+        self.caption = caption
         self.thumbnailData = thumbnailData
         self.uploadStateRaw = uploadState.rawValue
         self.profile = profile
@@ -73,6 +77,11 @@ final class GalleryItem {
     }
 
     var isVideo: Bool { mediaType == .video }
+
+    var hasCaption: Bool { !caption.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
+
+    /// Longest caption Kudao stores, matching the gallery room limit.
+    static let captionLimit = 140
 
     func isMine(_ userID: String) -> Bool {
         uploadedByUserID == userID

@@ -5,7 +5,6 @@
 
 import SwiftUI
 import SwiftData
-import PhotosUI
 
 /// Create or edit a celebration profile.
 struct ProfileFormView: View {
@@ -26,8 +25,6 @@ struct ProfileFormView: View {
     @State private var favoriteCharacter: String = ""
     @State private var isSurpriseMode: Bool = false
     @State private var photoData: Data?
-    @State private var pickerItem: PhotosPickerItem?
-    @State private var isLoadingPhoto: Bool = false
     @State private var didSave: Bool = false
 
     private var strings: Strings { settings.strings }
@@ -161,24 +158,18 @@ struct ProfileFormView: View {
         }
         .tint(Palette.coral)
         .onAppear(perform: loadExisting)
-        .onChange(of: pickerItem) { _, newItem in
-            guard let newItem else { return }
-            isLoadingPhoto = true
-            Task {
-                let loaded = try? await newItem.loadTransferable(type: Data.self)
-                if let loaded {
-                    photoData = ImageDownscaler.compress(loaded) ?? loaded
-                }
-                isLoadingPhoto = false
-            }
-        }
     }
 
     // MARK: - Photo
 
     private var photoPicker: some View {
         VStack(spacing: 12) {
-            PhotosPicker(selection: $pickerItem, matching: .images, photoLibrary: .shared()) {
+            PhotoSourcePicker(
+                onPicked: { data in
+                    withAnimation(.smooth(duration: 0.25)) { photoData = data }
+                },
+                onRemoved: photoData == nil ? nil : { photoData = nil }
+            ) {
                 ZStack(alignment: .bottomTrailing) {
                     AvatarView(
                         name: name.isEmpty ? "?" : name,
@@ -187,13 +178,6 @@ struct ProfileFormView: View {
                         ringColor: Palette.surface,
                         ringWidth: 4
                     )
-                    .overlay {
-                        if isLoadingPhoto {
-                            Circle().fill(.black.opacity(0.35))
-                                .overlay { ProgressView().tint(.white) }
-                        }
-                    }
-                    .clipShape(.circle)
 
                     Image(systemName: "camera.fill")
                         .font(.system(size: 13, weight: .bold))
@@ -204,21 +188,10 @@ struct ProfileFormView: View {
                 }
             }
             .buttonStyle(PressableCardStyle())
-            .accessibilityLabel(photoData == nil ? strings.addPhoto : strings.changePhoto)
 
-            if photoData != nil {
-                Button(role: .destructive) {
-                    photoData = nil
-                    pickerItem = nil
-                } label: {
-                    Text(strings.removePhoto)
-                        .font(.system(.footnote, design: .rounded, weight: .semibold))
-                }
-            } else {
-                Text(strings.addPhoto)
-                    .font(.system(.footnote, design: .rounded, weight: .semibold))
-                    .foregroundStyle(.secondary)
-            }
+            Text(photoData == nil ? strings.addPhoto : strings.changePhoto)
+                .font(.system(.footnote, design: .rounded, weight: .semibold))
+                .foregroundStyle(.secondary)
         }
         .padding(.top, 8)
     }

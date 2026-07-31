@@ -18,8 +18,15 @@ type ItemRow = {
   chunk_count: number;
   duration: number;
   thumb: string | null;
+  caption: string | null;
   committed: number;
 };
+
+/** Captions stay short: they are a line under a memory, not a story. */
+const MAX_CAPTION_LENGTH = 140;
+
+const ITEM_COLUMNS = `id, uploaded_by, uploader_name, media_type, mime, created_at,
+                      byte_size, chunk_count, duration, thumb, caption, committed`;
 
 const MEDIA_TYPES = new Set(["photo", "video"]);
 /** Hard ceiling per item, matching what the client is allowed to send. */
@@ -46,8 +53,15 @@ export class GalleryRoom extends DurableObject {
       chunk_count INTEGER NOT NULL DEFAULT 0,
       duration REAL NOT NULL DEFAULT 0,
       thumb TEXT,
+      caption TEXT,
       committed INTEGER NOT NULL DEFAULT 0
     )`);
+    // Galleries created before captions existed get the column added in place.
+    try {
+      sql.exec("ALTER TABLE items ADD COLUMN caption TEXT");
+    } catch {
+      // Column already there.
+    }
     sql.exec(`CREATE TABLE IF NOT EXISTS chunks (
       item_id TEXT NOT NULL,
       idx INTEGER NOT NULL,
@@ -76,6 +90,9 @@ export class GalleryRoom extends DurableObject {
       if (request.method === "GET" && path === "/media") {
         return this.media(url.searchParams.get("itemId") ?? "");
       }
+      if (request.method === "POST" && path === "/caption") {
+        return await this.setCaption(request);
+      }
       if (request.method === "POST" && path === "/delete") {
         return await this.remove(request);
       }
@@ -93,8 +110,7 @@ export class GalleryRoom extends DurableObject {
   private list(): Response {
     const rows = this.ctx.storage.sql
       .exec<ItemRow>(
-        `SELECT id, uploaded_by, uploader_name, media_type, mime, created_at,
-                byte_size, chunk_count, duration, thumb, committed
+        `SELECT ${ITEM_COLUMNS}
          FROM items WHERE committed = 1 ORDER BY created_at DESC LIMIT ?`,
         MAX_ITEMS,
       )
@@ -111,6 +127,7 @@ export class GalleryRoom extends DurableObject {
         byteSize: row.byte_size,
         duration: row.duration,
         thumbnailBase64: row.thumb,
+        caption: row.caption ?? "",
       })),
     });
   }
@@ -128,6 +145,7 @@ export class GalleryRoom extends DurableObject {
       chunkCount?: number;
       duration?: number;
       thumbnailBase64?: string | null;
+      caption?: string | null;
     };
 
     const itemId = (body.itemId ?? "").trim();
@@ -149,8 +167,8 @@ export class GalleryRoom extends DurableObject {
     this.ctx.storage.sql.exec("DELETE FROM chunks WHERE item_id = ?", itemId);
     this.ctx.storage.sql.exec(
       `INSERT INTO items (id, uploaded_by, uploader_name, media_type, mime, created_at,
-                          byte_size, chunk_count, duration, thumb, committed)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)
+                          byte_size, chunk_count, duration, thumb, caption, committed)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)
        ON CONFLICT(id) DO UPDATE SET
          uploader_name = excluded.uploader_name,
          mime = excluded.mime,
@@ -158,6 +176,7 @@ export class GalleryRoom extends DurableObject {
          chunk_count = excluded.chunk_count,
          duration = excluded.duration,
          thumb = excluded.thumb,
+         caption = excluded.caption,
          committed = 0`,
       itemId,
       userId,
@@ -169,6 +188,7 @@ export class GalleryRoom extends DurableObject {
       chunkCount,
       Number(body.duration) || 0,
       body.thumbnailBase64 ?? null,
+      (body.caption ?? "").trim().slice(0, MAX_CAPTION_LENGTH) || null,
     );
 
     return json({ ok: true, itemId });
@@ -253,6 +273,23 @@ export class GalleryRoom extends DurableObject {
     });
   }
 
+  /** Only the person who brought a memory writes or rewrites its caption. */
+  private async setCaption(request: Request): Promise<Response> {
+    const body = (await request.json()) as { itemId?: string; userId?: string; caption?: string };
+    const itemId = (body.itemId ?? "").trim();
+    const userId = (body.userId ?? "").trim();
+    if (!itemId || !userId) return json({ error: "bad_request" }, 400);
+
+    const item = this.item(itemId);
+    if (!item) return json({ error: "unknown_item" }, 404);
+    if (item.uploaded_by !== userId) return json({ error: "not_uploader" }, 403);
+
+    const caption = (body.caption ?? "").trim().slice(0, MAX_CAPTION_LENGTH);
+    this.ctx.storage.sql.exec("UPDATE items SET caption = ? WHERE id = ?", caption || null, itemId);
+
+    return json({ ok: true, itemId, caption });
+  }
+
   /** The uploader removes their own memories; the profile owner removes any. */
   private async remove(request: Request): Promise<Response> {
     const body = (await request.json()) as { itemId?: string; userId?: string; isOwner?: boolean };
@@ -275,12 +312,7 @@ export class GalleryRoom extends DurableObject {
 
   private item(itemId: string): ItemRow | undefined {
     return this.ctx.storage.sql
-      .exec<ItemRow>(
-        `SELECT id, uploaded_by, uploader_name, media_type, mime, created_at,
-                byte_size, chunk_count, duration, thumb, committed
-         FROM items WHERE id = ?`,
-        itemId,
-      )
+      .exec<ItemRow>(`SELECT ${ITEM_COLUMNS} FROM items WHERE id = ?`, itemId)
       .toArray()[0];
   }
 }

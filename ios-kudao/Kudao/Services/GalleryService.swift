@@ -100,7 +100,7 @@ final class GalleryService {
 
     /// Prepares and uploads a batch of picked photos and videos, one after the other.
     func upload(
-        sources: [PickedMedia],
+        sources: [PendingUpload],
         profile: BirthdayProfile,
         identity: KudaoIdentity,
         strings: Strings,
@@ -121,8 +121,15 @@ final class GalleryService {
             }
 
             do {
-                let prepared = try await prepare(source)
-                try await store(prepared, profile: profile, identity: identity, strings: strings, context: context)
+                let prepared = try await prepare(source.media)
+                try await store(
+                    prepared,
+                    caption: source.cleanCaption,
+                    profile: profile,
+                    identity: identity,
+                    strings: strings,
+                    context: context
+                )
             } catch let error as MediaPreparationError {
                 errorMessage = Self.message(error, strings)
             } catch {
@@ -150,6 +157,7 @@ final class GalleryService {
     /// Writes the local mirror first, then pushes the bytes to the room.
     private func store(
         _ prepared: PreparedMedia,
+        caption: String,
         profile: BirthdayProfile,
         identity: KudaoIdentity,
         strings: Strings,
@@ -167,6 +175,7 @@ final class GalleryService {
             byteSize: prepared.byteSize,
             durationSeconds: prepared.durationSeconds,
             createdAt: createdAt,
+            caption: caption,
             thumbnailData: prepared.thumbnail,
             uploadState: .uploading,
             profile: profile
@@ -203,6 +212,7 @@ final class GalleryService {
                 payload,
                 remoteID: remoteID,
                 prepared: prepared,
+                caption: caption,
                 createdAt: createdAt,
                 profile: profile,
                 identity: identity,
@@ -224,6 +234,7 @@ final class GalleryService {
         _ payload: Data,
         remoteID: String,
         prepared: PreparedMedia,
+        caption: String,
         createdAt: Date,
         profile: BirthdayProfile,
         identity: KudaoIdentity,
@@ -244,7 +255,8 @@ final class GalleryService {
                 byteSize: payload.count,
                 chunkCount: chunkCount,
                 duration: prepared.durationSeconds,
-                thumbnailBase64: prepared.thumbnail.base64EncodedString()
+                thumbnailBase64: prepared.thumbnail.base64EncodedString(),
+                caption: caption
             )
         )
 
@@ -307,6 +319,7 @@ final class GalleryService {
                     byteSize: payload.count,
                     durationSeconds: item.durationSeconds
                 ),
+                caption: item.caption,
                 createdAt: item.createdAt,
                 profile: profile,
                 identity: identity,
@@ -318,6 +331,45 @@ final class GalleryService {
             errorMessage = Self.message(error, strings)
         }
         save(context)
+    }
+
+    // MARK: - Captions
+
+    /// Saves the caption locally first, then mirrors it to everyone else.
+    func updateCaption(
+        _ text: String,
+        for item: GalleryItem,
+        profile: BirthdayProfile,
+        identity: KudaoIdentity,
+        strings: Strings,
+        context: ModelContext
+    ) async {
+        let caption = String(
+            text.trimmingCharacters(in: .whitespacesAndNewlines).prefix(GalleryItem.captionLimit)
+        )
+        guard caption != item.caption else { return }
+
+        let previous = item.caption
+        item.caption = caption
+        save(context)
+        revision += 1
+
+        guard item.uploadState == .uploaded else { return }
+
+        do {
+            try await GalleryClient.setCaption(
+                roomID: profile.roomID,
+                itemID: item.remoteID,
+                userID: identity.userID,
+                caption: caption
+            )
+        } catch {
+            // Put the old line back so the grid never shows something the room refused.
+            item.caption = previous
+            save(context)
+            revision += 1
+            errorMessage = Self.message(error, strings)
+        }
     }
 
     // MARK: - Deleting
@@ -369,6 +421,7 @@ final class GalleryService {
                 existing.uploadedByUserID = entry.uploadedByUserId
                 existing.byteSize = entry.byteSize
                 existing.durationSeconds = entry.duration
+                existing.caption = entry.caption ?? ""
                 existing.uploadState = .uploaded
                 if existing.thumbnailData == nil, let base64 = entry.thumbnailBase64 {
                     existing.thumbnailData = Data(base64Encoded: base64)
@@ -385,6 +438,7 @@ final class GalleryService {
                 byteSize: entry.byteSize,
                 durationSeconds: entry.duration,
                 createdAt: Date(timeIntervalSince1970: entry.createdAt / 1000),
+                caption: entry.caption ?? "",
                 thumbnailData: entry.thumbnailBase64.flatMap { Data(base64Encoded: $0) },
                 uploadState: .uploaded,
                 profile: profile

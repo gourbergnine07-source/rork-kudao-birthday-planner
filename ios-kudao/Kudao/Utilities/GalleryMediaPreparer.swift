@@ -97,6 +97,19 @@ nonisolated enum GalleryMediaPreparer {
         )
     }
 
+    // MARK: - Previews
+
+    /// Quick square preview of something the user just picked, for the caption sheet.
+    static func previewThumbnail(for media: PickedMedia) async -> Data? {
+        switch media {
+        case .photo(let data):
+            guard let image = UIImage(data: data) else { return nil }
+            return resize(image, maxDimension: thumbnailMaxDimension, quality: 0.6)
+        case .video(let url):
+            return try? await videoThumbnail(for: AVURLAsset(url: url))
+        }
+    }
+
     private static func videoThumbnail(for asset: AVURLAsset) async throws -> Data {
         let generator = AVAssetImageGenerator(asset: asset)
         generator.appliesPreferredTrackTransform = true

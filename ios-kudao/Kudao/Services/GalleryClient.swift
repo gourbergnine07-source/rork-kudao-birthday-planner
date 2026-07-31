@@ -17,6 +17,7 @@ nonisolated struct RemoteGalleryItem: Codable, Sendable, Equatable {
     let byteSize: Int
     let duration: Double
     let thumbnailBase64: String?
+    let caption: String?
 }
 
 /// Metadata sent before the binary chunks of one upload.
@@ -31,6 +32,7 @@ nonisolated struct GalleryUploadStart: Encodable, Sendable {
     let chunkCount: Int
     let duration: Double
     let thumbnailBase64: String?
+    let caption: String
 }
 
 /// HTTP client for the party gallery rooms.
@@ -102,6 +104,24 @@ nonisolated enum GalleryClient {
             path: "/rooms/\(escaped(roomID))/gallery/commit",
             method: "POST",
             body: try JSONEncoder().encode(Body(itemId: itemID, userId: userID)),
+            contentType: "application/json"
+        )
+    }
+
+    /// Writes (or clears) the caption of a memory already in the room.
+    static func setCaption(roomID: String, itemID: String, userID: String, caption: String) async throws {
+        struct Body: Encodable {
+            let itemId: String
+            let userId: String
+            let caption: String
+        }
+
+        _ = try await send(
+            path: "/rooms/\(escaped(roomID))/gallery/caption",
+            method: "POST",
+            body: try JSONEncoder().encode(
+                Body(itemId: itemID, userId: userID, caption: caption)
+            ),
             contentType: "application/json"
         )
     }

@@ -13,6 +13,8 @@ import UIKit
 /// screen: the caller hides the action instead.
 struct CameraCaptureView: UIViewControllerRepresentable {
     let onCapture: (PickedMedia) -> Void
+    /// Profile photos only want a still; the party gallery also takes clips.
+    var allowsVideo: Bool = true
 
     @Environment(\.dismiss) private var dismiss
 
@@ -23,7 +25,7 @@ struct CameraCaptureView: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> UIImagePickerController {
         let controller = UIImagePickerController()
         controller.sourceType = .camera
-        controller.mediaTypes = ["public.image", "public.movie"]
+        controller.mediaTypes = allowsVideo ? ["public.image", "public.movie"] : ["public.image"]
         controller.videoQuality = .typeMedium
         controller.videoMaximumDuration = 60
         controller.delegate = context.coordinator

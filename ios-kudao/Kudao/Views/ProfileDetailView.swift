@@ -348,15 +348,8 @@ struct ProfileDetailView: View {
                     }
                     .padding(.bottom, 60)
 
-                AvatarView(
-                    name: profile.name,
-                    photoData: profile.photoData,
-                    size: 116,
-                    ringColor: Palette.background,
-                    ringWidth: 5
-                )
-                .shadow(color: Palette.coral.opacity(0.3), radius: 14, y: 8)
-                .padding(.top, 58)
+                headerAvatar
+                    .padding(.top, 58)
             }
 
             VStack(spacing: 5) {
@@ -402,6 +395,62 @@ struct ProfileDetailView: View {
                         .padding(.top, 6)
                 }
             }
+        }
+    }
+
+    /// The photo stays editable for the owner at any time, straight from the header.
+    @ViewBuilder
+    private var headerAvatar: some View {
+        let avatar = AvatarView(
+            name: profile.name,
+            photoData: profile.photoData,
+            size: 116,
+            ringColor: Palette.background,
+            ringWidth: 5
+        )
+        .shadow(color: Palette.coral.opacity(0.3), radius: 14, y: 8)
+
+        if profile.isOwnedByMe {
+            PhotoSourcePicker(
+                onPicked: { data in updatePhoto(data) },
+                onRemoved: profile.photoData == nil ? nil : { updatePhoto(nil) }
+            ) {
+                ZStack(alignment: .bottomTrailing) {
+                    avatar
+
+                    Image(systemName: "camera.fill")
+                        .font(.system(size: 12, weight: .bold))
+                        .foregroundStyle(.white)
+                        .frame(width: 32, height: 32)
+                        .background(Circle().fill(Palette.warmGradient))
+                        .overlay(Circle().strokeBorder(Palette.background, lineWidth: 3))
+                }
+            }
+            .buttonStyle(PressableCardStyle())
+        } else {
+            avatar
+        }
+    }
+
+    /// Stores the new photo, refreshes the widget and lets the room know.
+    private func updatePhoto(_ data: Data?) {
+        withAnimation(.smooth(duration: 0.25)) {
+            profile.photoData = data
+        }
+        try? modelContext.save()
+
+        let settings = self.settings
+        let strings = self.strings
+        WidgetBridge.publish(profiles: [profile], settings: settings)
+
+        guard profile.isCollaborative else { return }
+        Task {
+            await collaboration.sync(
+                profile: profile,
+                identity: identity,
+                strings: strings,
+                context: modelContext
+            )
         }
     }
 

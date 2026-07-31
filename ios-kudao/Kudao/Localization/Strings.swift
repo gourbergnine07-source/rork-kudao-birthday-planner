@@ -402,6 +402,23 @@ nonisolated struct Strings: Sendable {
     let galleryTooLargeMessage: String
     let galleryPrepareFailedMessage: String
     let galleryRetryUnavailable: String
+    let galleryPreparingTitle: String
+    let galleryUploadAction: String
+    let galleryCaptionSheetTitle: String
+    let galleryCaptionSheetMessage: String
+    let galleryCaptionPlaceholder: String
+    let galleryCaptionAddAction: String
+    let galleryCaptionEditAction: String
+    let galleryCaptionEditorTitle: String
+    let photoSourceCameraAction: String
+    let photoSourceLibraryAction: String
+    let photoCropTitle: String
+    let photoCropHint: String
+    let photoUseAction: String
+    let cameraDeniedTitle: String
+    let cameraDeniedMessage: String
+    let libraryDeniedTitle: String
+    let libraryDeniedMessage: String
     let notificationGalleryTitle: String
     let notificationGalleryBodyFormat: String
 }
@@ -774,6 +791,23 @@ extension Strings {
         galleryTooLargeMessage: "Il file \u{00E8} troppo grande: prova con un video pi\u{00F9} corto (max 25 MB).",
         galleryPrepareFailedMessage: "Non riusciamo a preparare questo contenuto. Riprova con un altro file.",
         galleryRetryUnavailable: "Il file originale non \u{00E8} pi\u{00F9} disponibile: caricalo di nuovo.",
+        galleryPreparingTitle: "Preparo i ricordi\u{2026}",
+        galleryUploadAction: "Carica i ricordi",
+        galleryCaptionSheetTitle: "Nuovi ricordi",
+        galleryCaptionSheetMessage: "Aggiungi una breve didascalia a ogni ricordo. Puoi anche lasciarla vuota.",
+        galleryCaptionPlaceholder: "Scrivi una didascalia\u{2026}",
+        galleryCaptionAddAction: "Aggiungi didascalia",
+        galleryCaptionEditAction: "Modifica didascalia",
+        galleryCaptionEditorTitle: "Didascalia",
+        photoSourceCameraAction: "Scatta foto",
+        photoSourceLibraryAction: "Scegli dalla libreria",
+        photoCropTitle: "Inquadra la foto",
+        photoCropHint: "Trascina per spostare, pizzica per ingrandire.",
+        photoUseAction: "Usa questa foto",
+        cameraDeniedTitle: "Fotocamera non accessibile",
+        cameraDeniedMessage: "Kudao non ha il permesso di usare la fotocamera. Attivalo nelle Impostazioni di iOS per scattare una foto.",
+        libraryDeniedTitle: "Foto non accessibili",
+        libraryDeniedMessage: "Kudao non ha il permesso di accedere alle tue foto. Attivalo nelle Impostazioni di iOS per sceglierne una.",
         notificationGalleryTitle: "Ricordi della festa",
         notificationGalleryBodyFormat: "Carica i tuoi ricordi della festa di %@ su Kudao!"
     )
@@ -1145,6 +1179,23 @@ extension Strings {
         galleryTooLargeMessage: "That file is too big: try a shorter video (25 MB max).",
         galleryPrepareFailedMessage: "We can\u{2019}t prepare this content. Try another file.",
         galleryRetryUnavailable: "The original file is gone: please upload it again.",
+        galleryPreparingTitle: "Getting the memories ready\u{2026}",
+        galleryUploadAction: "Upload memories",
+        galleryCaptionSheetTitle: "New memories",
+        galleryCaptionSheetMessage: "Add a short caption to each memory. Leaving it empty is fine too.",
+        galleryCaptionPlaceholder: "Write a caption\u{2026}",
+        galleryCaptionAddAction: "Add caption",
+        galleryCaptionEditAction: "Edit caption",
+        galleryCaptionEditorTitle: "Caption",
+        photoSourceCameraAction: "Take a photo",
+        photoSourceLibraryAction: "Choose from library",
+        photoCropTitle: "Frame the photo",
+        photoCropHint: "Drag to move, pinch to zoom.",
+        photoUseAction: "Use this photo",
+        cameraDeniedTitle: "Camera not available",
+        cameraDeniedMessage: "Kudao is not allowed to use the camera. Turn it on in iOS Settings to take a photo.",
+        libraryDeniedTitle: "Photos not available",
+        libraryDeniedMessage: "Kudao is not allowed to access your photos. Turn it on in iOS Settings to pick one.",
         notificationGalleryTitle: "Party memories",
         notificationGalleryBodyFormat: "Upload your memories from %@\u{2019}s party on Kudao!"
     )
@@ -1516,6 +1567,23 @@ extension Strings {
         galleryTooLargeMessage: "Le fichier est trop lourd : essaie une vid\u{00E9}o plus courte (25 Mo max).",
         galleryPrepareFailedMessage: "Impossible de pr\u{00E9}parer ce contenu. Essaie un autre fichier.",
         galleryRetryUnavailable: "Le fichier d\u{2019}origine n\u{2019}est plus disponible : envoie-le \u{00E0} nouveau.",
+        galleryPreparingTitle: "Pr\u{00E9}paration des souvenirs\u{2026}",
+        galleryUploadAction: "Envoyer les souvenirs",
+        galleryCaptionSheetTitle: "Nouveaux souvenirs",
+        galleryCaptionSheetMessage: "Ajoute une l\u{00E9}g\u{00E8}re description \u{00E0} chaque souvenir. Tu peux aussi la laisser vide.",
+        galleryCaptionPlaceholder: "\u{00C9}cris une l\u{00E9}gende\u{2026}",
+        galleryCaptionAddAction: "Ajouter une l\u{00E9}gende",
+        galleryCaptionEditAction: "Modifier la l\u{00E9}gende",
+        galleryCaptionEditorTitle: "L\u{00E9}gende",
+        photoSourceCameraAction: "Prendre une photo",
+        photoSourceLibraryAction: "Choisir dans la biblioth\u{00E8}que",
+        photoCropTitle: "Cadrer la photo",
+        photoCropHint: "Fais glisser pour d\u{00E9}placer, pince pour zoomer.",
+        photoUseAction: "Utiliser cette photo",
+        cameraDeniedTitle: "Appareil photo indisponible",
+        cameraDeniedMessage: "Kudao n\u{2019}a pas l\u{2019}autorisation d\u{2019}utiliser l\u{2019}appareil photo. Active-la dans les R\u{00E9}glages iOS pour prendre une photo.",
+        libraryDeniedTitle: "Photos indisponibles",
+        libraryDeniedMessage: "Kudao n\u{2019}a pas acc\u{00E8}s \u{00E0} tes photos. Active l\u{2019}autorisation dans les R\u{00E9}glages iOS pour en choisir une.",
         notificationGalleryTitle: "Souvenirs de la f\u{00EA}te",
         notificationGalleryBodyFormat: "Ajoute tes souvenirs de la f\u{00EA}te de %@ sur Kudao !"
     )
@@ -1887,6 +1955,23 @@ extension Strings {
         galleryTooLargeMessage: "El archivo es demasiado grande: prueba con un v\u{00ED}deo m\u{00E1}s corto (m\u{00E1}x. 25 MB).",
         galleryPrepareFailedMessage: "No podemos preparar este contenido. Prueba con otro archivo.",
         galleryRetryUnavailable: "El archivo original ya no est\u{00E1} disponible: vuelve a subirlo.",
+        galleryPreparingTitle: "Preparando los recuerdos\u{2026}",
+        galleryUploadAction: "Subir recuerdos",
+        galleryCaptionSheetTitle: "Nuevos recuerdos",
+        galleryCaptionSheetMessage: "A\u{00F1}ade una descripci\u{00F3}n breve a cada recuerdo. Tambi\u{00E9}n puedes dejarla vac\u{00ED}a.",
+        galleryCaptionPlaceholder: "Escribe una descripci\u{00F3}n\u{2026}",
+        galleryCaptionAddAction: "A\u{00F1}adir descripci\u{00F3}n",
+        galleryCaptionEditAction: "Editar descripci\u{00F3}n",
+        galleryCaptionEditorTitle: "Descripci\u{00F3}n",
+        photoSourceCameraAction: "Hacer una foto",
+        photoSourceLibraryAction: "Elegir de la biblioteca",
+        photoCropTitle: "Encuadra la foto",
+        photoCropHint: "Arrastra para mover, pellizca para acercar.",
+        photoUseAction: "Usar esta foto",
+        cameraDeniedTitle: "C\u{00E1}mara no disponible",
+        cameraDeniedMessage: "Kudao no tiene permiso para usar la c\u{00E1}mara. Act\u{00ED}valo en los Ajustes de iOS para hacer una foto.",
+        libraryDeniedTitle: "Fotos no disponibles",
+        libraryDeniedMessage: "Kudao no tiene permiso para acceder a tus fotos. Act\u{00ED}valo en los Ajustes de iOS para elegir una.",
         notificationGalleryTitle: "Recuerdos de la fiesta",
         notificationGalleryBodyFormat: "\u{00A1}Sube tus recuerdos de la fiesta de %@ en Kudao!"
     )
