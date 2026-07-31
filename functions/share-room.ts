@@ -94,6 +94,9 @@ export class ShareRoom extends DurableObject {
       if (request.method === "GET" && path === "/state") {
         return this.state(url.searchParams.get("userId") ?? "");
       }
+      if (request.method === "GET" && path === "/access") {
+        return this.access(url.searchParams.get("userId") ?? "");
+      }
       if (request.method === "POST" && path === "/notes") {
         return await this.addNote(request);
       }
@@ -363,6 +366,32 @@ export class ShareRoom extends DurableObject {
   }
 
   // MARK: - Shared payload
+
+  /**
+   * Membership check used by satellite features such as the party gallery.
+   *
+   * A profile that was never shared has no room owner: the requester is then the
+   * only person who can address it (the room id is the profile's private uuid),
+   * so they are treated as its owner.
+   */
+  private access(userId: string): Response {
+    const owner = this.meta("owner_user_id");
+    if (!owner) {
+      return json({ exists: false, isMember: true, isOwner: true, permission: "edit" });
+    }
+
+    const requester = userId ? this.participant(userId) : undefined;
+    if (!requester) {
+      return json({ exists: true, isMember: false, isOwner: false, permission: "" });
+    }
+
+    return json({
+      exists: true,
+      isMember: true,
+      isOwner: requester.is_owner === 1,
+      permission: requester.is_owner === 1 ? "edit" : requester.permission,
+    });
+  }
 
   private state(userId: string): Response {
     const requester = userId ? this.participant(userId) : undefined;

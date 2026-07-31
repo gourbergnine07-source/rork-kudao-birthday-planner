@@ -63,6 +63,7 @@ struct MessageTabView: View {
                 generatingPanel
             } else if let message, message.hasText {
                 messageCard(message)
+                autoRefreshCard(message)
                 scheduleCard(message)
                 contactCard
                 sendRow(message)
@@ -270,11 +271,115 @@ struct MessageTabView: View {
     }
 
     /// Writes straight into the stored record so edits survive tab switches.
+    ///
+    /// A manual edit also pauses the automatic rewrites, so what the user typed
+    /// is never replaced by a new diary-driven generation.
     private func textBinding(_ message: BirthdayMessage) -> Binding<String> {
         Binding(
             get: { message.text },
-            set: { message.text = $0 }
+            set: { newValue in
+                guard newValue != message.text else { return }
+                message.text = newValue
+                message.markUserEdited()
+            }
         )
+    }
+
+    // MARK: - Automatic refresh
+
+    /// Keeps the draft in step with the diary, unless the user took over the text.
+    private func autoRefreshCard(_ message: BirthdayMessage) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Toggle(isOn: autoRefreshBinding(message)) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(strings.messageAutoRefreshToggle)
+                        .font(.system(.subheadline, design: .rounded, weight: .semibold))
+                    Text(strings.messageAutoRefreshCaption)
+                        .font(.system(.caption2, design: .rounded))
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+            .tint(Palette.violet)
+
+            if message.isUserEdited, message.isAutoRefreshEnabled {
+                Divider().overlay(Palette.hairline)
+
+                HStack(alignment: .top, spacing: 9) {
+                    Image(systemName: "hand.raised.fill")
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundStyle(Palette.amber)
+                        .padding(.top, 2)
+
+                    Text(strings.messageAutoRefreshPausedLabel)
+                        .font(.system(.caption, design: .rounded, weight: .medium))
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+
+                    Spacer(minLength: 0)
+
+                    Button(strings.messageAutoRefreshResumeAction) {
+                        resumeAutoRefresh(message)
+                    }
+                    .font(.system(.caption, design: .rounded, weight: .bold))
+                    .buttonStyle(.plain)
+                    .foregroundStyle(Palette.coral)
+                    .disabled(composer.isGenerating)
+                }
+            } else if let refreshedAt = message.autoRefreshedAt {
+                Divider().overlay(Palette.hairline)
+
+                HStack(spacing: 7) {
+                    Image(systemName: "sparkles")
+                        .font(.system(size: 10, weight: .bold))
+                        .foregroundStyle(Palette.violet)
+                    Text(
+                        String(
+                            format: strings.messageAutoRefreshedFormat,
+                            settings.noteTimestamp(refreshedAt)
+                        )
+                    )
+                    .font(.system(.caption2, design: .rounded, weight: .medium))
+                    .foregroundStyle(.secondary)
+                    Spacer(minLength: 0)
+                }
+            }
+        }
+        .padding(16)
+        .background(
+            RoundedRectangle(cornerRadius: 24, style: .continuous)
+                .fill(Palette.surface)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 24, style: .continuous)
+                .strokeBorder(Palette.hairline, lineWidth: 1)
+        )
+    }
+
+    private func autoRefreshBinding(_ message: BirthdayMessage) -> Binding<Bool> {
+        Binding(
+            get: { message.isAutoRefreshEnabled },
+            set: { newValue in
+                message.isAutoRefreshEnabled = newValue
+                message.updatedAt = Date()
+                composer.save(modelContext)
+            }
+        )
+    }
+
+    /// Gives the draft back to the diary and rewrites it right away.
+    private func resumeAutoRefresh(_ message: BirthdayMessage) {
+        message.resumeAutoRefresh()
+        composer.save(modelContext)
+
+        Task {
+            let changed = await composer.regenerate(
+                for: profile,
+                language: settings.language,
+                context: modelContext
+            )
+            if changed { rescheduleReminders() }
+        }
     }
 
     // MARK: - Schedule

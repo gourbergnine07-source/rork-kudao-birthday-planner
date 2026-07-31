@@ -374,6 +374,36 @@ nonisolated struct Strings: Sendable {
     let messageOpenFailedMessage: String
     let notificationMessageTitle: String
     let notificationMessageBodyFormat: String
+
+    let messageAutoRefreshToggle: String
+    let messageAutoRefreshCaption: String
+    let messageAutoRefreshPausedLabel: String
+    let messageAutoRefreshResumeAction: String
+    let messageAutoRefreshedFormat: String
+
+    let galleryTab: String
+    let gallerySectionTitle: String
+    let galleryCountFormat: String
+    let galleryAddAction: String
+    let galleryFromLibraryAction: String
+    let galleryCaptureAction: String
+    let galleryEmptyTitle: String
+    let galleryEmptyMessage: String
+    let galleryLockedTitle: String
+    let galleryLockedMessageFormat: String
+    let galleryUploadingTitle: String
+    let galleryUploadingCountFormat: String
+    let galleryDeleteAction: String
+    let galleryDeleteConfirmTitle: String
+    let galleryDeleteConfirmMessage: String
+    let galleryPrivacyNote: String
+    let galleryLoadingLabel: String
+    let galleryMediaUnavailable: String
+    let galleryTooLargeMessage: String
+    let galleryPrepareFailedMessage: String
+    let galleryRetryUnavailable: String
+    let notificationGalleryTitle: String
+    let notificationGalleryBodyFormat: String
 }
 
 extension Strings {
@@ -717,7 +747,35 @@ extension Strings {
         messageOpenFailedTitle: "App non disponibile",
         messageOpenFailedMessage: "Non riusciamo ad aprire l\u{2019}app su questo dispositivo. Il testo \u{00E8} stato copiato negli appunti.",
         notificationMessageTitle: "Auguri da inviare",
-        notificationMessageBodyFormat: "\u{00C8} il momento di augurare buon compleanno a %@!"
+        notificationMessageBodyFormat: "\u{00C8} il momento di augurare buon compleanno a %@!",
+        messageAutoRefreshToggle: "Aggiorna con le nuove note",
+        messageAutoRefreshCaption: "Quando aggiungi note o parole chiave al diario, riscriviamo la bozza degli auguri.",
+        messageAutoRefreshPausedLabel: "Hai modificato il testo a mano: l\u{2019}aggiornamento automatico \u{00E8} in pausa.",
+        messageAutoRefreshResumeAction: "Riprendi",
+        messageAutoRefreshedFormat: "Aggiornato con le tue ultime note \u{00B7} %@",
+        galleryTab: "Galleria",
+        gallerySectionTitle: "Ricordi della festa",
+        galleryCountFormat: "%d ricordi",
+        galleryAddAction: "Aggiungi ricordi",
+        galleryFromLibraryAction: "Scegli dalla libreria",
+        galleryCaptureAction: "Scatta o registra",
+        galleryEmptyTitle: "Nessun ricordo ancora",
+        galleryEmptyMessage: "Carica le foto e i video della festa: li vedranno tutti i partecipanti al profilo.",
+        galleryLockedTitle: "Disponibile dal giorno della festa",
+        galleryLockedMessageFormat: "La galleria condivisa si apre il %@, cos\u{00EC} puoi raccogliere subito foto e video del compleanno.",
+        galleryUploadingTitle: "Caricamento in corso\u{2026}",
+        galleryUploadingCountFormat: "%d in attesa",
+        galleryDeleteAction: "Elimina ricordo",
+        galleryDeleteConfirmTitle: "Eliminare il ricordo?",
+        galleryDeleteConfirmMessage: "La foto o il video sparir\u{00E0} anche per gli altri partecipanti.",
+        galleryPrivacyNote: "Solo chi ha accesso al profilo pu\u{00F2} vedere e caricare questi ricordi.",
+        galleryLoadingLabel: "Caricamento\u{2026}",
+        galleryMediaUnavailable: "Contenuto non disponibile offline. Riprova quando torni online.",
+        galleryTooLargeMessage: "Il file \u{00E8} troppo grande: prova con un video pi\u{00F9} corto (max 25 MB).",
+        galleryPrepareFailedMessage: "Non riusciamo a preparare questo contenuto. Riprova con un altro file.",
+        galleryRetryUnavailable: "Il file originale non \u{00E8} pi\u{00F9} disponibile: caricalo di nuovo.",
+        notificationGalleryTitle: "Ricordi della festa",
+        notificationGalleryBodyFormat: "Carica i tuoi ricordi della festa di %@ su Kudao!"
     )
 
     static let english = Strings(
@@ -1060,7 +1118,35 @@ extension Strings {
         messageOpenFailedTitle: "App unavailable",
         messageOpenFailedMessage: "We couldn\u{2019}t open that app on this device. The text has been copied to your clipboard.",
         notificationMessageTitle: "Wishes to send",
-        notificationMessageBodyFormat: "It\u{2019}s time to wish %@ a happy birthday!"
+        notificationMessageBodyFormat: "It\u{2019}s time to wish %@ a happy birthday!",
+        messageAutoRefreshToggle: "Update with new notes",
+        messageAutoRefreshCaption: "When you add notes or keywords to the diary, we rewrite the draft of your wishes.",
+        messageAutoRefreshPausedLabel: "You edited the text yourself, so automatic updates are paused.",
+        messageAutoRefreshResumeAction: "Resume",
+        messageAutoRefreshedFormat: "Updated with your latest notes \u{00B7} %@",
+        galleryTab: "Gallery",
+        gallerySectionTitle: "Party memories",
+        galleryCountFormat: "%d memories",
+        galleryAddAction: "Add memories",
+        galleryFromLibraryAction: "Choose from library",
+        galleryCaptureAction: "Take photo or video",
+        galleryEmptyTitle: "No memories yet",
+        galleryEmptyMessage: "Upload the party photos and videos: everyone with access to the profile will see them.",
+        galleryLockedTitle: "Available from the party day",
+        galleryLockedMessageFormat: "The shared gallery opens on %@, so you can collect the birthday photos and videos right away.",
+        galleryUploadingTitle: "Uploading\u{2026}",
+        galleryUploadingCountFormat: "%d left",
+        galleryDeleteAction: "Delete memory",
+        galleryDeleteConfirmTitle: "Delete this memory?",
+        galleryDeleteConfirmMessage: "The photo or video will disappear for the other participants too.",
+        galleryPrivacyNote: "Only people with access to the profile can see and add these memories.",
+        galleryLoadingLabel: "Loading\u{2026}",
+        galleryMediaUnavailable: "This content isn\u{2019}t available offline. Try again once you\u{2019}re back online.",
+        galleryTooLargeMessage: "That file is too big: try a shorter video (25 MB max).",
+        galleryPrepareFailedMessage: "We can\u{2019}t prepare this content. Try another file.",
+        galleryRetryUnavailable: "The original file is gone: please upload it again.",
+        notificationGalleryTitle: "Party memories",
+        notificationGalleryBodyFormat: "Upload your memories from %@\u{2019}s party on Kudao!"
     )
 
     static let french = Strings(
@@ -1403,7 +1489,35 @@ extension Strings {
         messageOpenFailedTitle: "Application indisponible",
         messageOpenFailedMessage: "Impossible d\u{2019}ouvrir cette application sur cet appareil. Le texte a \u{00E9}t\u{00E9} copi\u{00E9}.",
         notificationMessageTitle: "V\u{0153}ux \u{00E0} envoyer",
-        notificationMessageBodyFormat: "C\u{2019}est le moment de souhaiter un joyeux anniversaire \u{00E0} %@ !"
+        notificationMessageBodyFormat: "C\u{2019}est le moment de souhaiter un joyeux anniversaire \u{00E0} %@ !",
+        messageAutoRefreshToggle: "Mettre \u{00E0} jour avec les nouvelles notes",
+        messageAutoRefreshCaption: "Quand tu ajoutes des notes ou des mots-cl\u{00E9}s au journal, nous r\u{00E9}\u{00E9}crivons le brouillon des v\u{0153}ux.",
+        messageAutoRefreshPausedLabel: "Tu as modifi\u{00E9} le texte toi-m\u{00EA}me : la mise \u{00E0} jour automatique est en pause.",
+        messageAutoRefreshResumeAction: "Reprendre",
+        messageAutoRefreshedFormat: "Mis \u{00E0} jour avec tes derni\u{00E8}res notes \u{00B7} %@",
+        galleryTab: "Galerie",
+        gallerySectionTitle: "Souvenirs de la f\u{00EA}te",
+        galleryCountFormat: "%d souvenirs",
+        galleryAddAction: "Ajouter des souvenirs",
+        galleryFromLibraryAction: "Choisir dans la biblioth\u{00E8}que",
+        galleryCaptureAction: "Photo ou vid\u{00E9}o",
+        galleryEmptyTitle: "Aucun souvenir pour l\u{2019}instant",
+        galleryEmptyMessage: "Ajoute les photos et vid\u{00E9}os de la f\u{00EA}te : toutes les personnes ayant acc\u{00E8}s au profil les verront.",
+        galleryLockedTitle: "Disponible le jour de la f\u{00EA}te",
+        galleryLockedMessageFormat: "La galerie partag\u{00E9}e s\u{2019}ouvre le %@, pour rassembler tout de suite les photos et vid\u{00E9}os de l\u{2019}anniversaire.",
+        galleryUploadingTitle: "Envoi en cours\u{2026}",
+        galleryUploadingCountFormat: "%d en attente",
+        galleryDeleteAction: "Supprimer le souvenir",
+        galleryDeleteConfirmTitle: "Supprimer ce souvenir ?",
+        galleryDeleteConfirmMessage: "La photo ou la vid\u{00E9}o dispara\u{00EE}tra aussi pour les autres participants.",
+        galleryPrivacyNote: "Seules les personnes ayant acc\u{00E8}s au profil voient et ajoutent ces souvenirs.",
+        galleryLoadingLabel: "Chargement\u{2026}",
+        galleryMediaUnavailable: "Contenu indisponible hors ligne. R\u{00E9}essaie une fois reconnect\u{00E9}.",
+        galleryTooLargeMessage: "Le fichier est trop lourd : essaie une vid\u{00E9}o plus courte (25 Mo max).",
+        galleryPrepareFailedMessage: "Impossible de pr\u{00E9}parer ce contenu. Essaie un autre fichier.",
+        galleryRetryUnavailable: "Le fichier d\u{2019}origine n\u{2019}est plus disponible : envoie-le \u{00E0} nouveau.",
+        notificationGalleryTitle: "Souvenirs de la f\u{00EA}te",
+        notificationGalleryBodyFormat: "Ajoute tes souvenirs de la f\u{00EA}te de %@ sur Kudao !"
     )
 
     static let spanish = Strings(
@@ -1746,6 +1860,34 @@ extension Strings {
         messageOpenFailedTitle: "App no disponible",
         messageOpenFailedMessage: "No hemos podido abrir esa app en este dispositivo. El texto se ha copiado al portapapeles.",
         notificationMessageTitle: "Felicitaci\u{00F3}n pendiente",
-        notificationMessageBodyFormat: "\u{00A1}Es el momento de felicitar a %@ por su cumplea\u{00F1}os!"
+        notificationMessageBodyFormat: "\u{00A1}Es el momento de felicitar a %@ por su cumplea\u{00F1}os!",
+        messageAutoRefreshToggle: "Actualizar con las notas nuevas",
+        messageAutoRefreshCaption: "Cuando a\u{00F1}ades notas o palabras clave al diario, reescribimos el borrador de la felicitaci\u{00F3}n.",
+        messageAutoRefreshPausedLabel: "Has editado el texto a mano: la actualizaci\u{00F3}n autom\u{00E1}tica est\u{00E1} en pausa.",
+        messageAutoRefreshResumeAction: "Reanudar",
+        messageAutoRefreshedFormat: "Actualizado con tus \u{00FA}ltimas notas \u{00B7} %@",
+        galleryTab: "Galer\u{00ED}a",
+        gallerySectionTitle: "Recuerdos de la fiesta",
+        galleryCountFormat: "%d recuerdos",
+        galleryAddAction: "A\u{00F1}adir recuerdos",
+        galleryFromLibraryAction: "Elegir de la biblioteca",
+        galleryCaptureAction: "Hacer foto o v\u{00ED}deo",
+        galleryEmptyTitle: "A\u{00FA}n no hay recuerdos",
+        galleryEmptyMessage: "Sube las fotos y los v\u{00ED}deos de la fiesta: los ver\u{00E1} todo el que tenga acceso al perfil.",
+        galleryLockedTitle: "Disponible desde el d\u{00ED}a de la fiesta",
+        galleryLockedMessageFormat: "La galer\u{00ED}a compartida se abre el %@, para reunir enseguida las fotos y los v\u{00ED}deos del cumplea\u{00F1}os.",
+        galleryUploadingTitle: "Subiendo\u{2026}",
+        galleryUploadingCountFormat: "%d pendientes",
+        galleryDeleteAction: "Eliminar recuerdo",
+        galleryDeleteConfirmTitle: "\u{00BF}Eliminar este recuerdo?",
+        galleryDeleteConfirmMessage: "La foto o el v\u{00ED}deo desaparecer\u{00E1} tambi\u{00E9}n para los dem\u{00E1}s participantes.",
+        galleryPrivacyNote: "Solo quien tiene acceso al perfil puede ver y subir estos recuerdos.",
+        galleryLoadingLabel: "Cargando\u{2026}",
+        galleryMediaUnavailable: "Este contenido no est\u{00E1} disponible sin conexi\u{00F3}n. Int\u{00E9}ntalo cuando vuelvas a estar en l\u{00ED}nea.",
+        galleryTooLargeMessage: "El archivo es demasiado grande: prueba con un v\u{00ED}deo m\u{00E1}s corto (m\u{00E1}x. 25 MB).",
+        galleryPrepareFailedMessage: "No podemos preparar este contenido. Prueba con otro archivo.",
+        galleryRetryUnavailable: "El archivo original ya no est\u{00E1} disponible: vuelve a subirlo.",
+        notificationGalleryTitle: "Recuerdos de la fiesta",
+        notificationGalleryBodyFormat: "\u{00A1}Sube tus recuerdos de la fiesta de %@ en Kudao!"
     )
 }

@@ -55,4 +55,34 @@ extension BirthdayProfile {
         guard isReminderEnabled, isGiftReminderEnabled else { return nil }
         return reminderFireDate(daysBefore: giftReminderDaysBefore)
     }
+
+    /// "Upload your memories" nudge, the morning after the party.
+    ///
+    /// It is scheduled on every device that can see the profile, so each
+    /// participant gets the reminder without Kudao needing a push server.
+    func galleryReminderDate(reference: Date = Date(), calendar: Calendar = .current) -> Date? {
+        let components = calendar.dateComponents([.month, .day], from: birthDate)
+        let currentYear = calendar.component(.year, from: reference)
+
+        for offset in 0...2 {
+            var target = DateComponents()
+            target.year = currentYear + offset
+            target.month = components.month
+            target.day = components.day
+
+            guard let occurrence = calendar.date(from: target),
+                  let dayAfter = calendar.date(byAdding: .day, value: 1, to: occurrence),
+                  let fire = calendar.date(
+                      bySettingHour: Self.reminderHour,
+                      minute: 0,
+                      second: 0,
+                      of: dayAfter
+                  ),
+                  fire > reference
+            else { continue }
+
+            return fire
+        }
+        return nil
+    }
 }

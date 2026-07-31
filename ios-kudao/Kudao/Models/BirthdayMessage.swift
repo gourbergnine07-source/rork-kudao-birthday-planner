@@ -26,6 +26,17 @@ final class BirthdayMessage {
     var createdAt: Date = Date()
     var updatedAt: Date = Date()
 
+    // MARK: Automatic refresh from the diary
+
+    /// When true the draft is rewritten as soon as new notes change the extracted keywords.
+    var isAutoRefreshEnabled: Bool = true
+    /// Set the moment the user edits the text by hand: automatic rewrites then stop.
+    var isUserEdited: Bool = false
+    /// Fingerprint of the diary keywords the current text was written from.
+    var sourceSignature: String = ""
+    /// Last time new diary material rewrote the draft on its own.
+    var autoRefreshedAt: Date?
+
     var profile: BirthdayProfile?
 
     init(
@@ -53,6 +64,23 @@ final class BirthdayMessage {
     }
 
     var hasText: Bool { !trimmedText.isEmpty }
+
+    /// True while Kudao is still allowed to rewrite the draft by itself.
+    var followsDiary: Bool { isAutoRefreshEnabled && !isUserEdited && !isSent }
+
+    /// Records a manual edit, which freezes the text against automatic rewrites.
+    func markUserEdited() {
+        guard !isUserEdited else { return }
+        isUserEdited = true
+        updatedAt = Date()
+    }
+
+    /// Hands the draft back to the automatic refresh, dropping the "edited" flag.
+    func resumeAutoRefresh() {
+        isUserEdited = false
+        isAutoRefreshEnabled = true
+        updatedAt = Date()
+    }
 
     /// Fire date of the send reminder, or nil when there is nothing left to remind about.
     var reminderFireDate: Date? {

@@ -406,6 +406,9 @@
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "Kudao usa Face ID per proteggere i profili in modalit\U00e0 sorpresa.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Kudao usa la tua posizione solo per trovare negozi vicini dove comprare il regalo.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Kudao usa la fotocamera per scattare foto e registrare video della festa da aggiungere alla galleria condivisa.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Kudao usa il microfono per registrare l'audio dei video della festa.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Kudao accede alle foto solo per aggiungere alla galleria della festa i contenuti che scegli tu.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -441,6 +444,9 @@
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "Kudao usa Face ID per proteggere i profili in modalit\U00e0 sorpresa.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Kudao usa la tua posizione solo per trovare negozi vicini dove comprare il regalo.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Kudao usa la fotocamera per scattare foto e registrare video della festa da aggiungere alla galleria condivisa.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Kudao usa il microfono per registrare l'audio dei video della festa.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Kudao accede alle foto solo per aggiungere alla galleria della festa i contenuti che scegli tu.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

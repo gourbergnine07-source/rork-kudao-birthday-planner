@@ -29,6 +29,7 @@ struct ProfileDetailView: View {
     @State private var analyzer = DiaryAnalyzer()
     @State private var suggestionEngine = SuggestionEngine()
     @State private var composer = GreetingComposer()
+    @State private var gallery = GalleryService()
     @State private var isShowingStores: Bool = false
     @State private var noGiftIdeaAlert: Bool = false
     @State private var exportingFormat: DiaryExportFormat?
@@ -49,6 +50,7 @@ struct ProfileDetailView: View {
         case preferences
         case suggestions
         case message
+        case gallery
 
         var id: String { rawValue }
 
@@ -58,6 +60,7 @@ struct ProfileDetailView: View {
             case .preferences: "tag.fill"
             case .suggestions: "sparkles"
             case .message: "paperplane.fill"
+            case .gallery: "photo.stack.fill"
             }
         }
 
@@ -67,6 +70,7 @@ struct ProfileDetailView: View {
             case .preferences: strings.preferencesTab
             case .suggestions: strings.suggestionsTab
             case .message: strings.messageTab
+            case .gallery: strings.galleryTab
             }
         }
     }
@@ -167,6 +171,9 @@ struct ProfileDetailView: View {
                 context: modelContext
             )
         }
+        .task(id: diarySignature) {
+            await refreshGreetingFromDiary()
+        }
         .onDisappear {
             guard pendingDeletion else { return }
             notifications.cancelReminders(for: profile.id)
@@ -174,6 +181,30 @@ struct ProfileDetailView: View {
         }
         .environment(\.locale, settings.locale)
         .tint(Palette.coral)
+    }
+
+    // MARK: - Greeting kept in step with the diary
+
+    /// Fingerprint of the keywords extracted from the diary, notes and tags included.
+    private var diarySignature: String {
+        GreetingComposer.diarySignature(for: profile)
+    }
+
+    /// New notes rewrite the prepared greeting, unless the user edited it by hand.
+    private func refreshGreetingFromDiary() async {
+        let changed = await composer.refreshFromDiary(
+            for: profile,
+            language: settings.language,
+            context: modelContext
+        )
+        guard changed else { return }
+
+        // The reminder shows a preview of the greeting, so it follows the new text.
+        await notifications.sync(
+            profile: profile,
+            strings: strings,
+            privacy: ReminderPrivacy(hidesSurprisePreviews: settings.hidesSurpriseNotificationPreviews)
+        )
     }
 
     // MARK: - Settings menu
@@ -857,6 +888,9 @@ struct ProfileDetailView: View {
                 .transition(.opacity.combined(with: .offset(y: 8)))
         case .message:
             MessageTabView(profile: profile, composer: composer)
+                .transition(.opacity.combined(with: .offset(y: 8)))
+        case .gallery:
+            GalleryTabView(profile: profile, gallery: gallery)
                 .transition(.opacity.combined(with: .offset(y: 8)))
         }
     }

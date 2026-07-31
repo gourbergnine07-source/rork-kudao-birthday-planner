@@ -51,6 +51,9 @@ final class BirthdayProfile {
     @Relationship(deleteRule: .cascade, inverse: \BirthdayMessage.profile)
     var birthdayMessage: BirthdayMessage?
 
+    @Relationship(deleteRule: .cascade, inverse: \GalleryItem.profile)
+    var galleryItems: [GalleryItem] = []
+
     // MARK: Collaboration
 
     /// Kudao id of the person who owns the profile; empty until it is shared.
@@ -127,6 +130,21 @@ final class BirthdayProfile {
     /// Trimmed favourite character, only meaningful for children.
     var trimmedFavoriteCharacter: String {
         favoriteCharacter.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    // MARK: Party gallery
+
+    /// How long the shared gallery stays open after the party.
+    static let galleryWindowDays: Int = 60
+
+    /// The gallery opens on the day of the party and closes again once the memories are old.
+    var isGalleryUnlocked: Bool {
+        countdown.isToday || countdown.daysSinceLast <= Self.galleryWindowDays
+    }
+
+    /// Date the gallery becomes available: this year's birthday, or the next one.
+    var galleryUnlockDate: Date {
+        isGalleryUnlocked ? countdown.lastDate : countdown.nextDate
     }
 
     // MARK: Collaboration helpers

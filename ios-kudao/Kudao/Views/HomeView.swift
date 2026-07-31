@@ -72,6 +72,8 @@ struct HomeView: View {
     @State private var suggestionsProfileID: UUID?
     /// Profile that must open straight on the message tab after a send reminder.
     @State private var messageProfileID: UUID?
+    /// Profile that must open straight on the gallery after the party reminder.
+    @State private var galleryProfileID: UUID?
     @State private var isShowingSettings: Bool = false
     @State private var unlockFailed: Bool = false
 
@@ -181,9 +183,13 @@ struct HomeView: View {
         .onChange(of: notifications.pendingMessageProfileID) { _, pending in
             handleMessageTap(pending)
         }
+        .onChange(of: notifications.pendingGalleryProfileID) { _, pending in
+            handleGalleryTap(pending)
+        }
         .onAppear {
             handleReminderTap(notifications.pendingReviewProfileID)
             handleMessageTap(notifications.pendingMessageProfileID)
+            handleGalleryTap(notifications.pendingGalleryProfileID)
         }
     }
 
@@ -227,14 +233,29 @@ struct HomeView: View {
         }
     }
 
+    /// A tapped memories reminder opens the profile straight on its party gallery.
+    private func handleGalleryTap(_ pending: UUID?) {
+        guard let pending, let match = profiles.first(where: { $0.id == pending }) else { return }
+        notifications.consumePendingGallery()
+        path = []
+        open(match) {
+            suggestionsProfileID = nil
+            messageProfileID = nil
+            galleryProfileID = match.id
+            path = [match]
+        }
+    }
+
     private func openSuggestions(for profile: BirthdayProfile) {
         messageProfileID = nil
+        galleryProfileID = nil
         suggestionsProfileID = profile.id
         path = [profile]
     }
 
     /// Reminder taps and the plan review decide which tab the detail screen opens on.
     private func initialTab(for profile: BirthdayProfile) -> ProfileDetailView.ProfileTab {
+        if galleryProfileID == profile.id { return .gallery }
         if messageProfileID == profile.id { return .message }
         if suggestionsProfileID == profile.id { return .suggestions }
         return .diary

@@ -10,6 +10,10 @@ nonisolated struct BirthdayCountdown: Sendable, Equatable {
     let nextDate: Date
     let daysRemaining: Int
     let turningAge: Int
+    /// Most recent occurrence of the birthday: today when it is the birthday itself.
+    let lastDate: Date
+    /// Days elapsed since that occurrence, so features can react to a party that just happened.
+    let daysSinceLast: Int
 
     init(birthDate: Date, reference: Date = Date(), calendar: Calendar = .current) {
         let today = calendar.startOfDay(for: reference)
@@ -34,6 +38,13 @@ nonisolated struct BirthdayCountdown: Sendable, Equatable {
 
         nextDate = resolved
         daysRemaining = max(0, calendar.dateComponents([.day], from: today, to: resolved).day ?? 0)
+
+        let previous: Date = {
+            if let thisYear, thisYear <= today { return thisYear }
+            return occurrence(inYear: currentYear - 1) ?? today
+        }()
+        lastDate = previous
+        daysSinceLast = max(0, calendar.dateComponents([.day], from: previous, to: today).day ?? 0)
 
         let birthYear = birthComponents.year ?? currentYear
         let occurrenceYear = calendar.component(.year, from: resolved)

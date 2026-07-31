@@ -34,6 +34,8 @@ nonisolated enum ReminderKind: String, Sendable, CaseIterable {
     case gift
     case birthday
     case message
+    /// The morning after the party: time to upload the photos and videos.
+    case gallery
 }
 
 /// Schedules the local birthday and gift reminders and routes notification taps.
@@ -59,6 +61,8 @@ final class NotificationService {
     var pendingReviewProfileID: UUID?
     /// Set when the user taps a send-your-wishes reminder: the message tab opens.
     var pendingMessageProfileID: UUID?
+    /// Set when the user taps an upload-your-memories reminder: the gallery tab opens.
+    var pendingGalleryProfileID: UUID?
 
     private init() {}
 
@@ -160,6 +164,10 @@ final class NotificationService {
 
     func consumePendingMessage() {
         pendingMessageProfileID = nil
+    }
+
+    func consumePendingGallery() {
+        pendingGalleryProfileID = nil
     }
 
     // MARK: - Scheduling
@@ -267,6 +275,23 @@ final class NotificationService {
             )
         }
 
+        // Everyone with access to the profile schedules this one locally, which is
+        // how the whole group gets nudged without Kudao running a push server.
+        if profile.isReminderEnabled, let fireDate = profile.galleryReminderDate() {
+            result.append(
+                ScheduledReminder(
+                    id: identifier(kind: .gallery, profileID: profile.id),
+                    title: isDiscreet ? strings.notificationGenericTitle : strings.notificationGalleryTitle,
+                    body: isDiscreet
+                        ? strings.notificationGenericBody
+                        : String(format: strings.notificationGalleryBodyFormat, name),
+                    fireDate: fireDate,
+                    profileID: profile.id,
+                    kind: .gallery
+                )
+            )
+        }
+
         return result
     }
 }
@@ -294,6 +319,8 @@ final class NotificationRouter: NSObject, UNUserNotificationCenterDelegate {
             switch kind {
             case .message:
                 NotificationService.shared.pendingMessageProfileID = profileID
+            case .gallery:
+                NotificationService.shared.pendingGalleryProfileID = profileID
             case .birthday, .gift:
                 NotificationService.shared.pendingReviewProfileID = profileID
             }
