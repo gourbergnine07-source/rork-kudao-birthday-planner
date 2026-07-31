@@ -33,6 +33,7 @@ final class DiaryAnalyzer {
 
         let note = entry.textContent
         let personName = profile.name
+        let occasion = profile.occasion
         guard !note.isEmpty else { return }
 
         runningEntryIDs.insert(entryID)
@@ -44,7 +45,8 @@ final class DiaryAnalyzer {
                 let extraction = try await DiaryExtractionService.extract(
                     note: note,
                     personName: personName,
-                    language: language
+                    language: language,
+                    occasion: occasion
                 )
                 self?.apply(extraction, to: entry, profile: profile, context: context)
             } catch {

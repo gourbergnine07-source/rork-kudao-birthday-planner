@@ -36,10 +36,24 @@ nonisolated enum DiaryExtractionService {
     private static let model = "anthropic/claude-sonnet-4.6"
     private static let fallbackModels = ["anthropic/claude-haiku-4.5", "openai/gpt-5-mini"]
 
-    private static func systemPrompt(language: AppLanguage) -> String {
-        """
+    private static func systemPrompt(language: AppLanguage, occasion: OccasionKind) -> String {
+        if occasion == .remembrance {
+            return remembrancePrompt(language: language)
+        }
+
+        let framing: String
+        switch occasion {
+        case .wedding:
+            framing = "a couple whose wedding anniversary they are preparing"
+        case .other:
+            framing = "a person whose upcoming occasion they are preparing"
+        case .birthday, .remembrance:
+            framing = "a person whose birthday they are preparing"
+        }
+
+        return """
         You extract structured gift-planning data from short diary notes that a user writes \
-        about a person whose birthday they are preparing.
+        about \(framing).
 
         Answer with ONLY a raw JSON object, no prose, no markdown fences, using exactly this shape:
         {
@@ -61,11 +75,46 @@ nonisolated enum DiaryExtractionService {
         """
     }
 
+    /// A remembrance diary is not shopping research: it collects who somebody was.
+    private static func remembrancePrompt(language: AppLanguage) -> String {
+        """
+        You help someone keep the memory of a person who has passed away. They write short \
+        notes: anecdotes, habits, sayings, qualities, places and passions tied to that person. \
+        You turn each note into structured keywords so the memories stay searchable.
+
+        Answer with ONLY a raw JSON object, no prose, no markdown fences, using exactly this shape:
+        {
+          "categoria": "cibo" | "viaggi" | "shopping" | "hobby" | "luoghi" | "altro",
+          "tag": ["keyword 1", "keyword 2"],
+          "rilevanza_regalo": true or false,
+          "note_sintetiche": "short summary of 5-10 words"
+        }
+
+        Meaning of the fields in this context:
+        - "categoria": where the memory belongs. Use "hobby" for passions, crafts and talents, \
+        "luoghi" for places bound to the person, "cibo" for dishes and rituals around the table, \
+        "viaggi" for journeys and holidays, "shopping" for cherished objects, and "altro" for \
+        character traits, sayings, anecdotes and family stories.
+        - "tag": 1 to 4 short lowercase keywords (1-3 words each) taken from the note — a trait, \
+        a habit, a place, a person, an object. No sentences, no duplicates, no hashtags.
+        - "rilevanza_regalo": true when the note captures something that really defines the \
+        person — a quality, a recurring habit, a story worth retelling. False for passing details.
+        - "note_sintetiche": 5 to 10 words maximum, in the tone of a memory.
+
+        Rules:
+        - Never suggest gifts, parties, cakes or purchases. This is remembrance, not planning.
+        - Stay respectful and matter-of-fact. Never add sentiment the note does not contain.
+        - Write "tag" and "note_sintetiche" in \(language.promptName).
+        - If the note is vague, still answer with the best guess and use "altro".
+        """
+    }
+
     /// Throws `ProxyError` on transport failures and `ProxyError.badResponse` on unparseable output.
     static func extract(
         note: String,
         personName: String,
-        language: AppLanguage
+        language: AppLanguage,
+        occasion: OccasionKind = .birthday
     ) async throws -> DiaryExtraction {
         guard let url = ProxyClient.vercelChatCompletionsURL else {
             throw ProxyError.badResponse
@@ -81,7 +130,7 @@ nonisolated enum DiaryExtractionService {
             "temperature": 0,
             "max_tokens": 300,
             "messages": [
-                ["role": "system", "content": systemPrompt(language: language)],
+                ["role": "system", "content": systemPrompt(language: language, occasion: occasion)],
                 ["role": "user", "content": userPrompt]
             ],
             "providerOptions": ["gateway": ["models": fallbackModels]]

@@ -9,6 +9,8 @@ import OSLog
 /// Everything the model needs to write a personal birthday message.
 nonisolated struct GreetingInput: Sendable {
     let name: String
+    /// Decides whether this is a greeting, an anniversary wish or a thought.
+    let occasion: OccasionKind
     let relationship: String
     let turningAge: Int
     /// Life stage computed from the birth date; drives how the message is worded.
@@ -18,6 +20,8 @@ nonisolated struct GreetingInput: Sendable {
     /// One line per diary category, e.g. "cibo: sushi, ramen".
     let tagLines: [String]
     let tone: GreetingTone
+    /// Tie to the remembered person; only used by a remembrance.
+    let bond: BondKind
 }
 
 private nonisolated struct GreetingResponse: Decodable, Sendable {
@@ -37,38 +41,17 @@ nonisolated enum GreetingService {
     static func generate(_ input: GreetingInput, language: AppLanguage) async throws -> String {
         guard let url = ProxyClient.vercelChatCompletionsURL else { throw ProxyError.badResponse }
 
-        let system = """
-        You write short birthday messages that a person can send as-is to someone they care about.
+        let system = systemPrompt(input, language: language)
+        var lines: [String] = userLines(input)
 
-        Rules:
-        - Answer with the message text only. No greeting label, no quotes, no markdown, no explanation.
-        - 2 to 4 sentences, max 55 words. It must read like a real person wrote it.
-        - Address the person directly by their first name at least once.
-        - Weave in one or two of the collected keywords naturally. Never list them, never say \
-        "according to my notes". If there are no keywords, stay warm and generic.
-        - Never mention the gift, the party, the surprise or this app.
-        - Tone: \(input.tone.promptInstruction).
-        - Register for this age bracket (\(input.ageBracket.rawValue)): \(input.ageBracket.greetingGuidance).
-        - Adapt to the relationship too: informal and direct with friends and peers, warmer and more \
-        affectionate with family and partners, simple and playful with children.
-        - Write in the first person, as if the sender were writing it themselves. Never sign it, \
-        never add a placeholder name at the end.
-        - Write in \(language.promptName).
-        """
-
-        var lines: [String] = [
-            "Person: \(input.name)",
-            "Relationship to the sender: \(input.relationship)",
-            "Turning age: \(input.turningAge)",
-            "fascia_eta: \(input.ageBracket.rawValue)"
-        ]
-        if !input.favoriteCharacter.isEmpty {
-            lines.append("Favourite character or cartoon: \(input.favoriteCharacter)")
-        }
         if input.tagLines.isEmpty {
-            lines.append("Collected keywords: none")
+            lines.append(input.occasion == .remembrance ? "Collected memories: none" : "Collected keywords: none")
         } else {
-            lines.append("Collected keywords by category:")
+            lines.append(
+                input.occasion == .remembrance
+                    ? "Collected memories by category:"
+                    : "Collected keywords by category:"
+            )
             lines.append(contentsOf: input.tagLines.map { "- \($0)" })
         }
 
@@ -112,5 +95,119 @@ nonisolated enum GreetingService {
             text.removeLast()
         }
         return text.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    // MARK: - Prompts
+
+    private static func systemPrompt(_ input: GreetingInput, language: AppLanguage) -> String {
+        switch input.occasion {
+        case .remembrance:
+            return """
+            You write a short thought in memory of someone who has passed away, for the person \
+            who is remembering them. It is a private note they keep or share with their family \
+            on the anniversary.
+
+            Rules:
+            - Answer with the text only. No title, no quotes, no markdown, no explanation.
+            - 2 to 4 sentences, max 55 words. Composed, sincere, never theatrical.
+            - Speak about the person by their first name at least once.
+            - Ground the text in one or two of the collected memories — a habit, a place, a \
+            quality. Never list them, never say "according to my notes". If there are none, \
+            stay simple and dignified.
+            - Never say "happy", never wish anything, never mention gifts, parties or this app.
+            - Do not use religious language unless the collected memories clearly do.
+            - Avoid clichés such as "gone but not forgotten" or "in a better place".
+            - Tone: \(input.tone.promptInstruction(for: .remembrance)).
+            - Write in the first person, as if the person remembering wrote it themselves. \
+            Never sign it, never add a placeholder name at the end.
+            - Write in \(language.promptName).
+            """
+
+        case .wedding:
+            return """
+            You write short wedding-anniversary messages that a person can send as-is.
+
+            Rules:
+            - Answer with the message text only. No greeting label, no quotes, no markdown, \
+            no explanation.
+            - 2 to 4 sentences, max 55 words. It must read like a real person wrote it.
+            - Address the person directly by their first name at least once.
+            - Celebrate the years shared, not an age. A milestone year deserves a nod.
+            - Weave in one or two of the collected keywords naturally. Never list them, never say \
+            "according to my notes". If there are no keywords, stay warm and generic.
+            - Never mention the gift, the surprise or this app.
+            - Tone: \(input.tone.promptInstruction(for: .wedding)).
+            - Write in the first person, as if the sender were writing it themselves. Never sign \
+            it, never add a placeholder name at the end.
+            - Write in \(language.promptName).
+            """
+
+        case .other:
+            return """
+            You write short messages for a personal occasion, ready to send as-is.
+
+            Rules:
+            - Answer with the message text only. No greeting label, no quotes, no markdown, \
+            no explanation.
+            - 2 to 4 sentences, max 55 words. It must read like a real person wrote it.
+            - Address the person directly by their first name at least once.
+            - Never assume it is a birthday: speak of "this day" or the occasion itself.
+            - Weave in one or two of the collected keywords naturally. Never list them, never say \
+            "according to my notes". If there are no keywords, stay warm and generic.
+            - Never mention the gift, the surprise or this app.
+            - Tone: \(input.tone.promptInstruction(for: .other)).
+            - Write in the first person, as if the sender were writing it themselves. Never sign \
+            it, never add a placeholder name at the end.
+            - Write in \(language.promptName).
+            """
+
+        case .birthday:
+            return """
+            You write short birthday messages that a person can send as-is to someone they care about.
+
+            Rules:
+            - Answer with the message text only. No greeting label, no quotes, no markdown, no explanation.
+            - 2 to 4 sentences, max 55 words. It must read like a real person wrote it.
+            - Address the person directly by their first name at least once.
+            - Weave in one or two of the collected keywords naturally. Never list them, never say \
+            "according to my notes". If there are no keywords, stay warm and generic.
+            - Never mention the gift, the party, the surprise or this app.
+            - Tone: \(input.tone.promptInstruction(for: .birthday)).
+            - Register for this age bracket (\(input.ageBracket.rawValue)): \(input.ageBracket.greetingGuidance).
+            - Adapt to the relationship too: informal and direct with friends and peers, warmer and more \
+            affectionate with family and partners, simple and playful with children.
+            - Write in the first person, as if the sender were writing it themselves. Never sign it, \
+            never add a placeholder name at the end.
+            - Write in \(language.promptName).
+            """
+        }
+    }
+
+    private static func userLines(_ input: GreetingInput) -> [String] {
+        switch input.occasion {
+        case .remembrance:
+            return [
+                "Person being remembered: \(input.name)",
+                "They were the writer's \(input.bond.promptLabel)",
+                "Years since they passed: \(input.turningAge)"
+            ]
+        case .wedding:
+            return [
+                "Person: \(input.name)",
+                "Relationship to the sender: \(input.relationship)",
+                "Anniversary being celebrated: \(input.turningAge) years"
+            ]
+        case .other, .birthday:
+            var lines = [
+                "Person: \(input.name)",
+                "Relationship to the sender: \(input.relationship)",
+                "Turning age: \(input.turningAge)",
+                "fascia_eta: \(input.ageBracket.rawValue)"
+            ]
+            if !input.favoriteCharacter.isEmpty {
+                lines.append("Favourite character or cartoon: \(input.favoriteCharacter)")
+            }
+            return lines
+        }
     }
 }

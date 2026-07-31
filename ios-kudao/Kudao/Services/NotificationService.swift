@@ -219,16 +219,17 @@ final class NotificationService {
 
         /// Surprise profiles can be stripped of every identifying detail.
         let isDiscreet = privacy.hidesSurprisePreviews && profile.isSurpriseMode
+        let occasion = profile.occasion
         var result: [ScheduledReminder] = []
 
         if let fireDate = profile.birthdayReminderDate {
             result.append(
                 ScheduledReminder(
                     id: identifier(kind: .birthday, profileID: profile.id),
-                    title: isDiscreet ? strings.notificationGenericTitle : strings.notificationBirthdayTitle,
+                    title: isDiscreet ? strings.notificationGenericTitle : Self.mainTitle(occasion, strings),
                     body: isDiscreet
                         ? strings.notificationGenericBody
-                        : String(format: strings.notificationBirthdayBodyFormat, name),
+                        : String(format: Self.mainBodyFormat(occasion, strings), name),
                     fireDate: fireDate,
                     profileID: profile.id,
                     kind: .birthday
@@ -293,6 +294,26 @@ final class NotificationService {
         }
 
         return result
+    }
+
+    /// Title of the main reminder, in the vocabulary of the occasion.
+    private static func mainTitle(_ occasion: OccasionKind, _ strings: Strings) -> String {
+        switch occasion {
+        case .birthday: strings.notificationBirthdayTitle
+        case .wedding: strings.notificationAnniversaryTitle
+        case .remembrance: strings.notificationRemembranceTitle
+        case .other: strings.notificationEventTitle
+        }
+    }
+
+    /// Body of the main reminder. A remembrance says "today we remember", never a countdown.
+    private static func mainBodyFormat(_ occasion: OccasionKind, _ strings: Strings) -> String {
+        switch occasion {
+        case .birthday: strings.notificationBirthdayBodyFormat
+        case .wedding: strings.notificationAnniversaryBodyFormat
+        case .remembrance: strings.notificationRemembranceBodyFormat
+        case .other: strings.notificationEventBodyFormat
+        }
     }
 }
 

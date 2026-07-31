@@ -6,7 +6,11 @@
 import Foundation
 import SwiftData
 
-/// A person whose birthday the owner wants to plan for.
+/// An occasion the owner wants to prepare for, and the person behind it.
+///
+/// The type is still called `BirthdayProfile` because that is what SwiftData
+/// persists, but a profile can now be a birthday, a wedding anniversary, a
+/// remembrance or a free-form event — see `occasion`.
 @Model
 final class BirthdayProfile {
     var id: UUID = UUID()
@@ -16,7 +20,21 @@ final class BirthdayProfile {
     /// Optional family name, shown next to the first name in the header.
     var lastName: String = ""
     @Attribute(.externalStorage) var photoData: Data?
+    /// The one date the whole profile revolves around.
+    ///
+    /// Its meaning follows `occasion`: date of birth for a birthday, the wedding
+    /// day for an anniversary, the day somebody passed for a remembrance, or a
+    /// free date for anything else. The stored name is kept for compatibility.
     var birthDate: Date = Date()
+
+    // MARK: Occasion
+
+    /// Which kind of occasion this profile is, as an `OccasionKind` raw value.
+    var occasionRaw: String = OccasionKind.birthday.rawValue
+    /// True when the occasion belongs to the app user themselves.
+    var isSelfProfile: Bool = false
+    /// Tie to the remembered person, as a `BondKind` raw value. Remembrances only.
+    var bondRaw: String = BondKind.other.rawValue
 
     // MARK: Contact details (all optional)
 
@@ -80,7 +98,10 @@ final class BirthdayProfile {
         favoriteCharacter: String = "",
         photoData: Data? = nil,
         isSurpriseMode: Bool = false,
-        ownerUserID: String? = nil
+        ownerUserID: String? = nil,
+        occasion: OccasionKind = .birthday,
+        isSelfProfile: Bool = false,
+        bond: BondKind = .other
     ) {
         self.id = UUID()
         self.name = name
@@ -94,12 +115,43 @@ final class BirthdayProfile {
         self.photoData = photoData
         self.isSurpriseMode = isSurpriseMode
         self.ownerUserID = ownerUserID
+        self.occasionRaw = occasion.rawValue
+        self.isSelfProfile = isSelfProfile
+        self.bondRaw = bond.rawValue
         self.createdAt = Date()
     }
 
     var relationship: RelationshipKind {
         get { RelationshipKind(rawValue: relationshipRaw) ?? .friend }
         set { relationshipRaw = newValue.rawValue }
+    }
+
+    /// What this profile celebrates or commemorates.
+    var occasion: OccasionKind {
+        get { OccasionKind.parse(occasionRaw) }
+        set { occasionRaw = newValue.rawValue }
+    }
+
+    /// Tie to the remembered person; only meaningful on a remembrance.
+    var bond: BondKind {
+        get { BondKind.parse(bondRaw) }
+        set { bondRaw = newValue.rawValue }
+    }
+
+    /// The reference date, under the name the rest of the app should use.
+    var referenceDate: Date {
+        get { birthDate }
+        set { birthDate = newValue }
+    }
+
+    /// Short label describing the tie, whichever picker the occasion uses.
+    func bondOrRelationshipTitle(_ strings: Strings) -> String {
+        occasion.usesBond ? bond.title(strings) : relationship.title(strings)
+    }
+
+    /// Matching symbol for that label.
+    var bondOrRelationshipSymbol: String {
+        occasion.usesBond ? bond.symbolName : relationship.symbolName
     }
 
     var countdown: BirthdayCountdown {
@@ -116,15 +168,21 @@ final class BirthdayProfile {
         !lastName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 
-    /// Age reached at the last birthday, i.e. how old the person is right now.
+    /// Full years elapsed since the reference date.
+    ///
+    /// Age for a birthday, years married for an anniversary, years since the
+    /// loss for a remembrance.
     var currentAge: Int {
         let years = Calendar.current.dateComponents([.year], from: birthDate, to: Date()).year ?? 0
         return max(0, years)
     }
 
     /// Life stage derived from the birth date; never edited by hand.
+    ///
+    /// Only a birthday profile has a meaningful one — everything else reads as
+    /// an adult so the AI guidance stays neutral.
     var ageBracket: AgeBracket {
-        AgeBracket.forAge(currentAge)
+        occasion.wantsAgeBracket ? AgeBracket.forAge(currentAge) : .adult
     }
 
     /// Trimmed favourite character, only meaningful for children.
@@ -178,9 +236,11 @@ final class BirthdayProfile {
         }
     }
 
-    /// True while the birthday sits inside the reminder window and the plan is still unconfirmed.
+    /// True while the date sits inside the reminder window and the plan is still unconfirmed.
+    ///
+    /// Remembrances have nothing to plan, so they never ask for a confirmation.
     var needsPlanConfirmation: Bool {
-        guard isReminderEnabled else { return false }
+        guard isReminderEnabled, occasion.wantsSuggestions else { return false }
         return countdown.daysRemaining <= max(1, reminderDaysBefore) && !(partyPlan?.isConfirmed ?? false)
     }
 

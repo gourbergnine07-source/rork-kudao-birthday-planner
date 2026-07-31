@@ -9,6 +9,8 @@ import OSLog
 /// Everything the engine knows about a person when asking for a plan.
 nonisolated struct SuggestionInput: Sendable {
     let name: String
+    /// What is being prepared: a birthday, an anniversary or a free event.
+    let occasion: OccasionKind
     /// English relationship label, used inside the prompt.
     let relationship: String
     let age: Int
@@ -64,10 +66,26 @@ nonisolated enum SuggestionService {
 
     // MARK: - Prompts
 
-    private static func systemPrompt(language: AppLanguage) -> String {
-        """
-        You are a birthday party planner. From the preferences a user collected about a person \
-        you propose a gift, a cake, a venue type and an estimated guest count.
+    private static func systemPrompt(language: AppLanguage, occasion: OccasionKind) -> String {
+        if occasion == .wedding {
+            return anniversaryPrompt(language: language)
+        }
+
+        let role: String
+        if occasion == .other {
+            role = """
+            You are an occasion planner. From the preferences a user collected about a person \
+            you propose a gift, a treat to share, a venue type and an estimated guest count.
+            """
+        } else {
+            role = """
+            You are a birthday party planner. From the preferences a user collected about a person \
+            you propose a gift, a cake, a venue type and an estimated guest count.
+            """
+        }
+
+        return """
+        \(role)
 
         Answer with ONLY a raw JSON object, no prose, no markdown fences, using exactly this shape:
         {
@@ -97,14 +115,62 @@ nonisolated enum SuggestionService {
         """
     }
 
+    /// A wedding anniversary needs a present and something to live together,
+    /// not a cake and a guest list.
+    private static func anniversaryPrompt(language: AppLanguage) -> String {
+        """
+        You plan wedding anniversaries. From the preferences a user collected about their \
+        partner (or about the couple) you propose an anniversary gift, an experience the two \
+        of them can share, and where to celebrate it.
+
+        Answer with ONLY a raw JSON object, no prose, no markdown fences, using exactly this shape:
+        {
+          "regalo": {"idea": "...", "categoria": "...", "fascia_prezzo": "basso" | "medio" | "alto", "motivazione": "..."},
+          "torta": {"tipo": "...", "motivazione": "..."},
+          "locale_tipo": {"suggerimento": "...", "motivazione": "..."},
+          "numero_invitati_stimato": 2,
+          "confidenza": "bassa" | "media" | "alta"
+        }
+
+        Meaning of the keys for an anniversary:
+        - "regalo" is the anniversary present: something personal and lasting, fitting how many \
+        years the couple has been married. Milestone years (10, 25, 50) deserve a stronger idea.
+        - "torta.tipo" is NOT a cake here: it is one experience the couple can live together \
+        (a weekend away, a tasting, a workshop, a concert, a walk they used to love). \
+        "torta.motivazione" explains why it suits them.
+        - "locale_tipo" is where to celebrate: a restaurant style, a place, an atmosphere.
+        - "numero_invitati_stimato" is almost always 2. Use more only when the keywords clearly \
+        point to a party with family or friends.
+
+        Rules:
+        - Every "idea", "tipo" and "suggerimento" is one concrete proposal, 3 to 10 words. \
+        Never a list, never several options separated by "or".
+        - Every "motivazione" is 1 short sentence (max 18 words) and must reference the collected \
+        keywords explicitly. Never invent preferences that are not in the input.
+        - "regalo.categoria" is the kind of shop or service that sells the idea, 1 to 3 words and \
+        searchable on a map. Never a brand, never a website.
+        - "confidenza" reflects how much evidence the keywords give you.
+        - Write every text value in \(language.promptName). Keep the JSON keys exactly as above, in Italian.
+        """
+    }
+
     private static func userPrompt(_ input: SuggestionInput) -> String {
-        var lines: [String] = [
-            "Person: \(input.name)",
-            "Relationship to the user: \(input.relationship)",
-            "Turning age: \(input.age)",
-            "fascia_eta: \(input.ageBracket.rawValue)",
-            "Age bracket guidance: \(input.ageBracket.planGuidance)"
-        ]
+        var lines: [String]
+
+        if input.occasion == .wedding {
+            lines = [
+                "Partner or couple: \(input.name)",
+                "Anniversary being celebrated: \(input.age) years of marriage"
+            ]
+        } else {
+            lines = [
+                "Person: \(input.name)",
+                "Relationship to the user: \(input.relationship)",
+                "Turning age: \(input.age)",
+                "fascia_eta: \(input.ageBracket.rawValue)",
+                "Age bracket guidance: \(input.ageBracket.planGuidance)"
+            ]
+        }
         if !input.favoriteCharacter.isEmpty {
             lines.append("Favourite character or cartoon: \(input.favoriteCharacter)")
         }
@@ -127,7 +193,7 @@ nonisolated enum SuggestionService {
     /// Generates the whole plan. Throws `ProxyError` on transport or parsing failures.
     static func generatePlan(_ input: SuggestionInput, language: AppLanguage) async throws -> PartySuggestion {
         let content = try await complete(
-            system: systemPrompt(language: language),
+            system: systemPrompt(language: language, occasion: input.occasion),
             user: userPrompt(input),
             maxTokens: 700
         )
@@ -176,7 +242,7 @@ nonisolated enum SuggestionService {
         }
 
         let system = """
-        \(systemPrompt(language: language))
+        \(systemPrompt(language: language, occasion: input.occasion))
 
         For this request answer with ONLY this reduced JSON object and nothing else:
         \(shape)

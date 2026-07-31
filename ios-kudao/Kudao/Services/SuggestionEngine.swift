@@ -38,7 +38,7 @@ final class SuggestionEngine {
 
     /// Builds (or replaces) the whole plan for a profile.
     func generatePlan(for profile: BirthdayProfile, language: AppLanguage, context: ModelContext) {
-        guard !isGeneratingPlan else { return }
+        guard !isGeneratingPlan, profile.occasion.wantsSuggestions else { return }
         let input = Self.makeInput(for: profile)
         guard input.keywordCount > 0 else { return }
 
@@ -179,6 +179,7 @@ final class SuggestionEngine {
 
         return SuggestionInput(
             name: profile.name,
+            occasion: profile.occasion,
             relationship: profile.relationship.rawValue,
             age: profile.countdown.turningAge,
             ageBracket: profile.ageBracket,

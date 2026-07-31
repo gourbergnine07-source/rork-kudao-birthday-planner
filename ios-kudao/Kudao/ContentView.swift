@@ -20,5 +20,6 @@ struct ContentView: View {
         .environment(KudaoIdentity.shared)
         .environment(CollaborationService())
         .environment(CloudBackupService())
+        .environment(AuthService())
         .modelContainer(KudaoModelContainer.preview())
 }

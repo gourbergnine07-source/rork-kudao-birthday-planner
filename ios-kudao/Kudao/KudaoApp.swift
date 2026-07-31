@@ -14,6 +14,7 @@ struct KudaoApp: App {
     @State private var identity = KudaoIdentity.shared
     @State private var collaboration = CollaborationService()
     @State private var backup = CloudBackupService()
+    @State private var auth = AuthService()
     private let container: ModelContainer = KudaoModelContainer.make()
 
     init() {
@@ -29,6 +30,7 @@ struct KudaoApp: App {
                 .environment(identity)
                 .environment(collaboration)
                 .environment(backup)
+                .environment(auth)
                 .environment(\.locale, settings.locale)
         }
         .modelContainer(container)

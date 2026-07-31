@@ -20,8 +20,12 @@ import Supabase
 final class CloudBackupService {
     private static let lastSyncKey = "kudao.cloud.lastSyncedAt"
 
-    /// The recovery code, present exactly when the backup is on.
+    /// The recovery code, present exactly when this device holds one.
     private(set) var code: String?
+    /// True when the signed-in email account owns a vault on the server.
+    ///
+    /// This is the second door into the backup: no code needed, just the account.
+    private(set) var isLinkedToAccount: Bool = false
     private(set) var isWorking: Bool = false
     private(set) var lastSyncedAt: Date?
     /// How many profiles and notes the last sync brought back down.
@@ -34,7 +38,14 @@ final class CloudBackupService {
         lastSyncedAt = stored > 0 ? Date(timeIntervalSince1970: stored) : nil
     }
 
-    var isEnabled: Bool { code != nil }
+    /// The backup is live when either door is open.
+    var isEnabled: Bool { code != nil || isLinkedToAccount }
+
+    /// True when the vault is only reachable through the signed-in account.
+    var isAccountOnly: Bool { code == nil && isLinkedToAccount }
+
+    /// Code sent to the database: nil lets the account resolve the vault instead.
+    private var activeCode: String? { code }
 
     /// False when the build has no database keys (previews, local runs).
     var isAvailable: Bool { SupabaseBackend.isConfigured }
@@ -65,6 +76,8 @@ final class CloudBackupService {
 
             CloudVaultCode.save(fresh)
             code = fresh
+            // Creating a vault while signed in binds it to the account server-side.
+            isLinkedToAccount = created.linked ?? false
             let response = try await push(code: fresh, client: client, context: context)
             finish(response, context: context)
         } catch {
@@ -111,14 +124,14 @@ final class CloudBackupService {
 
     /// Uploads the current state and downloads anything missing.
     func sync(strings: Strings, context: ModelContext) async {
-        guard !isWorking, let code else { return }
+        guard !isWorking, isEnabled else { return }
         guard let client = SupabaseBackend.client else { return }
 
         isWorking = true
         errorMessage = nil
 
         do {
-            let response = try await push(code: code, client: client, context: context)
+            let response = try await push(code: activeCode, client: client, context: context)
             finish(response, context: context)
         } catch {
             errorMessage = Self.message(for: error, strings: strings)
@@ -127,9 +140,72 @@ final class CloudBackupService {
         isWorking = false
     }
 
+    // MARK: - Email account
+
+    /// Ties the vault this device already holds to the account that just signed in.
+    ///
+    /// From then on the same data can be recovered by signing in anywhere, even
+    /// if the recovery code is lost.
+    func linkToAccount(strings: Strings) async {
+        guard let client = SupabaseBackend.client, let code else { return }
+
+        do {
+            _ = try await client
+                .rpc("kudao_link_vault", params: CloudCodeParams(code: code))
+                .execute()
+            isLinkedToAccount = true
+        } catch {
+            errorMessage = Self.message(for: error, strings: strings)
+        }
+    }
+
+    /// Looks for a vault already owned by the signed-in account and adopts it.
+    ///
+    /// This is the "new phone, no code" path: sign in, and the notes come back.
+    /// Returns true when a vault was found.
+    @discardableResult
+    func adoptAccountVault(strings: Strings, context: ModelContext) async -> Bool {
+        guard !isWorking, let client = SupabaseBackend.client else { return false }
+
+        if code != nil {
+            await linkToAccount(strings: strings)
+            return isLinkedToAccount
+        }
+
+        isWorking = true
+        errorMessage = nil
+        defer { isWorking = false }
+
+        do {
+            let vault: CloudAccountVault = try await client
+                .rpc("kudao_account_vault")
+                .execute()
+                .value
+            guard vault.linked else { return false }
+
+            isLinkedToAccount = true
+            let response = try await push(code: nil, client: client, context: context)
+            finish(response, context: context)
+            return true
+        } catch {
+            errorMessage = Self.message(for: error, strings: strings)
+            return false
+        }
+    }
+
+    /// Called on sign-out: the account door closes, the code door stays open.
+    func forgetAccountLink() {
+        isLinkedToAccount = false
+        if code == nil {
+            lastSyncedAt = nil
+            lastRestoredCount = 0
+            UserDefaults.standard.removeObject(forKey: Self.lastSyncKey)
+        }
+    }
+
     /// Stops backing up. `deleteRemoteCopy` also wipes the rows from the database.
     func disable(deleteRemoteCopy: Bool, strings: Strings) async {
-        guard let code else { return }
+        guard isEnabled else { return }
 
         isWorking = true
         errorMessage = nil
@@ -137,7 +213,7 @@ final class CloudBackupService {
         if deleteRemoteCopy, let client = SupabaseBackend.client {
             do {
                 _ = try await client
-                    .rpc("kudao_forget_vault", params: CloudCodeParams(code: code))
+                    .rpc("kudao_forget_vault", params: CloudCodeParams(code: activeCode))
                     .execute()
             } catch {
                 errorMessage = Self.message(for: error, strings: strings)
@@ -150,6 +226,7 @@ final class CloudBackupService {
         CloudTombstones.clear()
         UserDefaults.standard.removeObject(forKey: Self.lastSyncKey)
         self.code = nil
+        isLinkedToAccount = false
         lastSyncedAt = nil
         lastRestoredCount = 0
         isWorking = false
@@ -158,7 +235,7 @@ final class CloudBackupService {
     // MARK: - Sync internals
 
     private func push(
-        code: String,
+        code: String?,
         client: SupabaseClient,
         context: ModelContext
     ) async throws -> CloudSyncResponse {
@@ -254,6 +331,9 @@ final class CloudBackupService {
             lastName: profile.lastName,
             birthDate: CloudDateFormat.day.string(from: profile.birthDate),
             relationship: profile.relationshipRaw,
+            occasion: profile.occasionRaw,
+            isSelfProfile: profile.isSelfProfile,
+            bond: profile.bondRaw,
             favoriteCharacter: profile.favoriteCharacter,
             address: profile.address,
             contactPhone: profile.contactPhone,
@@ -336,7 +416,10 @@ final class CloudBackupService {
             contactEmail: payload.contactEmail,
             favoriteCharacter: payload.favoriteCharacter,
             photoData: payload.photoBase64.flatMap { Data(base64Encoded: $0) },
-            isSurpriseMode: payload.isSurpriseMode
+            isSurpriseMode: payload.isSurpriseMode,
+            occasion: OccasionKind.parse(payload.occasion),
+            isSelfProfile: payload.isSelfProfile,
+            bond: BondKind.parse(payload.bond)
         )
 
         profile.id = id

@@ -15,19 +15,32 @@ struct ProfileRowCard: View {
     private var countdown: BirthdayCountdown { profile.countdown }
     private var strings: Strings { settings.strings }
 
+    private var occasion: OccasionKind { profile.occasion }
+
     private var ringCaption: String {
-        if countdown.isToday { return "🎉" }
+        if countdown.isToday { return occasion.isFestive ? "🎉" : "✦" }
         return countdown.daysRemaining == 1 ? strings.dayUnit : strings.daysUnit
     }
 
-    /// Birthdays inside the next seven days get a warm, unmistakable treatment.
+    /// Dates inside the next seven days get a warm, unmistakable treatment.
     private var isImminent: Bool { countdown.isThisWeek }
 
-    private var accent: Color { isImminent ? Palette.coral : profile.relationship.accent }
+    private var accent: Color { isImminent ? occasion.accent : profile.relationship.accent }
 
     var body: some View {
         HStack(spacing: 14) {
             AvatarView(name: profile.name, photoData: profile.photoData, size: 52)
+                .overlay(alignment: .bottomTrailing) {
+                    // The occasion glyph rides the avatar, readable at a glance.
+                    Image(systemName: occasion.symbolName)
+                        .font(.system(size: 9, weight: .heavy))
+                        .foregroundStyle(.white)
+                        .frame(width: 21, height: 21)
+                        .background(Circle().fill(occasion.gradient))
+                        .overlay(Circle().strokeBorder(cardFill, lineWidth: 2))
+                        .offset(x: 3, y: 2)
+                        .accessibilityLabel(occasion.title(strings))
+                }
                 .overlay(alignment: .topTrailing) {
                     if profile.needsPlanConfirmation {
                         Circle()
@@ -66,9 +79,9 @@ struct ProfileRowCard: View {
                 }
 
                 HStack(spacing: 6) {
-                    Image(systemName: profile.relationship.symbolName)
+                    Image(systemName: profile.bondOrRelationshipSymbol)
                         .font(.system(size: 10, weight: .bold))
-                        .foregroundStyle(profile.relationship.accent)
+                        .foregroundStyle(occasion.usesBond ? Palette.sage : profile.relationship.accent)
                     Text(settings.dayMonth(countdown.nextDate))
                         .font(.system(.subheadline, design: .rounded))
                         .foregroundStyle(.secondary)
@@ -77,8 +90,8 @@ struct ProfileRowCard: View {
                 if isImminent {
                     KudaoChip(
                         title: countdown.imminentLabel(strings),
-                        systemImage: countdown.isToday ? "party.popper.fill" : "flame.fill",
-                        tint: Palette.coral
+                        systemImage: imminentSymbol,
+                        tint: occasion.accent
                     )
                     .padding(.top, 1)
                     .accessibilityLabel("\(strings.imminentBadge), \(countdown.imminentLabel(strings))")
@@ -103,7 +116,7 @@ struct ProfileRowCard: View {
         .overlay(alignment: .leading) {
             if isImminent {
                 Capsule()
-                    .fill(Palette.warmGradient)
+                    .fill(occasion.gradient)
                     .frame(width: 4)
                     .padding(.vertical, 14)
                     .padding(.leading, 3)
@@ -112,12 +125,12 @@ struct ProfileRowCard: View {
         .overlay(
             RoundedRectangle(cornerRadius: 22, style: .continuous)
                 .strokeBorder(
-                    isImminent ? Palette.coral.opacity(0.42) : Palette.hairline,
+                    isImminent ? occasion.accent.opacity(0.42) : Palette.hairline,
                     lineWidth: isImminent ? 1.5 : 1
                 )
         )
         .shadow(
-            color: isImminent ? Palette.coral.opacity(0.18) : Color.black.opacity(0.05),
+            color: isImminent ? occasion.accent.opacity(0.18) : Color.black.opacity(0.05),
             radius: isImminent ? 14 : 10,
             x: 0,
             y: 6
@@ -125,7 +138,13 @@ struct ProfileRowCard: View {
         .accessibilityElement(children: .combine)
     }
 
+    private var imminentSymbol: String {
+        guard occasion.isFestive else { return countdown.isToday ? "leaf.fill" : "hourglass" }
+        return countdown.isToday ? "party.popper.fill" : "flame.fill"
+    }
+
     private var cardFill: Color {
-        isImminent ? Palette.surfaceRaised : Palette.surface
+        // A remembrance stays on the calm surface even when the date is close.
+        isImminent && occasion.isFestive ? Palette.surfaceRaised : Palette.surface
     }
 }

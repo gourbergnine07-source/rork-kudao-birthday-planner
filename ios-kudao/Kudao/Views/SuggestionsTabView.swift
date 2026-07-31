@@ -22,6 +22,9 @@ struct SuggestionsTabView: View {
     private var strings: Strings { settings.strings }
     private var keywordCount: Int { SuggestionEngine.keywordCount(for: profile) }
 
+    /// The cards this occasion actually plans: an anniversary has no guest list.
+    private var sections: [PlanSection] { PlanSection.sections(for: profile.occasion) }
+
     /// Only the owner regenerates, edits or confirms the plan.
     private var canManagePlan: Bool { profile.isOwnedByMe }
     /// Participants of a shared profile can vote on every card.
@@ -58,6 +61,7 @@ struct SuggestionsTabView: View {
         .sheet(item: $editingSection) { section in
             SuggestionEditSheet(
                 section: section,
+                occasion: profile.occasion,
                 suggestion: profile.partyPlan?.suggestion ?? Self.emptySuggestion,
                 strings: strings
             ) { edited in
@@ -97,7 +101,7 @@ struct SuggestionsTabView: View {
             }
         }
 
-        ForEach(PlanSection.allCases) { section in
+        ForEach(sections) { section in
             card(section, suggestion: suggestion)
         }
 
@@ -244,12 +248,12 @@ struct SuggestionsTabView: View {
                     Circle()
                         .fill(section.accent.opacity(0.14))
                         .frame(width: 34, height: 34)
-                    Image(systemName: section.symbolName)
+                    Image(systemName: section.symbolName(for: profile.occasion))
                         .font(.system(size: 15, weight: .bold))
                         .foregroundStyle(section.accent)
                 }
 
-                Text(section.title(strings))
+                Text(section.title(strings, occasion: profile.occasion))
                     .font(.system(.subheadline, design: .rounded, weight: .bold))
 
                 Spacer(minLength: 0)
@@ -507,7 +511,7 @@ struct SuggestionsTabView: View {
                 Spacer(minLength: 0)
             }
 
-            ForEach(PlanSection.allCases) { section in
+            ForEach(sections) { section in
                 SkeletonCard(accent: section.accent, reduceMotion: reduceMotion)
             }
         }
@@ -588,6 +592,7 @@ private struct SkeletonCard: View {
 /// Manual override for one card of the plan.
 private struct SuggestionEditSheet: View {
     let section: PlanSection
+    let occasion: OccasionKind
     let suggestion: PartySuggestion
     let strings: Strings
     let onSave: (PartySuggestion) -> Void
@@ -607,12 +612,12 @@ private struct SuggestionEditSheet: View {
                                 .font(.system(.body, design: .rounded, weight: .semibold))
                         }
                     } else {
-                        TextField(section.title(strings), text: $text, axis: .vertical)
+                        TextField(section.title(strings, occasion: occasion), text: $text, axis: .vertical)
                             .font(.system(.body, design: .rounded))
                             .lineLimit(1...4)
                     }
                 } header: {
-                    Text(section.title(strings))
+                    Text(section.title(strings, occasion: occasion))
                         .font(.system(.caption, design: .rounded, weight: .bold))
                 }
 

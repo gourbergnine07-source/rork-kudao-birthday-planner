@@ -48,6 +48,12 @@ nonisolated struct CloudProfilePayload: Codable, Sendable {
     let lastName: String
     let birthDate: String
     let relationship: String
+    /// `OccasionKind` raw value: what the profile actually celebrates.
+    let occasion: String
+    /// True when the occasion belongs to the app user themselves.
+    let isSelfProfile: Bool
+    /// `BondKind` raw value, only meaningful on a remembrance.
+    let bond: String
     let favoriteCharacter: String
     let address: String
     let contactPhone: String
@@ -70,6 +76,9 @@ nonisolated struct CloudProfilePayload: Codable, Sendable {
         case lastName = "last_name"
         case birthDate = "birth_date"
         case relationship
+        case occasion
+        case isSelfProfile = "is_self_profile"
+        case bond
         case favoriteCharacter = "favorite_character"
         case address
         case contactPhone = "contact_phone"
@@ -95,6 +104,9 @@ nonisolated struct CloudProfilePayload: Codable, Sendable {
             lastName: "",
             birthDate: CloudDateFormat.day.string(from: Date()),
             relationship: RelationshipKind.friend.rawValue,
+            occasion: OccasionKind.birthday.rawValue,
+            isSelfProfile: false,
+            bond: BondKind.other.rawValue,
             favoriteCharacter: "",
             address: "",
             contactPhone: "",
@@ -165,8 +177,12 @@ nonisolated struct CloudCreateVaultParams: Encodable, Sendable {
     }
 }
 
+/// Sync parameters.
+///
+/// `code` is optional on purpose: a signed-in device can leave it out and the
+/// database resolves the vault from the account instead.
 nonisolated struct CloudSyncParams: Encodable, Sendable {
-    let code: String
+    let code: String?
     let profiles: [CloudProfilePayload]
     let entries: [CloudEntryPayload]
 
@@ -178,18 +194,32 @@ nonisolated struct CloudSyncParams: Encodable, Sendable {
 }
 
 nonisolated struct CloudCodeParams: Encodable, Sendable {
-    let code: String
+    let code: String?
 
     enum CodingKeys: String, CodingKey {
         case code = "p_code"
     }
 }
 
+/// What `kudao_account_vault` reports about the signed-in account.
+nonisolated struct CloudAccountVault: Decodable, Sendable {
+    let linked: Bool
+    let profileCount: Int?
+
+    enum CodingKeys: String, CodingKey {
+        case linked
+        case profileCount = "profile_count"
+    }
+}
+
 nonisolated struct CloudVaultCreated: Decodable, Sendable {
     let accountId: String
+    /// True when the vault was bound to the signed-in account on creation.
+    let linked: Bool?
 
     enum CodingKeys: String, CodingKey {
         case accountId = "account_id"
+        case linked
     }
 }
 

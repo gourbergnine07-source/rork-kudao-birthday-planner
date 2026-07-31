@@ -28,8 +28,11 @@ final class GreetingComposer {
 
     /// Loads the tone the profile was last generated with, so the picker reopens where it was.
     func adoptTone(from profile: BirthdayProfile) {
-        guard let message = profile.birthdayMessage, message.hasText else { return }
-        tone = message.tone
+        guard let message = profile.birthdayMessage, message.hasText else {
+            tone = tone.resolved(for: profile.occasion)
+            return
+        }
+        tone = message.tone.resolved(for: profile.occasion)
     }
 
     /// Returns the stored message, creating an empty one on first use.
@@ -121,14 +124,17 @@ final class GreetingComposer {
     ) async -> Bool {
         guard !isGenerating else { return false }
 
+        let voice = requestedTone.resolved(for: profile.occasion)
         let input = GreetingInput(
             name: profile.name,
+            occasion: profile.occasion,
             relationship: profile.relationship.rawValue,
             turningAge: profile.countdown.turningAge,
             ageBracket: profile.ageBracket,
             favoriteCharacter: profile.trimmedFavoriteCharacter,
             tagLines: Self.tagLines(for: profile),
-            tone: requestedTone
+            tone: voice,
+            bond: profile.bond
         )
         let signature = Self.diarySignature(for: profile)
 
@@ -142,7 +148,7 @@ final class GreetingComposer {
 
             let record = record(for: profile, context: context)
             record.text = text
-            record.tone = requestedTone
+            record.tone = voice
             record.sourceSignature = signature
             record.isUserEdited = false
             record.updatedAt = Date()

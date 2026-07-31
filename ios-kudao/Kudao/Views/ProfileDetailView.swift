@@ -40,10 +40,18 @@ struct ProfileDetailView: View {
     @State private var shareBlockedAlert: Bool = false
     @Namespace private var tabNamespace
 
-    private var activeTab: ProfileTab { selectedTab ?? initialTab }
+    /// The requested tab, snapped back to one this occasion actually offers.
+    private var activeTab: ProfileTab {
+        let requested = selectedTab ?? initialTab
+        return tabs.contains(requested) ? requested : (tabs.first ?? .diary)
+    }
 
     private var strings: Strings { settings.strings }
     private var countdown: BirthdayCountdown { profile.countdown }
+    private var occasion: OccasionKind { profile.occasion }
+
+    /// Tabs available for this occasion. A remembrance has nothing to plan.
+    private var tabs: [ProfileTab] { ProfileTab.tabs(for: profile.occasion) }
 
     enum ProfileTab: String, CaseIterable, Identifiable {
         case diary
@@ -54,22 +62,27 @@ struct ProfileDetailView: View {
 
         var id: String { rawValue }
 
-        var symbolName: String {
+        /// The gift engine is dropped entirely for a remembrance.
+        static func tabs(for occasion: OccasionKind) -> [ProfileTab] {
+            occasion.wantsSuggestions ? allCases : allCases.filter { $0 != .suggestions }
+        }
+
+        func symbolName(for occasion: OccasionKind) -> String {
             switch self {
-            case .diary: "book.closed.fill"
+            case .diary: occasion.diarySymbolName
             case .preferences: "tag.fill"
             case .suggestions: "sparkles"
-            case .message: "paperplane.fill"
+            case .message: occasion.messageSymbolName
             case .gallery: "photo.stack.fill"
             }
         }
 
-        func title(_ strings: Strings) -> String {
+        func title(_ strings: Strings, occasion: OccasionKind) -> String {
             switch self {
-            case .diary: strings.diaryTab
-            case .preferences: strings.preferencesTab
+            case .diary: occasion.diaryTabTitle(strings)
+            case .preferences: occasion == .remembrance ? strings.traitsTab : strings.preferencesTab
             case .suggestions: strings.suggestionsTab
-            case .message: strings.messageTab
+            case .message: occasion.messageTabTitle(strings)
             case .gallery: strings.galleryTab
             }
         }
@@ -85,8 +98,10 @@ struct ProfileDetailView: View {
                         header
                         statsRow
                         contactCard
-                        sendWishesButton(proxy)
-                        giftActionsRow
+                        composeButton(proxy)
+                        if occasion.wantsSuggestions {
+                            giftActionsRow
+                        }
                         tabSelector
                             .id(Self.tabsAnchor)
                         tabContent
@@ -135,6 +150,7 @@ struct ProfileDetailView: View {
         }
         .alert(strings.noPlanAlertTitle, isPresented: $noGiftIdeaAlert) {
             Button(strings.suggestionsTab) {
+
                 withAnimation(reduceMotion ? nil : .smooth(duration: 0.3)) {
                     selectedTab = .suggestions
                 }
@@ -181,7 +197,7 @@ struct ProfileDetailView: View {
             modelContext.delete(profile)
         }
         .environment(\.locale, settings.locale)
-        .tint(Palette.coral)
+        .tint(occasion.accent)
     }
 
     // MARK: - Greeting kept in step with the diary
@@ -324,10 +340,11 @@ struct ProfileDetailView: View {
         VStack(spacing: 14) {
             ZStack(alignment: .top) {
                 RoundedRectangle(cornerRadius: 30, style: .continuous)
-                    .fill(Palette.warmGradient)
+                    .fill(occasion.gradient)
                     .frame(height: 116)
                     .overlay {
-                        if countdown.isToday {
+                        // A remembrance never gets confetti.
+                        if countdown.isToday && occasion.isFestive {
                             ConfettiView()
                                 .clipShape(.rect(cornerRadius: 30, style: .continuous))
                         }
@@ -368,16 +385,19 @@ struct ProfileDetailView: View {
                 }
 
                 HStack(spacing: 6) {
+                    OccasionBadge(occasion: occasion, strings: strings)
                     KudaoChip(
-                        title: profile.relationship.title(strings),
-                        systemImage: profile.relationship.symbolName,
-                        tint: profile.relationship.accent
+                        title: profile.bondOrRelationshipTitle(strings),
+                        systemImage: profile.bondOrRelationshipSymbol,
+                        tint: occasion.usesBond ? Palette.sage : profile.relationship.accent
                     )
-                    KudaoChip(
-                        title: profile.ageBracket.title(strings),
-                        systemImage: profile.ageBracket.symbolName,
-                        tint: Palette.violet
-                    )
+                    if occasion.wantsAgeBracket {
+                        KudaoChip(
+                            title: profile.ageBracket.title(strings),
+                            systemImage: profile.ageBracket.symbolName,
+                            tint: Palette.violet
+                        )
+                    }
                     if profile.isSurpriseMode {
                         KudaoChip(
                             title: strings.surpriseBadge,
@@ -409,7 +429,7 @@ struct ProfileDetailView: View {
             ringColor: Palette.background,
             ringWidth: 5
         )
-        .shadow(color: Palette.coral.opacity(0.3), radius: 14, y: 8)
+        .shadow(color: occasion.accent.opacity(0.3), radius: 14, y: 8)
 
         if profile.isOwnedByMe {
             PhotoSourcePicker(
@@ -423,7 +443,7 @@ struct ProfileDetailView: View {
                         .font(.system(size: 12, weight: .bold))
                         .foregroundStyle(.white)
                         .frame(width: 32, height: 32)
-                        .background(Circle().fill(Palette.warmGradient))
+                        .background(Circle().fill(occasion.gradient))
                         .overlay(Circle().strokeBorder(Palette.background, lineWidth: 3))
                 }
             }
@@ -557,12 +577,17 @@ struct ProfileDetailView: View {
 
     private var countdownBanner: some View {
         HStack(spacing: 10) {
-            Image(systemName: countdown.isToday ? "party.popper.fill" : "hourglass")
+            Image(systemName: countdownSymbol)
                 .font(.system(size: 15, weight: .bold))
-                .symbolEffect(.bounce, options: reduceMotion ? .nonRepeating : .repeat(.periodic(delay: 2.5)))
+                .symbolEffect(
+                    .bounce,
+                    options: reduceMotion || !occasion.isFestive
+                        ? .nonRepeating
+                        : .repeat(.periodic(delay: 2.5))
+                )
 
             if countdown.isToday {
-                Text(strings.todayTitle)
+                Text(occasion.todayTitle(strings))
                     .font(.system(.headline, design: .rounded, weight: .bold))
             } else if countdown.isTomorrow {
                 Text(strings.tomorrowLabel)
@@ -572,33 +597,56 @@ struct ProfileDetailView: View {
                     Text("\(countdown.daysRemaining)")
                         .font(.system(size: 24, weight: .heavy, design: .rounded))
                         .contentTransition(.numericText())
-                    Text("\(countdown.daysRemaining == 1 ? strings.dayUnit : strings.daysUnit) \(strings.daysToGo)")
+                    Text("\(countdown.daysRemaining == 1 ? strings.dayUnit : strings.daysUnit) \(occasion.countdownSuffix(strings))")
                         .font(.system(.subheadline, design: .rounded, weight: .semibold))
                 }
             }
         }
-        .foregroundStyle(Palette.coral)
+        .foregroundStyle(occasion.accent)
         .padding(.horizontal, 14)
         .padding(.vertical, 9)
-        .background(Capsule().fill(Palette.coral.opacity(0.13)))
-        .overlay(Capsule().strokeBorder(Palette.coral.opacity(0.28), lineWidth: 1))
+        .background(Capsule().fill(occasion.accent.opacity(0.13)))
+        .overlay(Capsule().strokeBorder(occasion.accent.opacity(0.28), lineWidth: 1))
     }
 
-    /// "Nascita" and "Et\u{00E0}" side by side, exactly the two facts people look for first.
+    private var countdownSymbol: String {
+        if occasion == .remembrance { return countdown.isToday ? "leaf.fill" : "hourglass" }
+        return countdown.isToday ? "party.popper.fill" : "hourglass"
+    }
+
+    /// The reference date and how long ago it was: the two facts people look for first.
     private var statsRow: some View {
         HStack(spacing: 12) {
             StatTile(
-                icon: "sunrise.fill",
-                caption: strings.birthLabel,
+                icon: statDateSymbol,
+                caption: occasion.dateStatLabel(strings),
                 value: settings.dayMonthYear(profile.birthDate),
-                tint: Palette.amber
+                tint: occasion == .remembrance ? Palette.dusk : Palette.amber
             )
             StatTile(
-                icon: "figure.walk",
-                caption: strings.ageLabel,
+                icon: statElapsedSymbol,
+                caption: occasion.elapsedStatLabel(strings),
                 value: String(format: strings.ageYearsFormat, profile.currentAge),
-                tint: Palette.berry
+                tint: occasion == .remembrance ? Palette.sage : Palette.berry
             )
+        }
+    }
+
+    private var statDateSymbol: String {
+        switch occasion {
+        case .birthday: "sunrise.fill"
+        case .wedding: "infinity"
+        case .remembrance: "leaf.fill"
+        case .other: "calendar"
+        }
+    }
+
+    private var statElapsedSymbol: String {
+        switch occasion {
+        case .birthday: "figure.walk"
+        case .wedding: "heart.fill"
+        case .remembrance: "hourglass"
+        case .other: "clock.fill"
         }
     }
 
@@ -696,7 +744,7 @@ struct ProfileDetailView: View {
         HStack(alignment: .top, spacing: 12) {
             Image(systemName: profile.isReminderEnabled ? "bell.fill" : "bell.slash.fill")
                 .font(.system(size: 14, weight: .bold))
-                .foregroundStyle(profile.isReminderEnabled ? Palette.coral : .secondary)
+                .foregroundStyle(profile.isReminderEnabled ? occasion.accent : .secondary)
                 .frame(width: 24)
 
             VStack(alignment: .leading, spacing: 3) {
@@ -705,20 +753,26 @@ struct ProfileDetailView: View {
                     .foregroundStyle(.primary)
 
                 if profile.isReminderEnabled {
-                    HStack(spacing: 6) {
-                        Text(strings.daysBeforeShortLabel)
+                    if occasion.remindsOnTheDay {
+                        Text(strings.reminderOnTheDayLabel)
+                            .font(.system(.footnote, design: .rounded, weight: .semibold))
                             .foregroundStyle(.secondary)
-                        Text("\(profile.reminderDaysBefore)")
-                            .foregroundStyle(Palette.coral)
-                            .contentTransition(.numericText())
+                    } else {
+                        HStack(spacing: 6) {
+                            Text(strings.daysBeforeShortLabel)
+                                .foregroundStyle(.secondary)
+                            Text("\(profile.reminderDaysBefore)")
+                                .foregroundStyle(occasion.accent)
+                                .contentTransition(.numericText())
+                        }
+                        .font(.system(.footnote, design: .rounded, weight: .semibold))
                     }
-                    .font(.system(.footnote, design: .rounded, weight: .semibold))
 
                     HStack(spacing: 6) {
                         Text(strings.hourShortLabel)
                             .foregroundStyle(.secondary)
                         Text(reminderTimeLabel)
-                            .foregroundStyle(Palette.coral)
+                            .foregroundStyle(occasion.accent)
                     }
                     .font(.system(.footnote, design: .rounded, weight: .semibold))
                 }
@@ -731,9 +785,9 @@ struct ProfileDetailView: View {
             } label: {
                 Image(systemName: "slider.horizontal.3")
                     .font(.system(size: 12, weight: .bold))
-                    .foregroundStyle(Palette.coral)
+                    .foregroundStyle(occasion.accent)
                     .frame(width: 32, height: 32)
-                    .background(Circle().fill(Palette.coral.opacity(0.12)))
+                    .background(Circle().fill(occasion.accent.opacity(0.12)))
             }
             .buttonStyle(PressableCardStyle())
             .accessibilityLabel(strings.remindersMenuTitle)
@@ -761,7 +815,7 @@ struct ProfileDetailView: View {
 
     // MARK: - Wishes & gift actions
 
-    private func sendWishesButton(_ proxy: ScrollViewProxy) -> some View {
+    private func composeButton(_ proxy: ScrollViewProxy) -> some View {
         Button {
             withAnimation(reduceMotion ? nil : .smooth(duration: 0.35)) {
                 selectedTab = .message
@@ -776,16 +830,16 @@ struct ProfileDetailView: View {
             }
         } label: {
             HStack(spacing: 9) {
-                Image(systemName: "paperplane.fill")
+                Image(systemName: occasion.messageSymbolName)
                     .font(.system(size: 15, weight: .bold))
-                Text(strings.sendWishesAction)
+                Text(occasion.composeAction(strings))
                     .font(.system(.headline, design: .rounded, weight: .bold))
             }
             .foregroundStyle(.white)
             .frame(maxWidth: .infinity)
             .padding(.vertical, 16)
-            .background(Capsule().fill(Palette.warmGradient))
-            .shadow(color: Palette.coral.opacity(0.35), radius: 14, y: 8)
+            .background(Capsule().fill(occasion.gradient))
+            .shadow(color: occasion.accent.opacity(0.35), radius: 14, y: 8)
         }
         .buttonStyle(PressableCardStyle())
     }
@@ -884,7 +938,7 @@ struct ProfileDetailView: View {
 
     private var tabSelector: some View {
         HStack(spacing: 4) {
-            ForEach(ProfileTab.allCases) { tab in
+            ForEach(tabs) { tab in
                 let isSelected = tab == activeTab
                 Button {
                     withAnimation(reduceMotion ? nil : .spring(response: 0.35, dampingFraction: 0.8)) {
@@ -892,10 +946,10 @@ struct ProfileDetailView: View {
                     }
                 } label: {
                     HStack(spacing: 6) {
-                        Image(systemName: tab.symbolName)
+                        Image(systemName: tab.symbolName(for: occasion))
                             .font(.system(size: 12, weight: .bold))
                         if isSelected {
-                            Text(tab.title(strings))
+                            Text(tab.title(strings, occasion: occasion))
                                 .font(.system(.subheadline, design: .rounded, weight: .semibold))
                                 .lineLimit(1)
                                 .minimumScaleFactor(0.85)
@@ -908,14 +962,14 @@ struct ProfileDetailView: View {
                     .background {
                         if isSelected {
                             Capsule()
-                                .fill(Palette.warmGradient)
+                                .fill(occasion.gradient)
                                 .matchedGeometryEffect(id: "tabHighlight", in: tabNamespace)
                         }
                     }
                     .contentShape(Capsule())
                 }
                 .buttonStyle(.plain)
-                .accessibilityLabel(tab.title(strings))
+                .accessibilityLabel(tab.title(strings, occasion: occasion))
             }
         }
         .padding(5)

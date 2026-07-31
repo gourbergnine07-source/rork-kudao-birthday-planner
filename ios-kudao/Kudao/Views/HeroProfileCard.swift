@@ -14,11 +14,12 @@ struct HeroProfileCard: View {
 
     private var countdown: BirthdayCountdown { profile.countdown }
     private var strings: Strings { settings.strings }
+    private var occasion: OccasionKind { profile.occasion }
 
     var body: some View {
         ZStack(alignment: .topLeading) {
             RoundedRectangle(cornerRadius: 30, style: .continuous)
-                .fill(Palette.warmGradient)
+                .fill(occasion.gradient)
 
             RoundedRectangle(cornerRadius: 30, style: .continuous)
                 .fill(
@@ -30,7 +31,7 @@ struct HeroProfileCard: View {
                     )
                 )
 
-            if countdown.isToday {
+            if countdown.isToday && occasion.isFestive {
                 ConfettiView()
                     .clipShape(.rect(cornerRadius: 30, style: .continuous))
             }
@@ -62,9 +63,10 @@ struct HeroProfileCard: View {
                             .lineLimit(1)
 
                         HStack(spacing: 6) {
+                            OccasionBadge(occasion: occasion, strings: strings, onDark: true)
                             KudaoChip(
-                                title: profile.relationship.title(strings),
-                                systemImage: profile.relationship.symbolName,
+                                title: profile.bondOrRelationshipTitle(strings),
+                                systemImage: profile.bondOrRelationshipSymbol,
                                 onDark: true
                             )
                             if profile.isSurpriseMode {
@@ -82,9 +84,11 @@ struct HeroProfileCard: View {
 
                 HStack(alignment: .lastTextBaseline, spacing: 10) {
                     if countdown.isToday {
-                        Text(strings.todayTitle)
-                            .font(.system(size: 40, weight: .heavy, design: .rounded))
+                        Text(occasion.todayTitle(strings))
+                            .font(.system(size: 36, weight: .heavy, design: .rounded))
                             .foregroundStyle(.white)
+                            .lineLimit(2)
+                            .minimumScaleFactor(0.7)
                     } else {
                         Text("\(countdown.daysRemaining)")
                             .font(.system(size: 62, weight: .heavy, design: .rounded))
@@ -94,9 +98,11 @@ struct HeroProfileCard: View {
                         VStack(alignment: .leading, spacing: -2) {
                             Text(countdown.daysRemaining == 1 ? strings.dayUnit : strings.daysUnit)
                                 .font(.system(.headline, design: .rounded, weight: .bold))
-                            Text(strings.daysToGo)
+                            Text(occasion.countdownSuffix(strings))
                                 .font(.system(.caption, design: .rounded, weight: .medium))
                                 .opacity(0.85)
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.8)
                         }
                         .foregroundStyle(.white)
                         .padding(.bottom, 8)
@@ -109,11 +115,10 @@ struct HeroProfileCard: View {
                     Label(settings.weekdayDayMonth(countdown.nextDate), systemImage: "calendar")
                         .font(.system(.footnote, design: .rounded, weight: .semibold))
                     Spacer(minLength: 0)
-                    Label(
-                        String(format: countdown.isToday ? strings.turnsTodayFormat : strings.turnsFormat, countdown.turningAge),
-                        systemImage: "birthday.cake.fill"
-                    )
-                    .font(.system(.footnote, design: .rounded, weight: .semibold))
+                    Label(milestoneLabel, systemImage: occasion.symbolName)
+                        .font(.system(.footnote, design: .rounded, weight: .semibold))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
                 }
                 .foregroundStyle(.white.opacity(0.92))
                 .padding(.top, 2)
@@ -122,7 +127,22 @@ struct HeroProfileCard: View {
         }
         .frame(maxWidth: .infinity)
         .clipShape(.rect(cornerRadius: 30, style: .continuous))
-        .shadow(color: Palette.coral.opacity(0.32), radius: 22, x: 0, y: 12)
+        .shadow(color: occasion.accent.opacity(0.32), radius: 22, x: 0, y: 12)
         .accessibilityElement(children: .combine)
+    }
+
+    /// "Compie 34 anni" / "34 anni insieme" / "34 anni fa".
+    private var milestoneLabel: String {
+        let years = countdown.turningAge
+        switch occasion {
+        case .birthday:
+            return String(format: countdown.isToday ? strings.turnsTodayFormat : strings.turnsFormat, years)
+        case .wedding:
+            return String(format: strings.anniversaryYearsFormat, years)
+        case .remembrance:
+            return String(format: strings.yearsAgoFormat, years)
+        case .other:
+            return String(format: strings.editionYearsFormat, years)
+        }
     }
 }

@@ -8,10 +8,11 @@ import Supabase
 
 /// Single entry point to the managed Postgres database.
 ///
-/// Kudao has no sign-in, so the client always talks as the `anon` role and every
-/// call goes through a `kudao_*` database function that requires the backup code.
-/// The tables themselves are locked by row level security with no policies, so
-/// nothing is reachable without that code.
+/// The client owns the session: signing in with an email address attaches a
+/// real JWT to every call, while a signed-out device keeps talking as `anon`.
+/// Either way the tables stay locked by row level security with no policies —
+/// all reads and writes go through the `kudao_*` functions, which accept the
+/// recovery code, the signed-in account, or both.
 enum SupabaseBackend {
     /// False in previews or if the project keys were not injected at build time.
     nonisolated static var isConfigured: Bool {
@@ -26,14 +27,7 @@ enum SupabaseBackend {
 
         return SupabaseClient(
             supabaseURL: url,
-            supabaseKey: Config.EXPO_PUBLIC_SUPABASE_ANON_KEY,
-            options: .init(
-                auth: .init(
-                    // The app never signs anybody in: returning nil keeps the
-                    // request on the anon role instead of sending a bogus JWT.
-                    accessToken: { nil }
-                )
-            )
+            supabaseKey: Config.EXPO_PUBLIC_SUPABASE_ANON_KEY
         )
     }()
 }

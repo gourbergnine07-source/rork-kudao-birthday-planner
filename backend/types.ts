@@ -25,6 +25,7 @@ export type Database = {
           device_label: string
           id: string
           last_seen_at: string
+          user_id: string | null
         }
         Insert: {
           code_hash: string
@@ -32,6 +33,7 @@ export type Database = {
           device_label?: string
           id?: string
           last_seen_at?: string
+          user_id?: string | null
         }
         Update: {
           code_hash?: string
@@ -39,6 +41,7 @@ export type Database = {
           device_label?: string
           id?: string
           last_seen_at?: string
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -101,6 +104,7 @@ export type Database = {
           account_id: string
           address: string
           birth_date: string
+          bond: string
           contact_email: string
           contact_phone: string
           created_at: string
@@ -109,10 +113,12 @@ export type Database = {
           gift_reminder_days_before: number
           gift_reminder_enabled: boolean
           id: string
+          is_self_profile: boolean
           is_surprise_mode: boolean
           last_name: string
           message: Json | null
           name: string
+          occasion: string
           photo_base64: string | null
           plan: Json | null
           relationship: string
@@ -124,6 +130,7 @@ export type Database = {
           account_id: string
           address?: string
           birth_date: string
+          bond?: string
           contact_email?: string
           contact_phone?: string
           created_at?: string
@@ -132,10 +139,12 @@ export type Database = {
           gift_reminder_days_before?: number
           gift_reminder_enabled?: boolean
           id: string
+          is_self_profile?: boolean
           is_surprise_mode?: boolean
           last_name?: string
           message?: Json | null
           name?: string
+          occasion?: string
           photo_base64?: string | null
           plan?: Json | null
           relationship?: string
@@ -147,6 +156,7 @@ export type Database = {
           account_id?: string
           address?: string
           birth_date?: string
+          bond?: string
           contact_email?: string
           contact_phone?: string
           created_at?: string
@@ -155,10 +165,12 @@ export type Database = {
           gift_reminder_days_before?: number
           gift_reminder_enabled?: boolean
           id?: string
+          is_self_profile?: boolean
           is_surprise_mode?: boolean
           last_name?: string
           message?: Json | null
           name?: string
+          occasion?: string
           photo_base64?: string | null
           plan?: Json | null
           relationship?: string
@@ -238,16 +250,20 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      kudao_account_vault: { Args: never; Returns: Json }
       kudao_code_hash: { Args: { p_code: string }; Returns: string }
       kudao_create_vault: {
         Args: { p_code: string; p_label?: string }
         Returns: Json
       }
-      kudao_forget_vault: { Args: { p_code: string }; Returns: Json }
+      kudao_forget_vault: { Args: { p_code?: string }; Returns: Json }
+      kudao_link_vault: { Args: { p_code: string }; Returns: Json }
+      kudao_resolve_account: { Args: { p_code: string }; Returns: string }
       kudao_sync_vault: {
-        Args: { p_code: string; p_entries?: Json; p_profiles?: Json }
+        Args: { p_code?: string; p_entries?: Json; p_profiles?: Json }
         Returns: Json
       }
+      kudao_unlink_vault: { Args: never; Returns: Json }
       user_id: { Args: never; Returns: string }
     }
     Enums: {

@@ -16,10 +16,12 @@ struct MyProfileView: View {
     @Environment(KudaoIdentity.self) private var identity
     @Environment(BiometricGate.self) private var gate
     @Environment(CloudBackupService.self) private var backup
+    @Environment(AuthService.self) private var auth
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
 
     @State private var isManagingBackup: Bool = false
+    @State private var isManagingAccount: Bool = false
     @State private var isConfirmingSignOut: Bool = false
 
     private var strings: Strings { settings.strings }
@@ -63,6 +65,9 @@ struct MyProfileView: View {
             .environment(\.locale, settings.locale)
             .sheet(isPresented: $isManagingBackup) {
                 CloudBackupView()
+            }
+            .sheet(isPresented: $isManagingAccount) {
+                AccountView()
             }
             .alert(strings.accountSignOutTitle, isPresented: $isConfirmingSignOut) {
                 Button(strings.cancelAction, role: .cancel) {}
@@ -301,23 +306,38 @@ struct MyProfileView: View {
             systemImage: "person.badge.key.fill",
             tint: Palette.teal
         ) {
-            HStack(spacing: 10) {
-                Image(systemName: "envelope.badge.shield.half.filled")
-                    .font(.system(size: 15, weight: .semibold))
-                    .foregroundStyle(Palette.teal)
-                    .frame(width: 22)
+            Button {
+                isManagingAccount = true
+            } label: {
+                HStack(spacing: 10) {
+                    Image(systemName: auth.isSignedIn
+                        ? "checkmark.seal.fill"
+                        : "envelope.badge.shield.half.filled")
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(Palette.teal)
+                        .frame(width: 22)
 
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(strings.accountNoLoginTitle)
-                        .font(.system(.body, design: .rounded, weight: .semibold))
-                    Text(strings.accountNoLoginCaption)
-                        .font(.system(.caption, design: .rounded))
-                        .foregroundStyle(.secondary)
-                        .fixedSize(horizontal: false, vertical: true)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(auth.isSignedIn ? auth.email : strings.accountSignInTitle)
+                            .font(.system(.body, design: .rounded, weight: .semibold))
+                            .foregroundStyle(.primary)
+                            .lineLimit(1)
+                            .truncationMode(.middle)
+                        Text(auth.isSignedIn ? strings.accountSignedInCaption : strings.accountSignInCaption)
+                            .font(.system(.caption, design: .rounded))
+                            .foregroundStyle(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+
+                    Spacer(minLength: 0)
+
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 11, weight: .heavy))
+                        .foregroundStyle(.tertiary)
                 }
-
-                Spacer(minLength: 0)
+                .contentShape(Rectangle())
             }
+            .buttonStyle(.plain)
 
             Divider().overlay(Palette.hairline)
 
@@ -484,5 +504,6 @@ private struct MyProfileCard<Content: View>: View {
         .environment(KudaoIdentity.shared)
         .environment(BiometricGate.shared)
         .environment(CloudBackupService())
+        .environment(AuthService())
         .modelContainer(KudaoModelContainer.preview())
 }

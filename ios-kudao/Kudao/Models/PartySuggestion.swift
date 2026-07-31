@@ -139,6 +139,38 @@ nonisolated enum PlanSection: String, CaseIterable, Identifiable, Sendable {
         }
     }
 
+    /// An anniversary plans a present and an experience, not a cake and a guest list.
+    func title(_ strings: Strings, occasion: OccasionKind) -> String {
+        guard occasion == .wedding else { return title(strings) }
+        switch self {
+        case .gift: return strings.anniversaryGiftCardTitle
+        case .cake: return strings.experienceCardTitle
+        case .venue: return strings.anniversaryVenueCardTitle
+        case .guests: return strings.guestsCardTitle
+        }
+    }
+
+    func symbolName(for occasion: OccasionKind) -> String {
+        guard occasion == .wedding else { return symbolName }
+        switch self {
+        case .gift: return "gift.fill"
+        case .cake: return "sparkles"
+        case .venue: return "fork.knife"
+        case .guests: return "person.2.fill"
+        }
+    }
+
+    /// Which cards the plan is made of, for a given occasion.
+    ///
+    /// A wedding drops the guest count: an anniversary is usually for two.
+    static func sections(for occasion: OccasionKind) -> [PlanSection] {
+        switch occasion {
+        case .wedding: [.gift, .cake, .venue]
+        case .birthday, .other: allCases
+        case .remembrance: []
+        }
+    }
+
     @MainActor
     var accent: Color {
         switch self {

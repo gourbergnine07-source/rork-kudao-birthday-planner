@@ -21,9 +21,41 @@ enum Palette {
     nonisolated static var teal: Color { dynamic(0x11776B, 0x4FC9B5) }
     nonisolated static var violet: Color { dynamic(0x6B45A6, 0xB79BFF) }
 
+    /// Muted sage, reserved for remembrance profiles.
+    nonisolated static var sage: Color { dynamic(0x5F7F6B, 0x9CC0A9) }
+    /// Dusty blue that pairs with sage in the remembrance surfaces.
+    nonisolated static var dusk: Color { dynamic(0x4F6E86, 0x93B6CE) }
+
     nonisolated static var warmGradient: LinearGradient {
         LinearGradient(
             colors: [dynamic(0xF2542D, 0xE3502C), dynamic(0xFF8A3D, 0xF07B33), dynamic(0xFFB03A, 0xE59A2E)],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+    }
+
+    /// Anniversary gradient: deep rose into warm gold.
+    nonisolated static var vowGradient: LinearGradient {
+        LinearGradient(
+            colors: [dynamic(0xB02A63, 0xA82A5F), dynamic(0xD9527F, 0xC44A72), dynamic(0xE0975F, 0xCC8654)],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+    }
+
+    /// Remembrance gradient: sage drifting into dusty blue. Quiet on purpose.
+    nonisolated static var stillGradient: LinearGradient {
+        LinearGradient(
+            colors: [dynamic(0x5F7F6B, 0x3F5A4B), dynamic(0x557488, 0x39505F), dynamic(0x6E8FA3, 0x475F6E)],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+    }
+
+    /// Generic event gradient: indigo into violet.
+    nonisolated static var eventGradient: LinearGradient {
+        LinearGradient(
+            colors: [dynamic(0x4A3A8C, 0x413080), dynamic(0x6B45A6, 0x5C3C94), dynamic(0x8E63C4, 0x7A55AC)],
             startPoint: .topLeading,
             endPoint: .bottomTrailing
         )

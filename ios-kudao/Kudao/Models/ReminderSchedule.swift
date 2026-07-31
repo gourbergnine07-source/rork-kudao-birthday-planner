@@ -73,15 +73,20 @@ extension BirthdayProfile {
         return nil
     }
 
-    /// Fire date of the main birthday reminder, when enabled.
+    /// Fire date of the main reminder, when enabled.
+    ///
+    /// A remembrance is never a countdown: its reminder lands on the morning of
+    /// the anniversary itself, not days ahead of it.
     var birthdayReminderDate: Date? {
         guard isReminderEnabled else { return nil }
-        return reminderFireDate(daysBefore: reminderDaysBefore)
+        return reminderFireDate(daysBefore: occasion.remindsOnTheDay ? 0 : reminderDaysBefore)
     }
 
     /// Fire date of the separate gift reminder, when enabled.
+    ///
+    /// Only occasions that actually involve a present get one.
     var giftReminderDate: Date? {
-        guard isReminderEnabled, isGiftReminderEnabled else { return nil }
+        guard isReminderEnabled, isGiftReminderEnabled, occasion.wantsSuggestions else { return nil }
         return reminderFireDate(daysBefore: giftReminderDaysBefore)
     }
 

@@ -55,6 +55,50 @@ enum ProfileSortOrder: String, CaseIterable, Identifiable {
     }
 }
 
+/// Which occasions the home list is showing.
+enum OccasionFilter: Hashable, Identifiable {
+    case all
+    case kind(OccasionKind)
+
+    var id: String {
+        switch self {
+        case .all: "all"
+        case .kind(let kind): kind.rawValue
+        }
+    }
+
+    static let allCases: [OccasionFilter] = [.all] + OccasionKind.allCases.map { .kind($0) }
+
+    func title(_ strings: Strings) -> String {
+        switch self {
+        case .all: strings.filterAllOccasions
+        case .kind(let kind): kind.pluralTitle(strings)
+        }
+    }
+
+    var symbolName: String {
+        switch self {
+        case .all: "square.stack.3d.up.fill"
+        case .kind(let kind): kind.symbolName
+        }
+    }
+
+    @MainActor
+    var accent: Color {
+        switch self {
+        case .all: Palette.coral
+        case .kind(let kind): kind.accent
+        }
+    }
+
+    func matches(_ profile: BirthdayProfile) -> Bool {
+        switch self {
+        case .all: true
+        case .kind(let kind): profile.occasion == kind
+        }
+    }
+}
+
 /// Root screen: the countdown list of saved celebrations.
 struct HomeView: View {
     @Environment(AppSettings.self) private var settings
@@ -68,6 +112,7 @@ struct HomeView: View {
     @State private var appeared: Bool = false
     @State private var searchText: String = ""
     @State private var sortOrder: ProfileSortOrder = .nearestBirthday
+    @State private var occasionFilter: OccasionFilter = .all
     @State private var reviewProfile: BirthdayProfile?
     /// Profile that must open straight on the suggestions tab after "Edit".
     @State private var suggestionsProfileID: UUID?
@@ -90,25 +135,37 @@ struct HomeView: View {
 
     private var isSearching: Bool { !query.isEmpty }
 
-    /// Profiles matching the search field, keeping the birthday-proximity order.
+    /// Profiles matching the search field, keeping the date-proximity order.
     private var results: [BirthdayProfile] {
         guard isSearching else { return ordered }
         return ordered.filter { $0.name.localizedStandardContains(query) }
     }
 
-    private var ordered: [BirthdayProfile] {
-        sortOrder.sorted(profiles)
+    /// Everything the active occasion filter lets through.
+    private var visibleProfiles: [BirthdayProfile] {
+        profiles.filter { occasionFilter.matches($0) }
     }
 
-    /// The closest birthday always leads the hero card, whatever the list order is.
+    private var ordered: [BirthdayProfile] {
+        sortOrder.sorted(visibleProfiles)
+    }
+
+    /// The closest date always leads the hero card, whatever the list order is.
     private var nextUp: BirthdayProfile? {
-        ProfileSortOrder.nearestBirthday.sorted(profiles).first
+        ProfileSortOrder.nearestBirthday.sorted(visibleProfiles).first
     }
 
     /// Profiles inside their reminder window whose party plan is still unconfirmed.
     private var pendingReviews: [BirthdayProfile] {
         ProfileSortOrder.nearestBirthday.sorted(profiles).filter(\.needsPlanConfirmation)
     }
+
+    /// Occasions actually present in the list; a lone-birthday library hides the filter.
+    private var presentOccasions: [OccasionKind] {
+        OccasionKind.allCases.filter { kind in profiles.contains { $0.occasion == kind } }
+    }
+
+    private var showsOccasionFilter: Bool { presentOccasions.count > 1 }
 
     var body: some View {
         NavigationStack(path: $path) {
@@ -334,8 +391,14 @@ struct HomeView: View {
                     sortMenu
                 }
 
+                if showsOccasionFilter {
+                    occasionFilterStrip
+                }
+
                 if isSearching {
                     searchResults
+                } else if visibleProfiles.isEmpty {
+                    filteredEmptyState
                 } else {
                     reviewBanner
                     upcomingSections
@@ -347,6 +410,76 @@ struct HomeView: View {
         .scrollIndicators(.hidden)
         .scrollDismissesKeyboard(.immediately)
         .onAppear { appeared = true }
+    }
+
+    /// Horizontal chips: Tutti, Compleanni, Matrimoni, Commemorazioni, Altro.
+    private var occasionFilterStrip: some View {
+        ScrollView(.horizontal) {
+            HStack(spacing: 8) {
+                ForEach(availableFilters) { filter in
+                    occasionChip(filter)
+                }
+            }
+            .padding(.vertical, 2)
+        }
+        .scrollIndicators(.hidden)
+        .scrollClipDisabled()
+        .sensoryFeedback(.selection, trigger: occasionFilter)
+    }
+
+    /// Only offer a chip for an occasion the user actually has.
+    private var availableFilters: [OccasionFilter] {
+        [.all] + presentOccasions.map { OccasionFilter.kind($0) }
+    }
+
+    private func occasionChip(_ filter: OccasionFilter) -> some View {
+        let isActive = occasionFilter == filter
+        let count = filter == .all ? profiles.count : profiles.filter { filter.matches($0) }.count
+
+        return Button {
+            withAnimation(reduceMotion ? nil : .smooth(duration: 0.28)) {
+                occasionFilter = filter
+            }
+        } label: {
+            HStack(spacing: 6) {
+                Image(systemName: filter.symbolName)
+                    .font(.system(size: 11, weight: .bold))
+                Text(filter.title(strings))
+                    .font(.system(.footnote, design: .rounded, weight: .bold))
+                    .lineLimit(1)
+                Text("\(count)")
+                    .font(.system(.caption2, design: .rounded, weight: .heavy).monospacedDigit())
+                    .opacity(0.7)
+            }
+            .foregroundStyle(isActive ? Color.white : filter.accent)
+            .padding(.horizontal, 13)
+            .padding(.vertical, 9)
+            .background(
+                Capsule().fill(
+                    isActive
+                        ? AnyShapeStyle(filter.accent)
+                        : AnyShapeStyle(filter.accent.opacity(0.12))
+                )
+            )
+            .overlay(
+                Capsule().strokeBorder(
+                    isActive ? Color.clear : filter.accent.opacity(0.28),
+                    lineWidth: 1
+                )
+            )
+        }
+        .buttonStyle(PressableCardStyle())
+        .accessibilityAddTraits(isActive ? [.isSelected] : [])
+    }
+
+    /// The library is not empty, this corner of it is.
+    private var filteredEmptyState: some View {
+        PlaceholderPanel(
+            icon: occasionFilter.symbolName,
+            title: strings.filterEmptyTitle,
+            message: String(format: strings.filterEmptyMessageFormat, occasionFilter.title(strings))
+        )
+        .padding(.top, 4)
     }
 
     @ViewBuilder
@@ -534,7 +667,7 @@ struct HomeView: View {
                     .fill(Palette.warmGradient)
                     .frame(width: 108, height: 108)
                     .shadow(color: Palette.coral.opacity(0.35), radius: 20, y: 10)
-                Image(systemName: "birthday.cake.fill")
+                Image(systemName: "sparkles")
                     .font(.system(size: 46, weight: .medium))
                     .foregroundStyle(.white)
             }
@@ -653,5 +786,6 @@ struct PressableCardStyle: ButtonStyle {
         .environment(BiometricGate.shared)
         .environment(KudaoIdentity.shared)
         .environment(CloudBackupService())
+        .environment(AuthService())
         .modelContainer(KudaoModelContainer.preview())
 }

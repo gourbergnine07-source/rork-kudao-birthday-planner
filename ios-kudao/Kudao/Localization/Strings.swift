@@ -477,6 +477,121 @@ nonisolated struct Strings: Sendable {
     let libraryDeniedMessage: String
     let notificationGalleryTitle: String
     let notificationGalleryBodyFormat: String
+
+    // MARK: Occasions
+
+    let occasionBirthday: String
+    let occasionWedding: String
+    let occasionRemembrance: String
+    let occasionOther: String
+    let occasionBirthdayCaption: String
+    let occasionWeddingCaption: String
+    let occasionRemembranceCaption: String
+    let occasionOtherCaption: String
+    let occasionBirthdayPlural: String
+    let occasionWeddingPlural: String
+    let occasionRemembrancePlural: String
+    let occasionOtherPlural: String
+    let occasionStepTitle: String
+    let occasionStepSubtitle: String
+    let weddingDateLabel: String
+    let passingDateLabel: String
+    let eventDateLabel: String
+    let weddingDateHint: String
+    let passingDateHint: String
+    let eventDateHint: String
+    let weddingStatLabel: String
+    let passingStatLabel: String
+    let eventStatLabel: String
+    let yearsTogetherLabel: String
+    let yearsSinceLabel: String
+    let yearsElapsedLabel: String
+    let daysToAnniversary: String
+    let daysToRemembrance: String
+    let daysToEvent: String
+    let todayAnniversaryTitle: String
+    let todayRemembranceTitle: String
+    let todayEventTitle: String
+    let anniversaryYearsFormat: String
+    let yearsAgoFormat: String
+    let editionYearsFormat: String
+    let sendAnniversaryWishesAction: String
+    let writeThoughtAction: String
+    let sendEventWishesAction: String
+    let memoriesTab: String
+    let thoughtTab: String
+    let traitsTab: String
+    let reminderOnTheDayLabel: String
+    let rememberedNamePlaceholder: String
+    let bondLabel: String
+    let bondCaption: String
+    let bondParent: String
+    let bondGrandparent: String
+    let bondSibling: String
+    let bondSpouse: String
+    let bondChild: String
+    let bondFriend: String
+    let bondOther: String
+    let selfProfileToggleTitle: String
+    let selfProfileToggleCaption: String
+    let selfProfileNameCaption: String
+    let selfProfileFallbackName: String
+    let backAction: String
+    let filterAllOccasions: String
+    let filterEmptyTitle: String
+    let filterEmptyMessageFormat: String
+    let anniversaryGiftCardTitle: String
+    let experienceCardTitle: String
+    let anniversaryVenueCardTitle: String
+    let toneIntimate: String
+    let toneSober: String
+    let notificationAnniversaryTitle: String
+    let notificationAnniversaryBodyFormat: String
+    let notificationRemembranceTitle: String
+    let notificationRemembranceBodyFormat: String
+    let notificationEventTitle: String
+    let notificationEventBodyFormat: String
+
+    // MARK: Email account
+
+    let accountSignInTitle: String
+    let accountSignInCaption: String
+    let accountSignedInCaption: String
+    let authSignInTab: String
+    let authSignUpTab: String
+    let authSignInTitle: String
+    let authSignInSubtitle: String
+    let authSignUpTitle: String
+    let authSignUpSubtitle: String
+    let authEmailPlaceholder: String
+    let authPasswordPlaceholder: String
+    let authPasswordHintFormat: String
+    let authSignInAction: String
+    let authSignUpAction: String
+    let authForgotPasswordAction: String
+    let authResetSentMessage: String
+    let authOptionalNote: String
+    let authConfirmTitle: String
+    let authConfirmMessageFormat: String
+    let authResendAction: String
+    let authSignedInBadge: String
+    let authVaultLinkedTitle: String
+    let authVaultLinkedCaption: String
+    let authVaultMissingTitle: String
+    let authVaultMissingCaption: String
+    let authRestoredFormat: String
+    let authSignOutAction: String
+    let authSignOutNote: String
+    let authUnavailableMessage: String
+    let authInvalidEmailMessage: String
+    let authMissingPasswordMessage: String
+    let authWeakPasswordFormat: String
+    let authWrongCredentialsMessage: String
+    let authNotConfirmedMessage: String
+    let authEmailTakenMessage: String
+    let authRateLimitMessage: String
+    let authOfflineMessage: String
+    let authGenericErrorMessage: String
 }
 
 extension Strings {
@@ -921,7 +1036,118 @@ extension Strings {
         libraryDeniedTitle: "Foto non accessibili",
         libraryDeniedMessage: "Kudao non ha il permesso di accedere alle tue foto. Attivalo nelle Impostazioni di iOS per sceglierne una.",
         notificationGalleryTitle: "Ricordi della festa",
-        notificationGalleryBodyFormat: "Carica i tuoi ricordi della festa di %@ su Kudao!"
+        notificationGalleryBodyFormat: "Carica i tuoi ricordi della festa di %@ su Kudao!",
+
+        occasionBirthday: "Compleanno",
+        occasionWedding: "Matrimonio",
+        occasionRemembrance: "Commemorazione",
+        occasionOther: "Altro",
+        occasionBirthdayCaption: "Regalo, torta, invitati e auguri per chi festeggia.",
+        occasionWeddingCaption: "Anniversario di nozze: regalo ed esperienza di coppia.",
+        occasionRemembranceCaption: "Custodisci i ricordi di una persona che non c\u{2019}\u{00E8} pi\u{00F9}.",
+        occasionOtherCaption: "Una ricorrenza libera, con le tue regole.",
+        occasionBirthdayPlural: "Compleanni",
+        occasionWeddingPlural: "Matrimoni",
+        occasionRemembrancePlural: "Commemorazioni",
+        occasionOtherPlural: "Altro",
+        occasionStepTitle: "Che occasione \u{00E8}?",
+        occasionStepSubtitle: "Kudao adatta domande, suggerimenti e promemoria al tipo che scegli.",
+        weddingDateLabel: "Data del matrimonio",
+        passingDateLabel: "Data della scomparsa",
+        eventDateLabel: "Data dell\u{2019}evento",
+        weddingDateHint: "Il giorno delle nozze: l\u{2019}anniversario si calcola da qui.",
+        passingDateHint: "Il giorno da ricordare ogni anno.",
+        eventDateHint: "La data che torna ogni anno.",
+        weddingStatLabel: "Nozze",
+        passingStatLabel: "Scomparsa",
+        eventStatLabel: "Data",
+        yearsTogetherLabel: "Anni insieme",
+        yearsSinceLabel: "Anni fa",
+        yearsElapsedLabel: "Anni",
+        daysToAnniversary: "all\u{2019}anniversario",
+        daysToRemembrance: "alla ricorrenza",
+        daysToEvent: "all\u{2019}evento",
+        todayAnniversaryTitle: "\u{00C8} oggi l\u{2019}anniversario!",
+        todayRemembranceTitle: "Oggi \u{00E8} il giorno del ricordo",
+        todayEventTitle: "\u{00C8} oggi!",
+        anniversaryYearsFormat: "%d anni insieme",
+        yearsAgoFormat: "%d anni fa",
+        editionYearsFormat: "%d\u{00B0} anno",
+        sendAnniversaryWishesAction: "Fai gli auguri",
+        writeThoughtAction: "Scrivi un pensiero",
+        sendEventWishesAction: "Scrivi un messaggio",
+        memoriesTab: "Ricordi",
+        thoughtTab: "Pensiero",
+        traitsTab: "Tratti",
+        reminderOnTheDayLabel: "Il giorno stesso",
+        rememberedNamePlaceholder: "Nome della persona",
+        bondLabel: "Legame",
+        bondCaption: "Serve solo a dare il tono giusto ai testi che Kudao prepara.",
+        bondParent: "Genitore",
+        bondGrandparent: "Nonno o nonna",
+        bondSibling: "Fratello o sorella",
+        bondSpouse: "Coniuge o compagno",
+        bondChild: "Figlio o figlia",
+        bondFriend: "Amico",
+        bondOther: "Persona cara",
+        selfProfileToggleTitle: "\u{00C8} un\u{2019}occasione mia",
+        selfProfileToggleCaption: "Attivalo per il tuo matrimonio o una tua ricorrenza: Kudao usa il tuo nome.",
+        selfProfileNameCaption: "Preso dal tuo profilo. Cambialo da \u{201C}Il mio profilo\u{201D}.",
+        selfProfileFallbackName: "Io",
+        backAction: "Indietro",
+        filterAllOccasions: "Tutti",
+        filterEmptyTitle: "Niente qui",
+        filterEmptyMessageFormat: "Non hai ancora occasioni nella categoria \u{201C}%@\u{201D}.",
+        anniversaryGiftCardTitle: "Regalo anniversario",
+        experienceCardTitle: "Esperienza di coppia",
+        anniversaryVenueCardTitle: "Dove festeggiare",
+        toneIntimate: "Intimo",
+        toneSober: "Sobrio",
+        notificationAnniversaryTitle: "Anniversario in arrivo",
+        notificationAnniversaryBodyFormat: "Preparati per l\u{2019}anniversario di %@.",
+        notificationRemembranceTitle: "Giorno del ricordo",
+        notificationRemembranceBodyFormat: "Oggi ricordiamo %@.",
+        notificationEventTitle: "Ricorrenza in arrivo",
+        notificationEventBodyFormat: "Si avvicina la ricorrenza di %@.",
+
+        accountSignInTitle: "Accedi con email",
+        accountSignInCaption: "Facoltativo: ritrovi i tuoi dati anche senza il codice di ripristino.",
+        accountSignedInCaption: "Account collegato al tuo backup.",
+        authSignInTab: "Accedi",
+        authSignUpTab: "Registrati",
+        authSignInTitle: "Bentornato",
+        authSignInSubtitle: "Accedi per ritrovare i tuoi festeggiati su questo iPhone.",
+        authSignUpTitle: "Crea il tuo account",
+        authSignUpSubtitle: "Un\u{2019}email e una password: bastano a non perdere pi\u{00F9} nulla.",
+        authEmailPlaceholder: "La tua email",
+        authPasswordPlaceholder: "Password",
+        authPasswordHintFormat: "Almeno %d caratteri.",
+        authSignInAction: "Accedi",
+        authSignUpAction: "Crea account",
+        authForgotPasswordAction: "Password dimenticata?",
+        authResetSentMessage: "Ti abbiamo inviato un\u{2019}email per reimpostare la password.",
+        authOptionalNote: "L\u{2019}account \u{00E8} facoltativo. Kudao funziona lo stesso senza, e il codice di ripristino continua a valere.",
+        authConfirmTitle: "Conferma la tua email",
+        authConfirmMessageFormat: "Abbiamo scritto a %@. Apri il link nell\u{2019}email, poi torna qui e accedi.",
+        authResendAction: "Invia di nuovo l\u{2019}email",
+        authSignedInBadge: "Accesso effettuato",
+        authVaultLinkedTitle: "Backup collegato",
+        authVaultLinkedCaption: "I tuoi dati tornano indietro accedendo con questa email, ovunque.",
+        authVaultMissingTitle: "Nessun backup collegato",
+        authVaultMissingCaption: "Attiva il backup: da quel momento sar\u{00E0} legato a questo account.",
+        authRestoredFormat: "Recuperati %d elementi dal tuo account.",
+        authSignOutAction: "Esci dall\u{2019}account",
+        authSignOutNote: "Uscendo resti su questo iPhone con tutti i tuoi dati: sparisce solo l\u{2019}accesso rapido.",
+        authUnavailableMessage: "Servizio non disponibile in questa versione dell\u{2019}app.",
+        authInvalidEmailMessage: "Controlla l\u{2019}indirizzo email.",
+        authMissingPasswordMessage: "Inserisci la password.",
+        authWeakPasswordFormat: "La password deve avere almeno %d caratteri.",
+        authWrongCredentialsMessage: "Email o password non corretti.",
+        authNotConfirmedMessage: "Devi prima confermare la tua email: controlla la posta.",
+        authEmailTakenMessage: "Esiste gi\u{00E0} un account con questa email. Prova ad accedere.",
+        authRateLimitMessage: "Troppi tentativi. Riprova tra qualche minuto.",
+        authOfflineMessage: "Sembri offline. Controlla la connessione e riprova.",
+        authGenericErrorMessage: "Qualcosa \u{00E8} andato storto. Riprova tra poco."
     )
 
     static let english = Strings(
@@ -1365,7 +1591,118 @@ extension Strings {
         libraryDeniedTitle: "Photos not available",
         libraryDeniedMessage: "Kudao is not allowed to access your photos. Turn it on in iOS Settings to pick one.",
         notificationGalleryTitle: "Party memories",
-        notificationGalleryBodyFormat: "Upload your memories from %@\u{2019}s party on Kudao!"
+        notificationGalleryBodyFormat: "Upload your memories from %@\u{2019}s party on Kudao!",
+
+        occasionBirthday: "Birthday",
+        occasionWedding: "Wedding",
+        occasionRemembrance: "Remembrance",
+        occasionOther: "Other",
+        occasionBirthdayCaption: "Gift, cake, guests and wishes for the person celebrating.",
+        occasionWeddingCaption: "Wedding anniversary: a present and something to live together.",
+        occasionRemembranceCaption: "Keep the memory of someone who is no longer here.",
+        occasionOtherCaption: "A free-form occasion, on your own terms.",
+        occasionBirthdayPlural: "Birthdays",
+        occasionWeddingPlural: "Weddings",
+        occasionRemembrancePlural: "Remembrances",
+        occasionOtherPlural: "Other",
+        occasionStepTitle: "What kind of occasion?",
+        occasionStepSubtitle: "Kudao adapts the questions, the ideas and the reminders to what you pick.",
+        weddingDateLabel: "Wedding date",
+        passingDateLabel: "Date of passing",
+        eventDateLabel: "Date of the event",
+        weddingDateHint: "The wedding day: the anniversary is counted from here.",
+        passingDateHint: "The day to remember every year.",
+        eventDateHint: "The date that comes back every year.",
+        weddingStatLabel: "Wedding",
+        passingStatLabel: "Passing",
+        eventStatLabel: "Date",
+        yearsTogetherLabel: "Years together",
+        yearsSinceLabel: "Years ago",
+        yearsElapsedLabel: "Years",
+        daysToAnniversary: "to the anniversary",
+        daysToRemembrance: "to the anniversary",
+        daysToEvent: "to the event",
+        todayAnniversaryTitle: "The anniversary is today!",
+        todayRemembranceTitle: "Today is the day of remembrance",
+        todayEventTitle: "It\u{2019}s today!",
+        anniversaryYearsFormat: "%d years together",
+        yearsAgoFormat: "%d years ago",
+        editionYearsFormat: "Year %d",
+        sendAnniversaryWishesAction: "Send your wishes",
+        writeThoughtAction: "Write a thought",
+        sendEventWishesAction: "Write a message",
+        memoriesTab: "Memories",
+        thoughtTab: "Thought",
+        traitsTab: "Traits",
+        reminderOnTheDayLabel: "On the day itself",
+        rememberedNamePlaceholder: "Their name",
+        bondLabel: "Bond",
+        bondCaption: "It only helps Kudao find the right tone for the texts it prepares.",
+        bondParent: "Parent",
+        bondGrandparent: "Grandparent",
+        bondSibling: "Sibling",
+        bondSpouse: "Spouse or partner",
+        bondChild: "Son or daughter",
+        bondFriend: "Friend",
+        bondOther: "Loved one",
+        selfProfileToggleTitle: "This one is mine",
+        selfProfileToggleCaption: "Turn it on for your own wedding or occasion: Kudao uses your name.",
+        selfProfileNameCaption: "Taken from your profile. Change it in \u{201C}My profile\u{201D}.",
+        selfProfileFallbackName: "Me",
+        backAction: "Back",
+        filterAllOccasions: "All",
+        filterEmptyTitle: "Nothing here",
+        filterEmptyMessageFormat: "You have no occasions under \u{201C}%@\u{201D} yet.",
+        anniversaryGiftCardTitle: "Anniversary gift",
+        experienceCardTitle: "Experience together",
+        anniversaryVenueCardTitle: "Where to celebrate",
+        toneIntimate: "Intimate",
+        toneSober: "Restrained",
+        notificationAnniversaryTitle: "Anniversary coming up",
+        notificationAnniversaryBodyFormat: "Get ready for %@\u{2019}s anniversary.",
+        notificationRemembranceTitle: "Day of remembrance",
+        notificationRemembranceBodyFormat: "Today we remember %@.",
+        notificationEventTitle: "Occasion coming up",
+        notificationEventBodyFormat: "%@\u{2019}s occasion is getting close.",
+
+        accountSignInTitle: "Sign in with email",
+        accountSignInCaption: "Optional: get your data back even without the recovery code.",
+        accountSignedInCaption: "Account linked to your backup.",
+        authSignInTab: "Sign in",
+        authSignUpTab: "Sign up",
+        authSignInTitle: "Welcome back",
+        authSignInSubtitle: "Sign in to bring your celebrations onto this iPhone.",
+        authSignUpTitle: "Create your account",
+        authSignUpSubtitle: "An email and a password \u{2014} enough to never lose anything again.",
+        authEmailPlaceholder: "Your email",
+        authPasswordPlaceholder: "Password",
+        authPasswordHintFormat: "At least %d characters.",
+        authSignInAction: "Sign in",
+        authSignUpAction: "Create account",
+        authForgotPasswordAction: "Forgot your password?",
+        authResetSentMessage: "We sent you an email to reset your password.",
+        authOptionalNote: "The account is optional. Kudao works fine without it, and the recovery code still counts.",
+        authConfirmTitle: "Confirm your email",
+        authConfirmMessageFormat: "We wrote to %@. Open the link in the email, then come back and sign in.",
+        authResendAction: "Send the email again",
+        authSignedInBadge: "Signed in",
+        authVaultLinkedTitle: "Backup linked",
+        authVaultLinkedCaption: "Your data comes back by signing in with this email, anywhere.",
+        authVaultMissingTitle: "No backup linked",
+        authVaultMissingCaption: "Turn the backup on: from then on it belongs to this account.",
+        authRestoredFormat: "Recovered %d items from your account.",
+        authSignOutAction: "Sign out",
+        authSignOutNote: "Signing out keeps everything on this iPhone: only the quick way back disappears.",
+        authUnavailableMessage: "This service is not available in this build of the app.",
+        authInvalidEmailMessage: "Check the email address.",
+        authMissingPasswordMessage: "Enter your password.",
+        authWeakPasswordFormat: "The password needs at least %d characters.",
+        authWrongCredentialsMessage: "Wrong email or password.",
+        authNotConfirmedMessage: "You need to confirm your email first \u{2014} check your inbox.",
+        authEmailTakenMessage: "An account already exists with this email. Try signing in.",
+        authRateLimitMessage: "Too many attempts. Try again in a few minutes.",
+        authOfflineMessage: "You seem offline. Check your connection and try again.",
+        authGenericErrorMessage: "Something went wrong. Try again shortly."
     )
 
     static let french = Strings(
@@ -1809,7 +2146,118 @@ extension Strings {
         libraryDeniedTitle: "Photos indisponibles",
         libraryDeniedMessage: "Kudao n\u{2019}a pas acc\u{00E8}s \u{00E0} tes photos. Active l\u{2019}autorisation dans les R\u{00E9}glages iOS pour en choisir une.",
         notificationGalleryTitle: "Souvenirs de la f\u{00EA}te",
-        notificationGalleryBodyFormat: "Ajoute tes souvenirs de la f\u{00EA}te de %@ sur Kudao !"
+        notificationGalleryBodyFormat: "Ajoute tes souvenirs de la f\u{00EA}te de %@ sur Kudao !",
+
+        occasionBirthday: "Anniversaire",
+        occasionWedding: "Mariage",
+        occasionRemembrance: "Comm\u{00E9}moration",
+        occasionOther: "Autre",
+        occasionBirthdayCaption: "Cadeau, g\u{00E2}teau, invit\u{00E9}s et v\u{0153}ux pour la personne f\u{00EA}t\u{00E9}e.",
+        occasionWeddingCaption: "Anniversaire de mariage : un cadeau et une exp\u{00E9}rience \u{00E0} deux.",
+        occasionRemembranceCaption: "Garder la m\u{00E9}moire d\u{2019}une personne qui n\u{2019}est plus l\u{00E0}.",
+        occasionOtherCaption: "Une occasion libre, \u{00E0} ta fa\u{00E7}on.",
+        occasionBirthdayPlural: "Anniversaires",
+        occasionWeddingPlural: "Mariages",
+        occasionRemembrancePlural: "Comm\u{00E9}morations",
+        occasionOtherPlural: "Autre",
+        occasionStepTitle: "Quel type d\u{2019}occasion ?",
+        occasionStepSubtitle: "Kudao adapte les questions, les id\u{00E9}es et les rappels \u{00E0} ton choix.",
+        weddingDateLabel: "Date du mariage",
+        passingDateLabel: "Date du d\u{00E9}c\u{00E8}s",
+        eventDateLabel: "Date de l\u{2019}\u{00E9}v\u{00E9}nement",
+        weddingDateHint: "Le jour du mariage : l\u{2019}anniversaire se compte \u{00E0} partir de l\u{00E0}.",
+        passingDateHint: "Le jour \u{00E0} se rappeler chaque ann\u{00E9}e.",
+        eventDateHint: "La date qui revient chaque ann\u{00E9}e.",
+        weddingStatLabel: "Mariage",
+        passingStatLabel: "D\u{00E9}part",
+        eventStatLabel: "Date",
+        yearsTogetherLabel: "Ann\u{00E9}es ensemble",
+        yearsSinceLabel: "Il y a",
+        yearsElapsedLabel: "Ann\u{00E9}es",
+        daysToAnniversary: "avant l\u{2019}anniversaire",
+        daysToRemembrance: "avant la date",
+        daysToEvent: "avant l\u{2019}\u{00E9}v\u{00E9}nement",
+        todayAnniversaryTitle: "C\u{2019}est l\u{2019}anniversaire aujourd\u{2019}hui !",
+        todayRemembranceTitle: "Aujourd\u{2019}hui est le jour du souvenir",
+        todayEventTitle: "C\u{2019}est aujourd\u{2019}hui !",
+        anniversaryYearsFormat: "%d ans ensemble",
+        yearsAgoFormat: "Il y a %d ans",
+        editionYearsFormat: "%de ann\u{00E9}e",
+        sendAnniversaryWishesAction: "Envoyer les v\u{0153}ux",
+        writeThoughtAction: "\u{00C9}crire une pens\u{00E9}e",
+        sendEventWishesAction: "\u{00C9}crire un message",
+        memoriesTab: "Souvenirs",
+        thoughtTab: "Pens\u{00E9}e",
+        traitsTab: "Traits",
+        reminderOnTheDayLabel: "Le jour m\u{00EA}me",
+        rememberedNamePlaceholder: "Son pr\u{00E9}nom",
+        bondLabel: "Lien",
+        bondCaption: "Cela sert seulement \u{00E0} donner le bon ton aux textes que Kudao pr\u{00E9}pare.",
+        bondParent: "Parent",
+        bondGrandparent: "Grand-parent",
+        bondSibling: "Fr\u{00E8}re ou s\u{0153}ur",
+        bondSpouse: "Conjoint ou compagnon",
+        bondChild: "Fils ou fille",
+        bondFriend: "Ami",
+        bondOther: "Proche",
+        selfProfileToggleTitle: "C\u{2019}est mon occasion",
+        selfProfileToggleCaption: "Active-le pour ton propre mariage ou ta propre date : Kudao utilise ton nom.",
+        selfProfileNameCaption: "Repris de ton profil. Modifie-le dans \u{00AB} Mon profil \u{00BB}.",
+        selfProfileFallbackName: "Moi",
+        backAction: "Retour",
+        filterAllOccasions: "Tout",
+        filterEmptyTitle: "Rien ici",
+        filterEmptyMessageFormat: "Tu n\u{2019}as encore aucune occasion dans \u{00AB} %@ \u{00BB}.",
+        anniversaryGiftCardTitle: "Cadeau d\u{2019}anniversaire",
+        experienceCardTitle: "Exp\u{00E9}rience \u{00E0} deux",
+        anniversaryVenueCardTitle: "O\u{00F9} f\u{00EA}ter",
+        toneIntimate: "Intime",
+        toneSober: "Sobre",
+        notificationAnniversaryTitle: "Anniversaire de mariage",
+        notificationAnniversaryBodyFormat: "Pr\u{00E9}pare-toi pour l\u{2019}anniversaire de %@.",
+        notificationRemembranceTitle: "Jour du souvenir",
+        notificationRemembranceBodyFormat: "Aujourd\u{2019}hui, nous nous souvenons de %@.",
+        notificationEventTitle: "Occasion \u{00E0} venir",
+        notificationEventBodyFormat: "L\u{2019}occasion de %@ approche.",
+
+        accountSignInTitle: "Se connecter par e-mail",
+        accountSignInCaption: "Facultatif : retrouve tes donn\u{00E9}es m\u{00EA}me sans le code de r\u{00E9}cup\u{00E9}ration.",
+        accountSignedInCaption: "Compte reli\u{00E9} \u{00E0} ta sauvegarde.",
+        authSignInTab: "Connexion",
+        authSignUpTab: "Inscription",
+        authSignInTitle: "Content de te revoir",
+        authSignInSubtitle: "Connecte-toi pour retrouver tes profils sur cet iPhone.",
+        authSignUpTitle: "Cr\u{00E9}e ton compte",
+        authSignUpSubtitle: "Un e-mail et un mot de passe : de quoi ne plus rien perdre.",
+        authEmailPlaceholder: "Ton e-mail",
+        authPasswordPlaceholder: "Mot de passe",
+        authPasswordHintFormat: "Au moins %d caract\u{00E8}res.",
+        authSignInAction: "Se connecter",
+        authSignUpAction: "Cr\u{00E9}er le compte",
+        authForgotPasswordAction: "Mot de passe oubli\u{00E9} ?",
+        authResetSentMessage: "Nous t\u{2019}avons envoy\u{00E9} un e-mail pour r\u{00E9}initialiser ton mot de passe.",
+        authOptionalNote: "Le compte est facultatif. Kudao fonctionne tr\u{00E8}s bien sans, et le code de r\u{00E9}cup\u{00E9}ration reste valable.",
+        authConfirmTitle: "Confirme ton e-mail",
+        authConfirmMessageFormat: "Nous avons \u{00E9}crit \u{00E0} %@. Ouvre le lien dans l\u{2019}e-mail, puis reviens ici pour te connecter.",
+        authResendAction: "Renvoyer l\u{2019}e-mail",
+        authSignedInBadge: "Connect\u{00E9}",
+        authVaultLinkedTitle: "Sauvegarde reli\u{00E9}e",
+        authVaultLinkedCaption: "Tes donn\u{00E9}es reviennent en te connectant avec cet e-mail, partout.",
+        authVaultMissingTitle: "Aucune sauvegarde reli\u{00E9}e",
+        authVaultMissingCaption: "Active la sauvegarde : elle appartiendra alors \u{00E0} ce compte.",
+        authRestoredFormat: "%d \u{00E9}l\u{00E9}ments r\u{00E9}cup\u{00E9}r\u{00E9}s depuis ton compte.",
+        authSignOutAction: "Se d\u{00E9}connecter",
+        authSignOutNote: "En te d\u{00E9}connectant, tout reste sur cet iPhone : seul l\u{2019}acc\u{00E8}s rapide dispara\u{00EE}t.",
+        authUnavailableMessage: "Ce service n\u{2019}est pas disponible dans cette version de l\u{2019}app.",
+        authInvalidEmailMessage: "V\u{00E9}rifie l\u{2019}adresse e-mail.",
+        authMissingPasswordMessage: "Saisis ton mot de passe.",
+        authWeakPasswordFormat: "Le mot de passe doit faire au moins %d caract\u{00E8}res.",
+        authWrongCredentialsMessage: "E-mail ou mot de passe incorrect.",
+        authNotConfirmedMessage: "Tu dois d\u{2019}abord confirmer ton e-mail : regarde ta bo\u{00EE}te de r\u{00E9}ception.",
+        authEmailTakenMessage: "Un compte existe d\u{00E9}j\u{00E0} avec cet e-mail. Essaie de te connecter.",
+        authRateLimitMessage: "Trop de tentatives. R\u{00E9}essaie dans quelques minutes.",
+        authOfflineMessage: "Tu sembles hors ligne. V\u{00E9}rifie ta connexion et r\u{00E9}essaie.",
+        authGenericErrorMessage: "Un probl\u{00E8}me est survenu. R\u{00E9}essaie dans un instant."
     )
 
     static let spanish = Strings(
@@ -2253,6 +2701,117 @@ extension Strings {
         libraryDeniedTitle: "Fotos no disponibles",
         libraryDeniedMessage: "Kudao no tiene permiso para acceder a tus fotos. Act\u{00ED}valo en los Ajustes de iOS para elegir una.",
         notificationGalleryTitle: "Recuerdos de la fiesta",
-        notificationGalleryBodyFormat: "\u{00A1}Sube tus recuerdos de la fiesta de %@ en Kudao!"
+        notificationGalleryBodyFormat: "\u{00A1}Sube tus recuerdos de la fiesta de %@ en Kudao!",
+
+        occasionBirthday: "Cumplea\u{00F1}os",
+        occasionWedding: "Boda",
+        occasionRemembrance: "Conmemoraci\u{00F3}n",
+        occasionOther: "Otro",
+        occasionBirthdayCaption: "Regalo, tarta, invitados y felicitaci\u{00F3}n para quien celebra.",
+        occasionWeddingCaption: "Aniversario de boda: un regalo y una experiencia en pareja.",
+        occasionRemembranceCaption: "Guarda el recuerdo de alguien que ya no est\u{00E1}.",
+        occasionOtherCaption: "Una ocasi\u{00F3}n libre, a tu manera.",
+        occasionBirthdayPlural: "Cumplea\u{00F1}os",
+        occasionWeddingPlural: "Bodas",
+        occasionRemembrancePlural: "Conmemoraciones",
+        occasionOtherPlural: "Otro",
+        occasionStepTitle: "\u{00BF}Qu\u{00E9} tipo de ocasi\u{00F3}n es?",
+        occasionStepSubtitle: "Kudao adapta las preguntas, las ideas y los recordatorios a lo que elijas.",
+        weddingDateLabel: "Fecha de la boda",
+        passingDateLabel: "Fecha del fallecimiento",
+        eventDateLabel: "Fecha del evento",
+        weddingDateHint: "El d\u{00ED}a de la boda: el aniversario se cuenta desde aqu\u{00ED}.",
+        passingDateHint: "El d\u{00ED}a que recordar cada a\u{00F1}o.",
+        eventDateHint: "La fecha que vuelve cada a\u{00F1}o.",
+        weddingStatLabel: "Boda",
+        passingStatLabel: "Partida",
+        eventStatLabel: "Fecha",
+        yearsTogetherLabel: "A\u{00F1}os juntos",
+        yearsSinceLabel: "Hace",
+        yearsElapsedLabel: "A\u{00F1}os",
+        daysToAnniversary: "para el aniversario",
+        daysToRemembrance: "para la fecha",
+        daysToEvent: "para el evento",
+        todayAnniversaryTitle: "\u{00A1}El aniversario es hoy!",
+        todayRemembranceTitle: "Hoy es el d\u{00ED}a del recuerdo",
+        todayEventTitle: "\u{00A1}Es hoy!",
+        anniversaryYearsFormat: "%d a\u{00F1}os juntos",
+        yearsAgoFormat: "Hace %d a\u{00F1}os",
+        editionYearsFormat: "A\u{00F1}o %d",
+        sendAnniversaryWishesAction: "Felicitar",
+        writeThoughtAction: "Escribir un pensamiento",
+        sendEventWishesAction: "Escribir un mensaje",
+        memoriesTab: "Recuerdos",
+        thoughtTab: "Pensamiento",
+        traitsTab: "Rasgos",
+        reminderOnTheDayLabel: "El mismo d\u{00ED}a",
+        rememberedNamePlaceholder: "Su nombre",
+        bondLabel: "V\u{00ED}nculo",
+        bondCaption: "Solo sirve para dar el tono correcto a los textos que prepara Kudao.",
+        bondParent: "Padre o madre",
+        bondGrandparent: "Abuelo o abuela",
+        bondSibling: "Hermano o hermana",
+        bondSpouse: "C\u{00F3}nyuge o pareja",
+        bondChild: "Hijo o hija",
+        bondFriend: "Amigo",
+        bondOther: "Ser querido",
+        selfProfileToggleTitle: "Es una ocasi\u{00F3}n m\u{00ED}a",
+        selfProfileToggleCaption: "Act\u{00ED}valo para tu propia boda o tu fecha: Kudao usa tu nombre.",
+        selfProfileNameCaption: "Tomado de tu perfil. C\u{00E1}mbialo en \u{201C}Mi perfil\u{201D}.",
+        selfProfileFallbackName: "Yo",
+        backAction: "Atr\u{00E1}s",
+        filterAllOccasions: "Todo",
+        filterEmptyTitle: "Nada por aqu\u{00ED}",
+        filterEmptyMessageFormat: "A\u{00FA}n no tienes ocasiones en \u{201C}%@\u{201D}.",
+        anniversaryGiftCardTitle: "Regalo de aniversario",
+        experienceCardTitle: "Experiencia en pareja",
+        anniversaryVenueCardTitle: "D\u{00F3}nde celebrarlo",
+        toneIntimate: "\u{00CD}ntimo",
+        toneSober: "Sobrio",
+        notificationAnniversaryTitle: "Aniversario cercano",
+        notificationAnniversaryBodyFormat: "Prep\u{00E1}rate para el aniversario de %@.",
+        notificationRemembranceTitle: "D\u{00ED}a del recuerdo",
+        notificationRemembranceBodyFormat: "Hoy recordamos a %@.",
+        notificationEventTitle: "Ocasi\u{00F3}n cercana",
+        notificationEventBodyFormat: "Se acerca la ocasi\u{00F3}n de %@.",
+
+        accountSignInTitle: "Entrar con correo",
+        accountSignInCaption: "Opcional: recupera tus datos aunque pierdas el c\u{00F3}digo.",
+        accountSignedInCaption: "Cuenta vinculada a tu copia de seguridad.",
+        authSignInTab: "Entrar",
+        authSignUpTab: "Registrarse",
+        authSignInTitle: "Bienvenido de nuevo",
+        authSignInSubtitle: "Entra para recuperar tus perfiles en este iPhone.",
+        authSignUpTitle: "Crea tu cuenta",
+        authSignUpSubtitle: "Un correo y una contrase\u{00F1}a: suficiente para no perder nada m\u{00E1}s.",
+        authEmailPlaceholder: "Tu correo",
+        authPasswordPlaceholder: "Contrase\u{00F1}a",
+        authPasswordHintFormat: "Al menos %d caracteres.",
+        authSignInAction: "Entrar",
+        authSignUpAction: "Crear cuenta",
+        authForgotPasswordAction: "\u{00BF}Olvidaste la contrase\u{00F1}a?",
+        authResetSentMessage: "Te hemos enviado un correo para restablecer la contrase\u{00F1}a.",
+        authOptionalNote: "La cuenta es opcional. Kudao funciona igual sin ella, y el c\u{00F3}digo de recuperaci\u{00F3}n sigue valiendo.",
+        authConfirmTitle: "Confirma tu correo",
+        authConfirmMessageFormat: "Hemos escrito a %@. Abre el enlace del correo y vuelve aqu\u{00ED} para entrar.",
+        authResendAction: "Enviar el correo otra vez",
+        authSignedInBadge: "Sesi\u{00F3}n iniciada",
+        authVaultLinkedTitle: "Copia vinculada",
+        authVaultLinkedCaption: "Tus datos vuelven al entrar con este correo, en cualquier sitio.",
+        authVaultMissingTitle: "Sin copia vinculada",
+        authVaultMissingCaption: "Activa la copia de seguridad: a partir de ah\u{00ED} ser\u{00E1} de esta cuenta.",
+        authRestoredFormat: "Recuperados %d elementos de tu cuenta.",
+        authSignOutAction: "Cerrar sesi\u{00F3}n",
+        authSignOutNote: "Al salir todo sigue en este iPhone: solo desaparece el acceso r\u{00E1}pido.",
+        authUnavailableMessage: "Este servicio no est\u{00E1} disponible en esta versi\u{00F3}n de la app.",
+        authInvalidEmailMessage: "Revisa la direcci\u{00F3}n de correo.",
+        authMissingPasswordMessage: "Escribe tu contrase\u{00F1}a.",
+        authWeakPasswordFormat: "La contrase\u{00F1}a debe tener al menos %d caracteres.",
+        authWrongCredentialsMessage: "Correo o contrase\u{00F1}a incorrectos.",
+        authNotConfirmedMessage: "Primero debes confirmar tu correo: revisa tu bandeja.",
+        authEmailTakenMessage: "Ya existe una cuenta con este correo. Prueba a entrar.",
+        authRateLimitMessage: "Demasiados intentos. Prueba dentro de unos minutos.",
+        authOfflineMessage: "Pareces estar sin conexi\u{00F3}n. Comprueba la red y vuelve a intentarlo.",
+        authGenericErrorMessage: "Algo ha ido mal. Int\u{00E9}ntalo dentro de un momento."
     )
 }
