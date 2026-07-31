@@ -21,6 +21,12 @@ nonisolated enum SharingPolicy {
         profiles.filter(canShareWithCelebrant)
     }
 
+    /// Collaborative sharing sends the profile to another Kudao user, so a
+    /// protected surprise profile must stay on this device only.
+    static func canShareWithCollaborators(isSurprise: Bool, protectsSurprises: Bool) -> Bool {
+        !(isSurprise && protectsSurprises)
+    }
+
     /// Owner-facing exports (PDF/JSON, share sheet) stay allowed: the data never
     /// reaches the celebrant, it goes to the person planning the party.
     static func canExportForOwner(_ profile: BirthdayProfile) -> Bool {

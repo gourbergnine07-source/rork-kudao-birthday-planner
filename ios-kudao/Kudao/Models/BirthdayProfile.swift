@@ -46,6 +46,21 @@ final class BirthdayProfile {
     @Relationship(deleteRule: .cascade, inverse: \PartyPlan.profile)
     var partyPlan: PartyPlan?
 
+    // MARK: Collaboration
+
+    /// Kudao id of the person who owns the profile; empty until it is shared.
+    var shareOwnerUserID: String = ""
+    /// Display name of that owner, shown to invited collaborators.
+    var shareOwnerName: String = ""
+    /// Share-room id: this profile's own uuid for owners, the original id for mirrors.
+    var remoteProfileID: String = ""
+    /// Permission granted to me; empty when I am the owner of the profile.
+    var sharedPermissionRaw: String = ""
+    /// Set once the profile belongs to a collaborative room.
+    var sharedAt: Date?
+    /// Last successful sync with the share room.
+    var lastSyncedAt: Date?
+
     init(
         name: String,
         birthDate: Date,
@@ -96,6 +111,30 @@ final class BirthdayProfile {
         let years = Calendar.current.dateComponents([.year], from: birthDate, to: Date()).year ?? 0
         return max(0, years)
     }
+
+    // MARK: Collaboration helpers
+
+    /// A profile I joined through an invite code, owned by somebody else.
+    var isSharedMirror: Bool { !sharedPermissionRaw.isEmpty }
+
+    /// Permission I hold on this profile: owners always have full access.
+    var myPermission: SharePermission {
+        isSharedMirror ? SharePermission.parse(sharedPermissionRaw) : .edit
+    }
+
+    /// True once the profile lives in a share room (either side of it).
+    var isCollaborative: Bool { sharedAt != nil }
+
+    /// Id used to address the share room on the backend.
+    var roomID: String {
+        remoteProfileID.isEmpty ? id.uuidString : remoteProfileID
+    }
+
+    /// Guests with "view" access can read everything but change nothing.
+    var canContribute: Bool { myPermission == .edit }
+
+    /// Only the original owner edits the profile data, the plan and the reminders.
+    var isOwnedByMe: Bool { !isSharedMirror }
 
     /// True when at least one contact field is filled in.
     var hasContactDetails: Bool {

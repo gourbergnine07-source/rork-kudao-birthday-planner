@@ -267,6 +267,76 @@ nonisolated struct Strings: Sendable {
     let openInMapsAction: String
     let distanceKmFormat: String
     let distanceMetersFormat: String
+
+    let shareProfileAction: String
+    let shareProfileTitle: String
+    let shareProfileSubtitleFormat: String
+    let permissionSectionTitle: String
+    let permissionViewTitle: String
+    let permissionViewCaption: String
+    let permissionEditTitle: String
+    let permissionEditCaption: String
+    let generateInviteAction: String
+    let inviteReadyTitle: String
+    let inviteCodeLabel: String
+    let inviteHint: String
+    let copyCodeAction: String
+    let copiedLabel: String
+    let shareInviteAction: String
+    let newInviteAction: String
+    let discardInviteAction: String
+    let inviteMessageFormat: String
+    let shareBlockedSurpriseTitle: String
+    let shareBlockedSurpriseMessage: String
+    let yourNameLabel: String
+    let yourNamePlaceholder: String
+    let yourNameCaption: String
+
+    let participantsTitle: String
+    let participantsMenuTitle: String
+    let participantsCountFormat: String
+    let participantOwnerBadge: String
+    let participantYou: String
+    let participantUnknown: String
+    let participantPendingTitle: String
+    let removeParticipantAction: String
+    let removeParticipantConfirmFormat: String
+    let ownerCannotBeRemoved: String
+    let guestLeaveHint: String
+    let participantsEmptyTitle: String
+    let participantsEmptyMessage: String
+    let joinedAtFormat: String
+
+    let joinShareMenuTitle: String
+    let joinShareTitle: String
+    let joinShareSubtitle: String
+    let joinCodePlaceholder: String
+    let joinAction: String
+    let pasteCodeAction: String
+    let joinSuccessFormat: String
+    let joinSuccessCaption: String
+    let sharedProfileFallbackName: String
+
+    let shareErrorGeneric: String
+    let shareErrorInvalidCode: String
+    let shareErrorCodeUsed: String
+    let shareErrorOwnProfile: String
+    let shareErrorNoAccess: String
+    let shareErrorReadOnly: String
+    let shareErrorNotOwner: String
+    let shareErrorOffline: String
+
+    let sharedBadge: String
+    let sharedByFormat: String
+    let readOnlyBadge: String
+    let readOnlyDiaryMessage: String
+    let readOnlyPlanMessage: String
+    let voteUpLabel: String
+    let voteDownLabel: String
+    let voteTallyFormat: String
+    let votesEmptyLabel: String
+    let syncingLabel: String
+    let collaborationSectionTitle: String
 }
 
 extension Strings {
@@ -510,7 +580,72 @@ extension Strings {
         storesSearchingCategoryFormat: "Cerco: %@",
         openInMapsAction: "Apri in Mappe",
         distanceKmFormat: "%.1f km",
-        distanceMetersFormat: "%d m"
+        distanceMetersFormat: "%d m",
+        shareProfileAction: "Condividi profilo",
+        shareProfileTitle: "Condividi profilo",
+        shareProfileSubtitleFormat: "Invita qualcuno a organizzare il compleanno di %@ con te.",
+        permissionSectionTitle: "Cosa pu\u{00F2} fare",
+        permissionViewTitle: "Sola lettura",
+        permissionViewCaption: "Vede profilo, diario e suggerimenti senza modificarli.",
+        permissionEditTitle: "Pu\u{00F2} collaborare",
+        permissionEditCaption: "Aggiunge note nel diario e vota i suggerimenti.",
+        generateInviteAction: "Genera codice invito",
+        inviteReadyTitle: "Invito pronto",
+        inviteCodeLabel: "Codice invito",
+        inviteHint: "Chi lo riceve apre Kudao, tocca l'icona impostazioni e scegli \u{00AB}Unisciti a un profilo\u{00BB}.",
+        copyCodeAction: "Copia codice",
+        copiedLabel: "Copiato",
+        shareInviteAction: "Condividi invito",
+        newInviteAction: "Genera un altro codice",
+        discardInviteAction: "Annulla invito",
+        inviteMessageFormat: "Organizziamo insieme il compleanno di %@ su Kudao! Apri l'app, vai su Impostazioni \u{2192} Unisciti a un profilo e inserisci il codice: %@",
+        shareBlockedSurpriseTitle: "Profilo sorpresa protetto",
+        shareBlockedSurpriseMessage: "Disattiva la protezione sorpresa nelle impostazioni per poter condividere questo profilo.",
+        yourNameLabel: "Il tuo nome",
+        yourNamePlaceholder: "Come ti chiami",
+        yourNameCaption: "Serve agli altri partecipanti per riconoscere le tue note.",
+        participantsTitle: "Partecipanti",
+        participantsMenuTitle: "Partecipanti",
+        participantsCountFormat: "%d partecipanti",
+        participantOwnerBadge: "Proprietario",
+        participantYou: "Tu",
+        participantUnknown: "Partecipante",
+        participantPendingTitle: "Inviti in attesa",
+        removeParticipantAction: "Rimuovi",
+        removeParticipantConfirmFormat: "%@ perder\u{00E0} l'accesso a questo profilo. Le note gi\u{00E0} scritte restano nel diario.",
+        ownerCannotBeRemoved: "Il proprietario non pu\u{00F2} essere rimosso: per chiudere la condivisione elimina il profilo.",
+        guestLeaveHint: "Solo il proprietario del profilo pu\u{00F2} gestire gli accessi.",
+        participantsEmptyTitle: "Nessun partecipante",
+        participantsEmptyMessage: "Condividi il profilo per organizzare la festa insieme a qualcun altro.",
+        joinedAtFormat: "Dal %@",
+        joinShareMenuTitle: "Unisciti a un profilo",
+        joinShareTitle: "Unisciti a un profilo",
+        joinShareSubtitle: "Inserisci il codice invito che hai ricevuto.",
+        joinCodePlaceholder: "CODICE",
+        joinAction: "Unisciti",
+        pasteCodeAction: "Incolla dagli appunti",
+        joinSuccessFormat: "Ora collabori al compleanno di %@",
+        joinSuccessCaption: "Trovi il profilo nella tua lista, con le note e i suggerimenti condivisi.",
+        sharedProfileFallbackName: "Profilo condiviso",
+        shareErrorGeneric: "Qualcosa \u{00E8} andato storto. Riprova.",
+        shareErrorInvalidCode: "Codice non valido. Controlla e riprova.",
+        shareErrorCodeUsed: "Questo codice \u{00E8} gi\u{00E0} stato usato da un'altra persona.",
+        shareErrorOwnProfile: "Questo profilo \u{00E8} gi\u{00E0} tuo.",
+        shareErrorNoAccess: "Non hai pi\u{00F9} accesso a questo profilo condiviso.",
+        shareErrorReadOnly: "Hai accesso in sola lettura a questo profilo.",
+        shareErrorNotOwner: "Solo il proprietario del profilo pu\u{00F2} farlo.",
+        shareErrorOffline: "Nessuna connessione. Riprova quando torni online.",
+        sharedBadge: "Condiviso",
+        sharedByFormat: "Condiviso da %@",
+        readOnlyBadge: "Sola lettura",
+        readOnlyDiaryMessage: "Hai accesso in sola lettura: puoi leggere le note ma non aggiungerne.",
+        readOnlyPlanMessage: "Il piano \u{00E8} gestito dal proprietario del profilo.",
+        voteUpLabel: "Mi piace",
+        voteDownLabel: "Non mi convince",
+        voteTallyFormat: "%1$d a favore \u{00B7} %2$d contro",
+        votesEmptyLabel: "Ancora nessun voto",
+        syncingLabel: "Aggiornamento\u{2026}",
+        collaborationSectionTitle: "Condivisione"
     )
 
     static let english = Strings(
@@ -753,7 +888,72 @@ extension Strings {
         storesSearchingCategoryFormat: "Searching: %@",
         openInMapsAction: "Open in Maps",
         distanceKmFormat: "%.1f km",
-        distanceMetersFormat: "%d m"
+        distanceMetersFormat: "%d m",
+        shareProfileAction: "Share profile",
+        shareProfileTitle: "Share profile",
+        shareProfileSubtitleFormat: "Invite someone to plan %@'s birthday with you.",
+        permissionSectionTitle: "What they can do",
+        permissionViewTitle: "View only",
+        permissionViewCaption: "Sees the profile, the diary and the suggestions without changing them.",
+        permissionEditTitle: "Can collaborate",
+        permissionEditCaption: "Adds diary notes and votes on the suggestions.",
+        generateInviteAction: "Generate invite code",
+        inviteReadyTitle: "Invite ready",
+        inviteCodeLabel: "Invite code",
+        inviteHint: "They open Kudao, tap the settings icon and choose \u{201C}Join a profile\u{201D}.",
+        copyCodeAction: "Copy code",
+        copiedLabel: "Copied",
+        shareInviteAction: "Share invite",
+        newInviteAction: "Generate another code",
+        discardInviteAction: "Discard invite",
+        inviteMessageFormat: "Let's plan %@'s birthday together on Kudao! Open the app, go to Settings \u{2192} Join a profile and enter the code: %@",
+        shareBlockedSurpriseTitle: "Protected surprise profile",
+        shareBlockedSurpriseMessage: "Turn off surprise protection in the settings to share this profile.",
+        yourNameLabel: "Your name",
+        yourNamePlaceholder: "What's your name",
+        yourNameCaption: "Other participants use it to recognise your notes.",
+        participantsTitle: "Participants",
+        participantsMenuTitle: "Participants",
+        participantsCountFormat: "%d participants",
+        participantOwnerBadge: "Owner",
+        participantYou: "You",
+        participantUnknown: "Participant",
+        participantPendingTitle: "Pending invites",
+        removeParticipantAction: "Remove",
+        removeParticipantConfirmFormat: "%@ will lose access to this profile. The notes they already wrote stay in the diary.",
+        ownerCannotBeRemoved: "The owner cannot be removed: delete the profile to end the sharing.",
+        guestLeaveHint: "Only the profile owner can manage access.",
+        participantsEmptyTitle: "No participants yet",
+        participantsEmptyMessage: "Share the profile to plan the party together with someone else.",
+        joinedAtFormat: "Since %@",
+        joinShareMenuTitle: "Join a profile",
+        joinShareTitle: "Join a profile",
+        joinShareSubtitle: "Enter the invite code you received.",
+        joinCodePlaceholder: "CODE",
+        joinAction: "Join",
+        pasteCodeAction: "Paste from clipboard",
+        joinSuccessFormat: "You now help plan %@'s birthday",
+        joinSuccessCaption: "The profile is in your list, with the shared notes and suggestions.",
+        sharedProfileFallbackName: "Shared profile",
+        shareErrorGeneric: "Something went wrong. Please try again.",
+        shareErrorInvalidCode: "Invalid code. Please check it and try again.",
+        shareErrorCodeUsed: "This code has already been used by someone else.",
+        shareErrorOwnProfile: "This profile is already yours.",
+        shareErrorNoAccess: "You no longer have access to this shared profile.",
+        shareErrorReadOnly: "You have view-only access to this profile.",
+        shareErrorNotOwner: "Only the profile owner can do that.",
+        shareErrorOffline: "No connection. Please try again once you are online.",
+        sharedBadge: "Shared",
+        sharedByFormat: "Shared by %@",
+        readOnlyBadge: "View only",
+        readOnlyDiaryMessage: "You have view-only access: you can read the notes but not add any.",
+        readOnlyPlanMessage: "The plan is managed by the profile owner.",
+        voteUpLabel: "Love it",
+        voteDownLabel: "Not convinced",
+        voteTallyFormat: "%1$d for \u{00B7} %2$d against",
+        votesEmptyLabel: "No votes yet",
+        syncingLabel: "Refreshing\u{2026}",
+        collaborationSectionTitle: "Sharing"
     )
 
     static let french = Strings(
@@ -996,7 +1196,72 @@ extension Strings {
         storesSearchingCategoryFormat: "Recherche : %@",
         openInMapsAction: "Ouvrir dans Plans",
         distanceKmFormat: "%.1f km",
-        distanceMetersFormat: "%d m"
+        distanceMetersFormat: "%d m",
+        shareProfileAction: "Partager le profil",
+        shareProfileTitle: "Partager le profil",
+        shareProfileSubtitleFormat: "Invitez quelqu'un \u{00E0} organiser l'anniversaire de %@ avec vous.",
+        permissionSectionTitle: "Ce qu'il pourra faire",
+        permissionViewTitle: "Lecture seule",
+        permissionViewCaption: "Voit le profil, le journal et les suggestions sans les modifier.",
+        permissionEditTitle: "Peut collaborer",
+        permissionEditCaption: "Ajoute des notes au journal et vote pour les suggestions.",
+        generateInviteAction: "G\u{00E9}n\u{00E9}rer un code d'invitation",
+        inviteReadyTitle: "Invitation pr\u{00EA}te",
+        inviteCodeLabel: "Code d'invitation",
+        inviteHint: "La personne ouvre Kudao, touche l'ic\u{00F4}ne des r\u{00E9}glages et choisit \u{00AB} Rejoindre un profil \u{00BB}.",
+        copyCodeAction: "Copier le code",
+        copiedLabel: "Copi\u{00E9}",
+        shareInviteAction: "Partager l'invitation",
+        newInviteAction: "G\u{00E9}n\u{00E9}rer un autre code",
+        discardInviteAction: "Annuler l'invitation",
+        inviteMessageFormat: "Organisons ensemble l'anniversaire de %@ sur Kudao ! Ouvre l'app, va dans R\u{00E9}glages \u{2192} Rejoindre un profil et saisis le code : %@",
+        shareBlockedSurpriseTitle: "Profil surprise prot\u{00E9}g\u{00E9}",
+        shareBlockedSurpriseMessage: "D\u{00E9}sactivez la protection surprise dans les r\u{00E9}glages pour partager ce profil.",
+        yourNameLabel: "Votre nom",
+        yourNamePlaceholder: "Comment vous appelez-vous",
+        yourNameCaption: "Il permet aux autres participants de reconna\u{00EE}tre vos notes.",
+        participantsTitle: "Participants",
+        participantsMenuTitle: "Participants",
+        participantsCountFormat: "%d participants",
+        participantOwnerBadge: "Propri\u{00E9}taire",
+        participantYou: "Vous",
+        participantUnknown: "Participant",
+        participantPendingTitle: "Invitations en attente",
+        removeParticipantAction: "Retirer",
+        removeParticipantConfirmFormat: "%@ perdra l'acc\u{00E8}s \u{00E0} ce profil. Les notes d\u{00E9}j\u{00E0} \u{00E9}crites restent dans le journal.",
+        ownerCannotBeRemoved: "Le propri\u{00E9}taire ne peut pas \u{00EA}tre retir\u{00E9} : supprimez le profil pour mettre fin au partage.",
+        guestLeaveHint: "Seul le propri\u{00E9}taire du profil g\u{00E8}re les acc\u{00E8}s.",
+        participantsEmptyTitle: "Aucun participant",
+        participantsEmptyMessage: "Partagez le profil pour organiser la f\u{00EA}te avec quelqu'un d'autre.",
+        joinedAtFormat: "Depuis le %@",
+        joinShareMenuTitle: "Rejoindre un profil",
+        joinShareTitle: "Rejoindre un profil",
+        joinShareSubtitle: "Saisissez le code d'invitation re\u{00E7}u.",
+        joinCodePlaceholder: "CODE",
+        joinAction: "Rejoindre",
+        pasteCodeAction: "Coller depuis le presse-papiers",
+        joinSuccessFormat: "Vous participez \u{00E0} l'anniversaire de %@",
+        joinSuccessCaption: "Le profil appara\u{00EE}t dans votre liste, avec les notes et suggestions partag\u{00E9}es.",
+        sharedProfileFallbackName: "Profil partag\u{00E9}",
+        shareErrorGeneric: "Une erreur est survenue. R\u{00E9}essayez.",
+        shareErrorInvalidCode: "Code invalide. V\u{00E9}rifiez-le et r\u{00E9}essayez.",
+        shareErrorCodeUsed: "Ce code a d\u{00E9}j\u{00E0} \u{00E9}t\u{00E9} utilis\u{00E9} par quelqu'un d'autre.",
+        shareErrorOwnProfile: "Ce profil est d\u{00E9}j\u{00E0} le v\u{00F4}tre.",
+        shareErrorNoAccess: "Vous n'avez plus acc\u{00E8}s \u{00E0} ce profil partag\u{00E9}.",
+        shareErrorReadOnly: "Vous avez un acc\u{00E8}s en lecture seule \u{00E0} ce profil.",
+        shareErrorNotOwner: "Seul le propri\u{00E9}taire du profil peut le faire.",
+        shareErrorOffline: "Aucune connexion. R\u{00E9}essayez une fois en ligne.",
+        sharedBadge: "Partag\u{00E9}",
+        sharedByFormat: "Partag\u{00E9} par %@",
+        readOnlyBadge: "Lecture seule",
+        readOnlyDiaryMessage: "Acc\u{00E8}s en lecture seule : vous pouvez lire les notes mais pas en ajouter.",
+        readOnlyPlanMessage: "Le plan est g\u{00E9}r\u{00E9} par le propri\u{00E9}taire du profil.",
+        voteUpLabel: "J'adore",
+        voteDownLabel: "Pas convaincu",
+        voteTallyFormat: "%1$d pour \u{00B7} %2$d contre",
+        votesEmptyLabel: "Aucun vote pour l'instant",
+        syncingLabel: "Actualisation\u{2026}",
+        collaborationSectionTitle: "Partage"
     )
 
     static let spanish = Strings(
@@ -1239,6 +1504,71 @@ extension Strings {
         storesSearchingCategoryFormat: "Buscando: %@",
         openInMapsAction: "Abrir en Mapas",
         distanceKmFormat: "%.1f km",
-        distanceMetersFormat: "%d m"
+        distanceMetersFormat: "%d m",
+        shareProfileAction: "Compartir perfil",
+        shareProfileTitle: "Compartir perfil",
+        shareProfileSubtitleFormat: "Invita a alguien a organizar el cumplea\u{00F1}os de %@ contigo.",
+        permissionSectionTitle: "Qu\u{00E9} podr\u{00E1} hacer",
+        permissionViewTitle: "Solo lectura",
+        permissionViewCaption: "Ve el perfil, el diario y las sugerencias sin modificarlos.",
+        permissionEditTitle: "Puede colaborar",
+        permissionEditCaption: "A\u{00F1}ade notas al diario y vota las sugerencias.",
+        generateInviteAction: "Generar c\u{00F3}digo de invitaci\u{00F3}n",
+        inviteReadyTitle: "Invitaci\u{00F3}n lista",
+        inviteCodeLabel: "C\u{00F3}digo de invitaci\u{00F3}n",
+        inviteHint: "Quien lo reciba abre Kudao, toca el icono de ajustes y elige \u{00AB}Unirse a un perfil\u{00BB}.",
+        copyCodeAction: "Copiar c\u{00F3}digo",
+        copiedLabel: "Copiado",
+        shareInviteAction: "Compartir invitaci\u{00F3}n",
+        newInviteAction: "Generar otro c\u{00F3}digo",
+        discardInviteAction: "Cancelar invitaci\u{00F3}n",
+        inviteMessageFormat: "\u{00A1}Organicemos juntos el cumplea\u{00F1}os de %@ en Kudao! Abre la app, ve a Ajustes \u{2192} Unirse a un perfil e introduce el c\u{00F3}digo: %@",
+        shareBlockedSurpriseTitle: "Perfil sorpresa protegido",
+        shareBlockedSurpriseMessage: "Desactiva la protecci\u{00F3}n sorpresa en los ajustes para compartir este perfil.",
+        yourNameLabel: "Tu nombre",
+        yourNamePlaceholder: "C\u{00F3}mo te llamas",
+        yourNameCaption: "Los dem\u{00E1}s participantes lo usan para reconocer tus notas.",
+        participantsTitle: "Participantes",
+        participantsMenuTitle: "Participantes",
+        participantsCountFormat: "%d participantes",
+        participantOwnerBadge: "Propietario",
+        participantYou: "T\u{00FA}",
+        participantUnknown: "Participante",
+        participantPendingTitle: "Invitaciones pendientes",
+        removeParticipantAction: "Quitar",
+        removeParticipantConfirmFormat: "%@ perder\u{00E1} el acceso a este perfil. Las notas ya escritas se quedan en el diario.",
+        ownerCannotBeRemoved: "El propietario no se puede quitar: elimina el perfil para terminar el uso compartido.",
+        guestLeaveHint: "Solo el propietario del perfil gestiona los accesos.",
+        participantsEmptyTitle: "Sin participantes",
+        participantsEmptyMessage: "Comparte el perfil para organizar la fiesta junto a otra persona.",
+        joinedAtFormat: "Desde el %@",
+        joinShareMenuTitle: "Unirse a un perfil",
+        joinShareTitle: "Unirse a un perfil",
+        joinShareSubtitle: "Introduce el c\u{00F3}digo de invitaci\u{00F3}n que has recibido.",
+        joinCodePlaceholder: "C\u{00D3}DIGO",
+        joinAction: "Unirse",
+        pasteCodeAction: "Pegar del portapapeles",
+        joinSuccessFormat: "Ya colaboras en el cumplea\u{00F1}os de %@",
+        joinSuccessCaption: "El perfil est\u{00E1} en tu lista, con las notas y sugerencias compartidas.",
+        sharedProfileFallbackName: "Perfil compartido",
+        shareErrorGeneric: "Algo ha ido mal. Int\u{00E9}ntalo de nuevo.",
+        shareErrorInvalidCode: "C\u{00F3}digo no v\u{00E1}lido. Compru\u{00E9}balo e int\u{00E9}ntalo otra vez.",
+        shareErrorCodeUsed: "Este c\u{00F3}digo ya lo ha usado otra persona.",
+        shareErrorOwnProfile: "Este perfil ya es tuyo.",
+        shareErrorNoAccess: "Ya no tienes acceso a este perfil compartido.",
+        shareErrorReadOnly: "Tienes acceso de solo lectura a este perfil.",
+        shareErrorNotOwner: "Solo el propietario del perfil puede hacerlo.",
+        shareErrorOffline: "Sin conexi\u{00F3}n. Int\u{00E9}ntalo cuando vuelvas a estar online.",
+        sharedBadge: "Compartido",
+        sharedByFormat: "Compartido por %@",
+        readOnlyBadge: "Solo lectura",
+        readOnlyDiaryMessage: "Tienes acceso de solo lectura: puedes leer las notas pero no a\u{00F1}adirlas.",
+        readOnlyPlanMessage: "El plan lo gestiona el propietario del perfil.",
+        voteUpLabel: "Me encanta",
+        voteDownLabel: "No me convence",
+        voteTallyFormat: "%1$d a favor \u{00B7} %2$d en contra",
+        votesEmptyLabel: "A\u{00FA}n sin votos",
+        syncingLabel: "Actualizando\u{2026}",
+        collaborationSectionTitle: "Compartir"
     )
 }

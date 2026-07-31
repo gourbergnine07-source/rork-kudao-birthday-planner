@@ -14,6 +14,8 @@ struct ProfileDetailView: View {
 
     @Environment(AppSettings.self) private var settings
     @Environment(NotificationService.self) private var notifications
+    @Environment(KudaoIdentity.self) private var identity
+    @Environment(CollaborationService.self) private var collaboration
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
@@ -32,6 +34,9 @@ struct ProfileDetailView: View {
     @State private var exportingFormat: DiaryExportFormat?
     @State private var exportedFile: ExportedFile?
     @State private var exportFailed: Bool = false
+    @State private var isSharingProfile: Bool = false
+    @State private var isShowingParticipants: Bool = false
+    @State private var shareBlockedAlert: Bool = false
     @Namespace private var tabNamespace
 
     private var activeTab: ProfileTab { selectedTab ?? initialTab }
@@ -96,7 +101,12 @@ struct ProfileDetailView: View {
                     .font(.system(.headline, design: .rounded, weight: .semibold))
             }
             ToolbarItem(placement: .topBarTrailing) {
-                settingsMenu
+                HStack(spacing: 2) {
+                    if profile.isCollaborative {
+                        participantsButton
+                    }
+                    settingsMenu
+                }
             }
         }
         .sheet(isPresented: $isEditing) {
@@ -107,6 +117,12 @@ struct ProfileDetailView: View {
         }
         .sheet(item: $exportedFile) { file in
             ShareSheet(url: file.url)
+        }
+        .sheet(isPresented: $isSharingProfile) {
+            ShareProfileView(profile: profile)
+        }
+        .sheet(isPresented: $isShowingParticipants) {
+            ParticipantsView(profile: profile)
         }
         .sheet(isPresented: $isShowingStores) {
             if let plan = profile.partyPlan, plan.hasGiftIdea {
@@ -123,6 +139,11 @@ struct ProfileDetailView: View {
         } message: {
             Text(strings.noPlanAlertMessage)
         }
+        .alert(strings.shareBlockedSurpriseTitle, isPresented: $shareBlockedAlert) {
+            Button(strings.doneAction, role: .cancel) {}
+        } message: {
+            Text(strings.shareBlockedSurpriseMessage)
+        }
         .alert(strings.exportFailedTitle, isPresented: $exportFailed) {
             Button(strings.doneAction, role: .cancel) {}
         } message: {
@@ -137,6 +158,15 @@ struct ProfileDetailView: View {
         } message: {
             Text(String(format: strings.deleteConfirmMessageFormat, profile.name))
         }
+        .task(id: profile.id) {
+            guard profile.isCollaborative else { return }
+            await collaboration.sync(
+                profile: profile,
+                identity: identity,
+                strings: strings,
+                context: modelContext
+            )
+        }
         .onDisappear {
             guard pendingDeletion else { return }
             notifications.cancelReminders(for: profile.id)
@@ -148,18 +178,49 @@ struct ProfileDetailView: View {
 
     // MARK: - Settings menu
 
+    private var participantsButton: some View {
+        Button {
+            isShowingParticipants = true
+        } label: {
+            Image(systemName: "person.2.fill")
+                .font(.system(size: 15, weight: .semibold))
+                .foregroundStyle(Palette.violet)
+                .frame(width: 34, height: 34)
+                .contentShape(Rectangle())
+        }
+        .accessibilityLabel(strings.participantsTitle)
+    }
+
     private var settingsMenu: some View {
         Menu {
-            Button {
-                isEditing = true
-            } label: {
-                Label(strings.editData, systemImage: "pencil")
+            if profile.isOwnedByMe {
+                Button {
+                    isEditing = true
+                } label: {
+                    Label(strings.editData, systemImage: "pencil")
+                }
             }
 
             Button {
                 isShowingSettings = true
             } label: {
                 Label(strings.remindersMenuTitle, systemImage: "bell.badge")
+            }
+
+            if profile.isOwnedByMe {
+                Button {
+                    startSharing()
+                } label: {
+                    Label(strings.shareProfileAction, systemImage: "person.badge.plus")
+                }
+            }
+
+            if profile.isCollaborative {
+                Button {
+                    isShowingParticipants = true
+                } label: {
+                    Label(strings.participantsMenuTitle, systemImage: "person.2")
+                }
             }
 
             Menu {
@@ -240,8 +301,19 @@ struct ProfileDetailView: View {
                         }
                     }
                     .overlay(alignment: .topTrailing) {
-                        editButton
+                        if profile.isOwnedByMe {
+                            editButton
+                                .padding(14)
+                        } else {
+                            KudaoChip(
+                                title: profile.myPermission == .view
+                                    ? strings.readOnlyBadge
+                                    : strings.sharedBadge,
+                                systemImage: profile.myPermission.symbolName,
+                                tint: .white
+                            )
                             .padding(14)
+                        }
                     }
                     .padding(.bottom, 60)
 
@@ -288,8 +360,94 @@ struct ProfileDetailView: View {
 
                 countdownBanner
                     .padding(.top, 5)
+
+                if profile.isCollaborative {
+                    participantsStrip
+                        .padding(.top, 6)
+                }
             }
         }
+    }
+
+    // MARK: - Participants
+
+    /// Everyone who can see the profile, tappable to open the participants screen.
+    private var participantsStrip: some View {
+        let people = collaboration
+            .shares(for: profile, context: modelContext)
+            .filter { !$0.sharedWithUserID.isEmpty }
+            .sorted { lhs, rhs in
+                if lhs.isOwner != rhs.isOwner { return lhs.isOwner }
+                return lhs.invitedAt < rhs.invitedAt
+            }
+        let visible = Array(people.prefix(5))
+        let extra = max(0, people.count - visible.count)
+
+        return Button {
+            isShowingParticipants = true
+        } label: {
+            HStack(spacing: 8) {
+                HStack(spacing: -10) {
+                    ForEach(visible) { share in
+                        AvatarView(
+                            name: share.displayName.isEmpty ? "?" : share.displayName,
+                            photoData: nil,
+                            size: 30,
+                            ringColor: Palette.surface,
+                            ringWidth: 2
+                        )
+                    }
+
+                    if extra > 0 {
+                        Text("+\(extra)")
+                            .font(.system(.caption2, design: .rounded, weight: .heavy))
+                            .foregroundStyle(.secondary)
+                            .frame(width: 30, height: 30)
+                            .background(Circle().fill(Palette.surfaceRaised))
+                            .overlay(Circle().strokeBorder(Palette.surface, lineWidth: 2))
+                    }
+                }
+
+                VStack(alignment: .leading, spacing: 1) {
+                    Text(
+                        profile.isOwnedByMe
+                            ? String(format: strings.participantsCountFormat, max(people.count, 1))
+                            : String(format: strings.sharedByFormat, profile.shareOwnerName)
+                    )
+                    .font(.system(.caption, design: .rounded, weight: .bold))
+                    .foregroundStyle(.primary)
+                    .lineLimit(1)
+
+                    if collaboration.isSyncing(profile) {
+                        Text(strings.syncingLabel)
+                            .font(.system(.caption2, design: .rounded))
+                            .foregroundStyle(.secondary)
+                    }
+                }
+
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 10, weight: .heavy))
+                    .foregroundStyle(.tertiary)
+            }
+            .padding(.leading, 8)
+            .padding(.trailing, 12)
+            .padding(.vertical, 7)
+            .background(Capsule().fill(Palette.surface))
+            .overlay(Capsule().strokeBorder(Palette.hairline, lineWidth: 1))
+        }
+        .buttonStyle(PressableCardStyle())
+    }
+
+    /// Surprise profiles under biometric protection never reach another device.
+    private func startSharing() {
+        guard SharingPolicy.canShareWithCollaborators(
+            isSurprise: profile.isSurpriseMode,
+            protectsSurprises: settings.protectsSurpriseProfiles
+        ) else {
+            shareBlockedAlert = true
+            return
+        }
+        isSharingProfile = true
     }
 
     private var editButton: some View {

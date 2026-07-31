@@ -11,6 +11,8 @@ struct KudaoApp: App {
     @State private var settings = AppSettings()
     @State private var notifications = NotificationService.shared
     @State private var biometricGate = BiometricGate.shared
+    @State private var identity = KudaoIdentity.shared
+    @State private var collaboration = CollaborationService()
     private let container: ModelContainer = KudaoModelContainer.make()
 
     init() {
@@ -23,6 +25,8 @@ struct KudaoApp: App {
                 .environment(settings)
                 .environment(notifications)
                 .environment(biometricGate)
+                .environment(identity)
+                .environment(collaboration)
                 .environment(\.locale, settings.locale)
         }
         .modelContainer(container)

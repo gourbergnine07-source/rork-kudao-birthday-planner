@@ -12,6 +12,8 @@ struct DiaryTabView: View {
     let analyzer: DiaryAnalyzer
 
     @Environment(AppSettings.self) private var settings
+    @Environment(KudaoIdentity.self) private var identity
+    @Environment(CollaborationService.self) private var collaboration
     @Environment(\.modelContext) private var modelContext
 
     @State private var draft: String = ""
@@ -30,9 +32,18 @@ struct DiaryTabView: View {
         draft.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
+    /// Guests with view-only access read the diary but never write into it.
+    private var canWrite: Bool {
+        !profile.isCollaborative || profile.canContribute
+    }
+
     var body: some View {
         VStack(spacing: 18) {
-            composer
+            if canWrite {
+                composer
+            } else {
+                readOnlyBanner
+            }
 
             if notes.isEmpty {
                 PlaceholderPanel(
@@ -59,6 +70,7 @@ struct DiaryTabView: View {
                             note: note,
                             settings: settings,
                             isAnalyzing: analyzer.isRunning(note),
+                            canDelete: canDelete(note),
                             onRetry: { retry(note) },
                             onDelete: { delete(note) }
                         )
@@ -66,6 +78,56 @@ struct DiaryTabView: View {
                 }
             }
         }
+        .task(id: pendingRemoteSignature) {
+            analyzePendingRemoteNotes()
+        }
+    }
+
+    private var readOnlyBanner: some View {
+        HStack(alignment: .top, spacing: 10) {
+            Image(systemName: "eye.fill")
+                .font(.system(size: 14, weight: .bold))
+                .foregroundStyle(Palette.teal)
+            Text(strings.readOnlyDiaryMessage)
+                .font(.system(.footnote, design: .rounded, weight: .medium))
+                .fixedSize(horizontal: false, vertical: true)
+            Spacer(minLength: 0)
+        }
+        .padding(14)
+        .background(RoundedRectangle(cornerRadius: 20, style: .continuous).fill(Palette.teal.opacity(0.12)))
+        .overlay(
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .strokeBorder(Palette.teal.opacity(0.28), lineWidth: 1)
+        )
+    }
+
+    /// Notes written by collaborators still feed the AI suggestions of the owner.
+    private var pendingRemoteSignature: String {
+        guard profile.isOwnedByMe else { return "" }
+        return notes
+            .filter { $0.isRemote && $0.extraction == nil && $0.extractionStatus == .pending }
+            .map(\.id.uuidString)
+            .joined()
+    }
+
+    private func analyzePendingRemoteNotes() {
+        guard profile.isOwnedByMe else { return }
+        for note in notes where note.isRemote
+            && note.extraction == nil
+            && note.extractionStatus == .pending
+            && !analyzer.isRunning(note) {
+            analyzer.analyze(
+                entry: note,
+                profile: profile,
+                language: settings.language,
+                context: modelContext
+            )
+        }
+    }
+
+    /// Owners delete anything; collaborators only their own notes.
+    private func canDelete(_ note: DiaryEntry) -> Bool {
+        profile.isOwnedByMe || note.isMine(identity.userID)
     }
 
     // MARK: - Composer
@@ -140,13 +202,30 @@ struct DiaryTabView: View {
         let text = trimmedDraft
         guard !text.isEmpty else { return }
 
-        let note = DiaryEntry(textContent: text, profile: profile)
+        let note = DiaryEntry(
+            textContent: text,
+            profile: profile,
+            authorUserID: identity.userID,
+            authorName: identity.outgoingName(strings)
+        )
         modelContext.insert(note)
         try? modelContext.save()
 
         draft = ""
         isComposerFocused = false
         savedCount += 1
+
+        // Guests push straight away; owners publish with the next snapshot sync.
+        if profile.isCollaborative && !profile.isOwnedByMe {
+            Task {
+                await collaboration.publish(
+                    note: note,
+                    profile: profile,
+                    identity: identity,
+                    strings: strings
+                )
+            }
+        }
 
         analyzer.analyze(
             entry: note,
@@ -166,8 +245,20 @@ struct DiaryTabView: View {
     }
 
     private func delete(_ note: DiaryEntry) {
+        let noteID = note.id
+        let wasShared = profile.isCollaborative
         modelContext.delete(note)
         try? modelContext.save()
+
+        guard wasShared else { return }
+        Task {
+            await collaboration.retract(
+                noteID: noteID,
+                profile: profile,
+                identity: identity,
+                strings: strings
+            )
+        }
     }
 }
 
@@ -176,6 +267,7 @@ private struct DiaryNoteCard: View {
     let note: DiaryEntry
     let settings: AppSettings
     let isAnalyzing: Bool
+    let canDelete: Bool
     let onRetry: () -> Void
     let onDelete: () -> Void
 
@@ -192,20 +284,36 @@ private struct DiaryNoteCard: View {
                     .fixedSize(horizontal: false, vertical: true)
                     .frame(maxWidth: .infinity, alignment: .leading)
 
-                Button {
-                    isConfirmingDelete = true
-                } label: {
-                    Image(systemName: "trash")
-                        .font(.system(size: 13, weight: .semibold))
-                        .foregroundStyle(.secondary)
-                        .padding(8)
-                        .contentShape(Rectangle())
+                if canDelete {
+                    Button {
+                        isConfirmingDelete = true
+                    } label: {
+                        Image(systemName: "trash")
+                            .font(.system(size: 13, weight: .semibold))
+                            .foregroundStyle(.secondary)
+                            .padding(8)
+                            .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(strings.deleteNoteAction)
                 }
-                .buttonStyle(.plain)
-                .accessibilityLabel(strings.deleteNoteAction)
             }
 
             HStack(spacing: 8) {
+                if note.isRemote, !note.authorName.isEmpty {
+                    HStack(spacing: 5) {
+                        AvatarView(name: note.authorName, photoData: nil, size: 18)
+                        Text(note.authorName)
+                            .font(.system(.caption2, design: .rounded, weight: .bold))
+                            .foregroundStyle(.primary)
+                            .lineLimit(1)
+                    }
+                    .padding(.leading, 3)
+                    .padding(.trailing, 8)
+                    .padding(.vertical, 3)
+                    .background(Capsule().fill(Palette.violet.opacity(0.14)))
+                }
+
                 Text(settings.noteTimestamp(note.createdAt))
                     .font(.system(.caption2, design: .rounded, weight: .medium))
                     .foregroundStyle(.secondary)
@@ -236,10 +344,12 @@ private struct DiaryNoteCard: View {
                 .strokeBorder(Palette.hairline, lineWidth: 1)
         )
         .contextMenu {
-            Button(role: .destructive) {
-                onDelete()
-            } label: {
-                Label(strings.deleteNoteAction, systemImage: "trash")
+            if canDelete {
+                Button(role: .destructive) {
+                    onDelete()
+                } label: {
+                    Label(strings.deleteNoteAction, systemImage: "trash")
+                }
             }
         }
         .alert(strings.deleteNoteAction, isPresented: $isConfirmingDelete) {

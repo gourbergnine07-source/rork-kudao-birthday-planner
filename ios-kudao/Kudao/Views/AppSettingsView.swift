@@ -4,12 +4,16 @@
 //
 
 import SwiftUI
+import SwiftData
 
-/// App-wide settings: language, surprise-mode protections and widget hint.
+/// App-wide settings: language, sharing, surprise-mode protections and widget hint.
 struct AppSettingsView: View {
     @Environment(AppSettings.self) private var settings
     @Environment(BiometricGate.self) private var gate
+    @Environment(KudaoIdentity.self) private var identity
     @Environment(\.dismiss) private var dismiss
+
+    @State private var isJoining: Bool = false
 
     private var strings: Strings { settings.strings }
 
@@ -20,6 +24,7 @@ struct AppSettingsView: View {
 
                 ScrollView {
                     VStack(spacing: 18) {
+                        collaborationCard
                         surpriseCard
                         languageCard
                         widgetCard
@@ -39,8 +44,60 @@ struct AppSettingsView: View {
                 }
             }
             .environment(\.locale, settings.locale)
+            .sheet(isPresented: $isJoining) {
+                JoinShareView()
+            }
         }
         .tint(Palette.coral)
+    }
+
+    // MARK: - Sharing
+
+    private var collaborationCard: some View {
+        @Bindable var bindableIdentity = identity
+
+        return AppSettingsCard(
+            title: strings.collaborationSectionTitle,
+            systemImage: "person.2.fill",
+            tint: Palette.violet
+        ) {
+            Button {
+                isJoining = true
+            } label: {
+                HStack(spacing: 10) {
+                    Image(systemName: "person.2.badge.key.fill")
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(Palette.violet)
+                    Text(strings.joinShareMenuTitle)
+                        .font(.system(.body, design: .rounded, weight: .semibold))
+                        .foregroundStyle(.primary)
+                    Spacer(minLength: 0)
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 11, weight: .heavy))
+                        .foregroundStyle(.tertiary)
+                }
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+
+            Divider().overlay(Palette.hairline)
+
+            VStack(alignment: .leading, spacing: 6) {
+                Text(strings.yourNameLabel)
+                    .font(.system(.footnote, design: .rounded, weight: .semibold))
+                    .foregroundStyle(.secondary)
+
+                TextField(strings.yourNamePlaceholder, text: $bindableIdentity.displayName)
+                    .font(.system(.body, design: .rounded, weight: .medium))
+                    .textInputAutocapitalization(.words)
+                    .textContentType(.givenName)
+
+                Text(strings.yourNameCaption)
+                    .font(.system(.caption2, design: .rounded))
+                    .foregroundStyle(.tertiary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
     }
 
     // MARK: - Surprise mode
@@ -215,4 +272,7 @@ private struct AppSettingsCard<Content: View>: View {
     AppSettingsView()
         .environment(AppSettings())
         .environment(BiometricGate.shared)
+        .environment(KudaoIdentity.shared)
+        .environment(CollaborationService())
+        .modelContainer(KudaoModelContainer.preview())
 }

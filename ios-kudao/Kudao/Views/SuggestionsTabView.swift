@@ -12,6 +12,8 @@ struct SuggestionsTabView: View {
     let engine: SuggestionEngine
 
     @Environment(AppSettings.self) private var settings
+    @Environment(KudaoIdentity.self) private var identity
+    @Environment(CollaborationService.self) private var collaboration
     @Environment(\.modelContext) private var modelContext
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
@@ -20,12 +22,20 @@ struct SuggestionsTabView: View {
     private var strings: Strings { settings.strings }
     private var keywordCount: Int { SuggestionEngine.keywordCount(for: profile) }
 
+    /// Only the owner regenerates, edits or confirms the plan.
+    private var canManagePlan: Bool { profile.isOwnedByMe }
+    /// Participants of a shared profile can vote on every card.
+    private var canVote: Bool { profile.isCollaborative && profile.canContribute }
+
     var body: some View {
         VStack(spacing: 16) {
-            if keywordCount == 0 {
+            if let plan = profile.partyPlan, !canManagePlan {
+                readOnlyPlanBanner
+                planContent(plan)
+            } else if keywordCount == 0 {
                 PlaceholderPanel(
                     icon: "sparkles",
-                    title: strings.suggestionsNoTagsTitle,
+                    title: canManagePlan ? strings.suggestionsNoTagsTitle : strings.readOnlyPlanMessage,
                     message: strings.suggestionsNoTagsMessage,
                     tint: Palette.berry
                 )
@@ -39,7 +49,8 @@ struct SuggestionsTabView: View {
         }
         .animation(reduceMotion ? nil : .smooth(duration: 0.32), value: profile.partyPlan?.generatedAt)
         .task(id: profile.id) {
-            guard profile.partyPlan == nil,
+            guard canManagePlan,
+                  profile.partyPlan == nil,
                   keywordCount > 0,
                   !engine.hasAttemptedAutoGeneration else { return }
             engine.generatePlan(for: profile, language: settings.language, context: modelContext)
@@ -74,14 +85,16 @@ struct SuggestionsTabView: View {
     private func planContent(_ plan: PartyPlan) -> some View {
         let suggestion = plan.suggestion
 
-        planHeader(plan)
+        if canManagePlan {
+            planHeader(plan)
 
-        if suggestion.confidence == .low {
-            lowConfidenceBanner
-        }
+            if suggestion.confidence == .low {
+                lowConfidenceBanner
+            }
 
-        if let message = engine.errorMessage {
-            errorBanner(message)
+            if let message = engine.errorMessage {
+                errorBanner(message)
+            }
         }
 
         ForEach(PlanSection.allCases) { section in
@@ -90,9 +103,27 @@ struct SuggestionsTabView: View {
 
         if plan.isConfirmed, let confirmedAt = plan.confirmedAt {
             confirmedBanner(confirmedAt)
-        } else {
+        } else if canManagePlan {
             confirmButton(plan)
         }
+    }
+
+    private var readOnlyPlanBanner: some View {
+        HStack(alignment: .top, spacing: 10) {
+            Image(systemName: "person.2.fill")
+                .font(.system(size: 14, weight: .bold))
+                .foregroundStyle(Palette.violet)
+            Text(canVote ? strings.readOnlyPlanMessage : strings.readOnlyDiaryMessage)
+                .font(.system(.footnote, design: .rounded, weight: .medium))
+                .fixedSize(horizontal: false, vertical: true)
+            Spacer(minLength: 0)
+        }
+        .padding(14)
+        .background(RoundedRectangle(cornerRadius: 18, style: .continuous).fill(Palette.violet.opacity(0.1)))
+        .overlay(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .strokeBorder(Palette.violet.opacity(0.25), lineWidth: 1)
+        )
     }
 
     private func planHeader(_ plan: PartyPlan) -> some View {
@@ -228,66 +259,55 @@ struct SuggestionsTabView: View {
                 }
             }
 
-            Button {
-                editingSection = section
-            } label: {
-                VStack(alignment: .leading, spacing: 6) {
-                    HStack(alignment: .firstTextBaseline, spacing: 6) {
-                        Text(headline.isEmpty ? "—" : headline)
-                            .font(.system(.title3, design: .rounded, weight: .bold))
-                            .foregroundStyle(.primary)
-                            .multilineTextAlignment(.leading)
-                            .fixedSize(horizontal: false, vertical: true)
-                        Image(systemName: "pencil")
-                            .font(.system(size: 11, weight: .bold))
-                            .foregroundStyle(.tertiary)
-                    }
-
-                    if !reason.isEmpty {
-                        Text(reason)
-                            .font(.system(.footnote, design: .rounded))
-                            .foregroundStyle(.secondary)
-                            .multilineTextAlignment(.leading)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
-            .accessibilityHint(strings.editSuggestionTitle)
-
-            HStack(spacing: 8) {
-                Spacer(minLength: 0)
+            if canManagePlan {
                 Button {
-                    engine.regenerate(
-                        section: section,
-                        for: profile,
-                        language: settings.language,
-                        context: modelContext
-                    )
+                    editingSection = section
                 } label: {
-                    HStack(spacing: 6) {
-                        if engine.isRegenerating(section) {
-                            ProgressView()
-                                .controlSize(.mini)
-                                .tint(section.accent)
-                        } else {
-                            Image(systemName: "sparkles")
-                                .font(.system(size: 11, weight: .bold))
-                        }
-                        Text(strings.regenerateAction)
-                            .font(.system(.caption, design: .rounded, weight: .bold))
-                    }
-                    .foregroundStyle(section.accent)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 7)
-                    .background(Capsule().fill(section.accent.opacity(0.12)))
-                    .contentShape(Capsule())
+                    cardBody(headline: headline, reason: reason, showsPencil: true)
                 }
                 .buttonStyle(.plain)
-                .disabled(engine.isBusy)
-                .opacity(engine.isBusy ? 0.5 : 1)
+                .accessibilityHint(strings.editSuggestionTitle)
+            } else {
+                cardBody(headline: headline, reason: reason, showsPencil: false)
+            }
+
+            if profile.isCollaborative {
+                voteRow(section)
+            }
+
+            if canManagePlan {
+                HStack(spacing: 8) {
+                    Spacer(minLength: 0)
+                    Button {
+                        engine.regenerate(
+                            section: section,
+                            for: profile,
+                            language: settings.language,
+                            context: modelContext
+                        )
+                    } label: {
+                        HStack(spacing: 6) {
+                            if engine.isRegenerating(section) {
+                                ProgressView()
+                                    .controlSize(.mini)
+                                    .tint(section.accent)
+                            } else {
+                                Image(systemName: "sparkles")
+                                    .font(.system(size: 11, weight: .bold))
+                            }
+                            Text(strings.regenerateAction)
+                                .font(.system(.caption, design: .rounded, weight: .bold))
+                        }
+                        .foregroundStyle(section.accent)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 7)
+                        .background(Capsule().fill(section.accent.opacity(0.12)))
+                        .contentShape(Capsule())
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(engine.isBusy)
+                    .opacity(engine.isBusy ? 0.5 : 1)
+                }
             }
         }
         .padding(16)
@@ -300,6 +320,101 @@ struct SuggestionsTabView: View {
                 .strokeBorder(Palette.hairline, lineWidth: 1)
         )
         .shadow(color: Color.black.opacity(0.04), radius: 10, y: 4)
+    }
+
+    private func cardBody(headline: String, reason: String, showsPencil: Bool) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(alignment: .firstTextBaseline, spacing: 6) {
+                Text(headline.isEmpty ? "—" : headline)
+                    .font(.system(.title3, design: .rounded, weight: .bold))
+                    .foregroundStyle(.primary)
+                    .multilineTextAlignment(.leading)
+                    .fixedSize(horizontal: false, vertical: true)
+                if showsPencil {
+                    Image(systemName: "pencil")
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundStyle(.tertiary)
+                }
+            }
+
+            if !reason.isEmpty {
+                Text(reason)
+                    .font(.system(.footnote, design: .rounded))
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.leading)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .contentShape(Rectangle())
+    }
+
+    // MARK: - Voting
+
+    /// Thumbs up / down for every participant, with the running tally.
+    private func voteRow(_ section: PlanSection) -> some View {
+        let tally = collaboration.tally(
+            for: section,
+            profile: profile,
+            identity: identity,
+            context: modelContext
+        )
+
+        return HStack(spacing: 8) {
+            voteButton(section, value: 1, tally: tally)
+            voteButton(section, value: -1, tally: tally)
+
+            Spacer(minLength: 0)
+
+            Text(
+                tally.hasVotes
+                    ? String(format: strings.voteTallyFormat, tally.up, tally.down)
+                    : strings.votesEmptyLabel
+            )
+            .font(.system(.caption2, design: .rounded, weight: .semibold))
+            .foregroundStyle(.secondary)
+            .lineLimit(1)
+            .minimumScaleFactor(0.85)
+        }
+        .padding(.top, 2)
+    }
+
+    private func voteButton(_ section: PlanSection, value: Int, tally: VoteTally) -> some View {
+        let isUp = value > 0
+        let isActive = tally.mine == value
+        let tint = isUp ? Palette.teal : Palette.berry
+        let count = isUp ? tally.up : tally.down
+
+        return Button {
+            let newValue = isActive ? 0 : value
+            Task {
+                await collaboration.setVote(
+                    card: section,
+                    value: newValue,
+                    profile: profile,
+                    identity: identity,
+                    strings: strings,
+                    context: modelContext
+                )
+            }
+        } label: {
+            HStack(spacing: 5) {
+                Image(systemName: isUp ? "hand.thumbsup.fill" : "hand.thumbsdown.fill")
+                    .font(.system(size: 12, weight: .bold))
+                Text("\(count)")
+                    .font(.system(.caption, design: .rounded, weight: .heavy))
+                    .contentTransition(.numericText())
+            }
+            .foregroundStyle(isActive ? .white : tint)
+            .padding(.horizontal, 11)
+            .padding(.vertical, 7)
+            .background(Capsule().fill(isActive ? AnyShapeStyle(tint) : AnyShapeStyle(tint.opacity(0.12))))
+            .contentShape(Capsule())
+        }
+        .buttonStyle(PressableCardStyle())
+        .disabled(!canVote)
+        .opacity(canVote ? 1 : 0.45)
+        .accessibilityLabel(isUp ? strings.voteUpLabel : strings.voteDownLabel)
     }
 
     private func priceBadge(_ band: PriceBand) -> some View {

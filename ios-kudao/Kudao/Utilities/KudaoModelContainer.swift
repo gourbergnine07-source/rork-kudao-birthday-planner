@@ -18,6 +18,8 @@ enum KudaoModelContainer {
         DiaryEntry.self,
         DiaryTag.self,
         PartyPlan.self,
+        ProfileShare.self,
+        SuggestionVote.self,
     ])
 
     static func make() -> ModelContainer {
