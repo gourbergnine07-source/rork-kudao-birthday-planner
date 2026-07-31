@@ -12,12 +12,20 @@ nonisolated struct ExportedFile: Identifiable, Equatable, Sendable {
     let url: URL
 }
 
-/// Native share sheet used to hand the exported diary file to the system.
+/// Native share sheet used to hand a file or a piece of text to the system.
 struct ShareSheet: UIViewControllerRepresentable {
-    let url: URL
+    private let items: [Any]
+
+    init(url: URL) {
+        items = [url]
+    }
+
+    init(text: String) {
+        items = [text]
+    }
 
     func makeUIViewController(context: Context) -> UIActivityViewController {
-        UIActivityViewController(activityItems: [url], applicationActivities: nil)
+        UIActivityViewController(activityItems: items, applicationActivities: nil)
     }
 
     func updateUIViewController(_ controller: UIActivityViewController, context: Context) {}

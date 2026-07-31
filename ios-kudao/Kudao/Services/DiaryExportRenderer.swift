@@ -41,6 +41,7 @@ nonisolated enum DiaryExportRenderer {
 
         struct Plan: Encodable {
             let regalo: String
+            let categoria_regalo: String
             let fascia_prezzo: String
             let motivazione_regalo: String
             let torta: String
@@ -93,6 +94,7 @@ nonisolated enum DiaryExportRenderer {
             party_plan: snapshot.plan.map { plan in
                 Payload.Plan(
                     regalo: plan.giftIdea,
+                    categoria_regalo: plan.giftCategory,
                     fascia_prezzo: plan.giftPriceBand.rawValue,
                     motivazione_regalo: plan.giftReason,
                     torta: plan.cakeType,

@@ -21,6 +21,7 @@ nonisolated struct SuggestionInput: Sendable {
 
 private nonisolated struct GiftPayload: Decodable, Sendable {
     let idea: String?
+    let categoria: String?
     let fascia_prezzo: String?
     let motivazione: String?
 }
@@ -66,7 +67,7 @@ nonisolated enum SuggestionService {
 
         Answer with ONLY a raw JSON object, no prose, no markdown fences, using exactly this shape:
         {
-          "regalo": {"idea": "...", "fascia_prezzo": "basso" | "medio" | "alto", "motivazione": "..."},
+          "regalo": {"idea": "...", "categoria": "...", "fascia_prezzo": "basso" | "medio" | "alto", "motivazione": "..."},
           "torta": {"tipo": "...", "motivazione": "..."},
           "locale_tipo": {"suggerimento": "...", "motivazione": "..."},
           "numero_invitati_stimato": 12,
@@ -78,6 +79,9 @@ nonisolated enum SuggestionService {
         Never a list, never several options separated by "or".
         - Every "motivazione" is 1 short sentence (max 18 words) and must reference the collected \
         keywords explicitly. Never invent preferences that are not in the input.
+        - "regalo.categoria" is the kind of shop that sells the idea, 1 to 3 words and searchable on \
+        a map (e.g. "profumeria", "negozio di giocattoli", "libreria", "negozio di sport"). \
+        Never a brand, never a website.
         - "numero_invitati_stimato" is a realistic integer between 2 and 60 for this relationship and age.
         - "confidenza" reflects how much evidence the keywords give you: few or vague keywords \
         means "bassa", a rich and coherent list means "alta".
@@ -122,6 +126,7 @@ nonisolated enum SuggestionService {
 
         let suggestion = PartySuggestion(
             giftIdea: clean(payload.regalo?.idea),
+            giftCategory: clean(payload.regalo?.categoria),
             giftPriceBand: PriceBand.parse(payload.regalo?.fascia_prezzo ?? ""),
             giftReason: clean(payload.regalo?.motivazione),
             cakeType: clean(payload.torta?.tipo),
@@ -148,7 +153,7 @@ nonisolated enum SuggestionService {
         let shape: String
         switch section {
         case .gift:
-            shape = #"{"regalo": {"idea": "...", "fascia_prezzo": "basso" | "medio" | "alto", "motivazione": "..."}}"#
+            shape = #"{"regalo": {"idea": "...", "categoria": "...", "fascia_prezzo": "basso" | "medio" | "alto", "motivazione": "..."}}"#
         case .cake:
             shape = #"{"torta": {"tipo": "...", "motivazione": "..."}}"#
         case .venue:
@@ -192,6 +197,8 @@ nonisolated enum SuggestionService {
             let idea = clean(payload.regalo?.idea)
             guard !idea.isEmpty else { throw ProxyError.badResponse }
             updated.giftIdea = idea
+            let category = clean(payload.regalo?.categoria)
+            updated.giftCategory = category.isEmpty ? current.giftCategory : category
             updated.giftPriceBand = PriceBand.parse(payload.regalo?.fascia_prezzo ?? current.giftPriceBand.rawValue)
             updated.giftReason = clean(payload.regalo?.motivazione)
         case .cake:

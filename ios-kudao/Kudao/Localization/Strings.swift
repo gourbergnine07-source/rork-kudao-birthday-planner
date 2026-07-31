@@ -216,6 +216,68 @@ nonisolated struct Strings: Sendable {
     let settingsWidgetSection: String
     let settingsWidgetHint: String
     let settingsSharingNote: String
+
+    let lastNameLabel: String
+    let lastNamePlaceholder: String
+    let noLastNameLabel: String
+    let addressLabel: String
+    let addressPlaceholder: String
+    let phoneLabel: String
+    let phonePlaceholder: String
+    let emailLabel: String
+    let emailPlaceholder: String
+    let contactsSectionTitle: String
+    let birthLabel: String
+    let ageLabel: String
+    let ageYearsFormat: String
+    let notificationActiveLabel: String
+    let notificationOffLabel: String
+    let daysBeforeShortLabel: String
+    let hourShortLabel: String
+    let editAction: String
+
+    let sendWishesAction: String
+    let messageTab: String
+    let messageSectionTitle: String
+    let messageGeneratingTitle: String
+    let messageGeneratingMessage: String
+    let messageEmptyTitle: String
+    let messageEmptyMessage: String
+    let messageToneLabel: String
+    let toneWarm: String
+    let toneFunny: String
+    let toneElegant: String
+    let messageRegenerateAction: String
+    let messageCopyAction: String
+    let messageCopiedLabel: String
+    let messageShareAction: String
+    let messageSMSAction: String
+    let messageEmailAction: String
+    let messageEmailSubjectFormat: String
+    let messageBasedOnNote: String
+
+    let buyOnlineAction: String
+    let findStoreAction: String
+    let noPlanAlertTitle: String
+    let noPlanAlertMessage: String
+    let giftFromPlanFormat: String
+
+    let storesTitle: String
+    let storesSearchingLabel: String
+    let storesEmptyTitle: String
+    let storesEmptyMessage: String
+    let storesPermissionTitle: String
+    let storesPermissionMessage: String
+    let storesPermissionAction: String
+    let storesDeniedTitle: String
+    let storesDeniedMessage: String
+    let storesFailedTitle: String
+    let storesFailedMessage: String
+    let storesRadiusNote: String
+    let storesSearchingCategoryFormat: String
+    let openInMapsAction: String
+    let distanceKmFormat: String
+    let distanceMetersFormat: String
 }
 
 extension Strings {
@@ -411,7 +473,65 @@ extension Strings {
         maskedProfileName: "Sorpresa",
         settingsWidgetSection: "Widget",
         settingsWidgetHint: "Tieni premuto sulla schermata Home, tocca Modifica, poi Aggiungi widget e scegli Kudao per il conto alla rovescia.",
-        settingsSharingNote: "I profili sorpresa resteranno esclusi da qualsiasi condivisione con il festeggiato."
+        settingsSharingNote: "I profili sorpresa resteranno esclusi da qualsiasi condivisione con il festeggiato.",
+        lastNameLabel: "Cognome",
+        lastNamePlaceholder: "Cognome (opzionale)",
+        noLastNameLabel: "Cognome non indicato",
+        addressLabel: "Indirizzo",
+        addressPlaceholder: "Via, citt\u{00E0} (opzionale)",
+        phoneLabel: "Telefono",
+        phonePlaceholder: "Numero di telefono (opzionale)",
+        emailLabel: "Email",
+        emailPlaceholder: "Indirizzo email (opzionale)",
+        contactsSectionTitle: "Contatti",
+        birthLabel: "Nascita",
+        ageLabel: "Et\u{00E0}",
+        ageYearsFormat: "%d anni",
+        notificationActiveLabel: "Notifica attiva",
+        notificationOffLabel: "Notifica disattivata",
+        daysBeforeShortLabel: "giorni prima:",
+        hourShortLabel: "ora:",
+        editAction: "Modifica",
+        sendWishesAction: "Invia auguri",
+        messageTab: "Messaggio",
+        messageSectionTitle: "Messaggio di auguri",
+        messageGeneratingTitle: "Scrivo gli auguri\u{2026}",
+        messageGeneratingMessage: "Uso le note del diario per un messaggio davvero personale.",
+        messageEmptyTitle: "Nessun messaggio",
+        messageEmptyMessage: "Genera un messaggio di auguri personalizzato dalle parole chiave raccolte nel diario.",
+        messageToneLabel: "Tono",
+        toneWarm: "Affettuoso",
+        toneFunny: "Spiritoso",
+        toneElegant: "Elegante",
+        messageRegenerateAction: "Rigenera",
+        messageCopyAction: "Copia",
+        messageCopiedLabel: "Copiato",
+        messageShareAction: "Condividi",
+        messageSMSAction: "Messaggi",
+        messageEmailAction: "Email",
+        messageEmailSubjectFormat: "Buon compleanno %@!",
+        messageBasedOnNote: "Scritto dalle parole chiave del diario",
+        buyOnlineAction: "Acquista online",
+        findStoreAction: "Trova un negozio vicino a te",
+        noPlanAlertTitle: "Nessuna idea regalo",
+        noPlanAlertMessage: "Genera prima i suggerimenti nella tab Suggerimenti.",
+        giftFromPlanFormat: "Idea regalo: %@",
+        storesTitle: "Negozi vicini",
+        storesSearchingLabel: "Cerco negozi\u{2026}",
+        storesEmptyTitle: "Nessun negozio trovato",
+        storesEmptyMessage: "Non ci sono negozi di questo tipo entro 5 km da te.",
+        storesPermissionTitle: "Serve la posizione",
+        storesPermissionMessage: "Kudao usa la tua posizione solo per cercare negozi vicini.",
+        storesPermissionAction: "Consenti la posizione",
+        storesDeniedTitle: "Posizione non disponibile",
+        storesDeniedMessage: "Attiva i servizi di localizzazione per Kudao nelle Impostazioni.",
+        storesFailedTitle: "Ricerca non riuscita",
+        storesFailedMessage: "Non riesco a cercare i negozi adesso. Riprova tra poco.",
+        storesRadiusNote: "Entro 5 km da te",
+        storesSearchingCategoryFormat: "Cerco: %@",
+        openInMapsAction: "Apri in Mappe",
+        distanceKmFormat: "%.1f km",
+        distanceMetersFormat: "%d m"
     )
 
     static let english = Strings(
@@ -606,7 +726,65 @@ extension Strings {
         maskedProfileName: "Surprise",
         settingsWidgetSection: "Widget",
         settingsWidgetHint: "Touch and hold the Home Screen, tap Edit, then Add Widget and pick Kudao for the countdown.",
-        settingsSharingNote: "Surprise profiles will stay out of any sharing with the birthday person."
+        settingsSharingNote: "Surprise profiles will stay out of any sharing with the birthday person.",
+        lastNameLabel: "Last name",
+        lastNamePlaceholder: "Last name (optional)",
+        noLastNameLabel: "No last name",
+        addressLabel: "Address",
+        addressPlaceholder: "Street, city (optional)",
+        phoneLabel: "Phone",
+        phonePlaceholder: "Phone number (optional)",
+        emailLabel: "Email",
+        emailPlaceholder: "Email address (optional)",
+        contactsSectionTitle: "Contact",
+        birthLabel: "Born",
+        ageLabel: "Age",
+        ageYearsFormat: "%d years",
+        notificationActiveLabel: "Reminder on",
+        notificationOffLabel: "Reminder off",
+        daysBeforeShortLabel: "days before:",
+        hourShortLabel: "time:",
+        editAction: "Edit",
+        sendWishesAction: "Send wishes",
+        messageTab: "Message",
+        messageSectionTitle: "Birthday message",
+        messageGeneratingTitle: "Writing the wishes\u{2026}",
+        messageGeneratingMessage: "Using your diary notes to make it truly personal.",
+        messageEmptyTitle: "No message yet",
+        messageEmptyMessage: "Generate a personal birthday message from the keywords collected in the diary.",
+        messageToneLabel: "Tone",
+        toneWarm: "Warm",
+        toneFunny: "Playful",
+        toneElegant: "Elegant",
+        messageRegenerateAction: "Regenerate",
+        messageCopyAction: "Copy",
+        messageCopiedLabel: "Copied",
+        messageShareAction: "Share",
+        messageSMSAction: "Messages",
+        messageEmailAction: "Email",
+        messageEmailSubjectFormat: "Happy birthday %@!",
+        messageBasedOnNote: "Written from your diary keywords",
+        buyOnlineAction: "Buy online",
+        findStoreAction: "Find a shop near you",
+        noPlanAlertTitle: "No gift idea yet",
+        noPlanAlertMessage: "Generate the suggestions in the Suggestions tab first.",
+        giftFromPlanFormat: "Gift idea: %@",
+        storesTitle: "Nearby shops",
+        storesSearchingLabel: "Looking for shops\u{2026}",
+        storesEmptyTitle: "No shop found",
+        storesEmptyMessage: "There is no shop of this kind within 5 km of you.",
+        storesPermissionTitle: "Location needed",
+        storesPermissionMessage: "Kudao uses your location only to look for nearby shops.",
+        storesPermissionAction: "Allow location",
+        storesDeniedTitle: "Location unavailable",
+        storesDeniedMessage: "Turn on location services for Kudao in Settings.",
+        storesFailedTitle: "Search failed",
+        storesFailedMessage: "Shops cannot be searched right now. Please try again shortly.",
+        storesRadiusNote: "Within 5 km of you",
+        storesSearchingCategoryFormat: "Searching: %@",
+        openInMapsAction: "Open in Maps",
+        distanceKmFormat: "%.1f km",
+        distanceMetersFormat: "%d m"
     )
 
     static let french = Strings(
@@ -801,7 +979,65 @@ extension Strings {
         maskedProfileName: "Surprise",
         settingsWidgetSection: "Widget",
         settingsWidgetHint: "Appuyez longuement sur l’écran d’accueil, touchez Modifier, puis Ajouter un widget et choisissez Kudao.",
-        settingsSharingNote: "Les profils surprise resteront exclus de tout partage avec la personne fêtée."
+        settingsSharingNote: "Les profils surprise resteront exclus de tout partage avec la personne fêtée.",
+        lastNameLabel: "Nom",
+        lastNamePlaceholder: "Nom (facultatif)",
+        noLastNameLabel: "Nom non renseign\u{00E9}",
+        addressLabel: "Adresse",
+        addressPlaceholder: "Rue, ville (facultatif)",
+        phoneLabel: "T\u{00E9}l\u{00E9}phone",
+        phonePlaceholder: "Num\u{00E9}ro de t\u{00E9}l\u{00E9}phone (facultatif)",
+        emailLabel: "E-mail",
+        emailPlaceholder: "Adresse e-mail (facultatif)",
+        contactsSectionTitle: "Contact",
+        birthLabel: "Naissance",
+        ageLabel: "\u{00C2}ge",
+        ageYearsFormat: "%d ans",
+        notificationActiveLabel: "Rappel activ\u{00E9}",
+        notificationOffLabel: "Rappel d\u{00E9}sactiv\u{00E9}",
+        daysBeforeShortLabel: "jours avant :",
+        hourShortLabel: "heure :",
+        editAction: "Modifier",
+        sendWishesAction: "Envoyer les v\u{0153}ux",
+        messageTab: "Message",
+        messageSectionTitle: "Message d'anniversaire",
+        messageGeneratingTitle: "J'\u{00E9}cris les v\u{0153}ux\u{2026}",
+        messageGeneratingMessage: "J'utilise vos notes du journal pour un message vraiment personnel.",
+        messageEmptyTitle: "Aucun message",
+        messageEmptyMessage: "G\u{00E9}n\u{00E9}rez un message d'anniversaire personnel \u{00E0} partir des mots-cl\u{00E9}s du journal.",
+        messageToneLabel: "Ton",
+        toneWarm: "Affectueux",
+        toneFunny: "Amusant",
+        toneElegant: "\u{00C9}l\u{00E9}gant",
+        messageRegenerateAction: "R\u{00E9}g\u{00E9}n\u{00E9}rer",
+        messageCopyAction: "Copier",
+        messageCopiedLabel: "Copi\u{00E9}",
+        messageShareAction: "Partager",
+        messageSMSAction: "Messages",
+        messageEmailAction: "E-mail",
+        messageEmailSubjectFormat: "Joyeux anniversaire %@ !",
+        messageBasedOnNote: "\u{00C9}crit \u{00E0} partir des mots-cl\u{00E9}s du journal",
+        buyOnlineAction: "Acheter en ligne",
+        findStoreAction: "Trouver une boutique pr\u{00E8}s de vous",
+        noPlanAlertTitle: "Aucune id\u{00E9}e cadeau",
+        noPlanAlertMessage: "G\u{00E9}n\u{00E9}rez d'abord les suggestions dans l'onglet Suggestions.",
+        giftFromPlanFormat: "Id\u{00E9}e cadeau : %@",
+        storesTitle: "Boutiques proches",
+        storesSearchingLabel: "Je cherche des boutiques\u{2026}",
+        storesEmptyTitle: "Aucune boutique trouv\u{00E9}e",
+        storesEmptyMessage: "Il n'y a pas de boutique de ce type dans un rayon de 5 km.",
+        storesPermissionTitle: "Localisation requise",
+        storesPermissionMessage: "Kudao utilise votre position uniquement pour chercher des boutiques proches.",
+        storesPermissionAction: "Autoriser la position",
+        storesDeniedTitle: "Position indisponible",
+        storesDeniedMessage: "Activez les services de localisation pour Kudao dans R\u{00E9}glages.",
+        storesFailedTitle: "Recherche \u{00E9}chou\u{00E9}e",
+        storesFailedMessage: "Impossible de chercher des boutiques maintenant. R\u{00E9}essayez bient\u{00F4}t.",
+        storesRadiusNote: "Dans un rayon de 5 km",
+        storesSearchingCategoryFormat: "Recherche : %@",
+        openInMapsAction: "Ouvrir dans Plans",
+        distanceKmFormat: "%.1f km",
+        distanceMetersFormat: "%d m"
     )
 
     static let spanish = Strings(
@@ -996,6 +1232,64 @@ extension Strings {
         maskedProfileName: "Sorpresa",
         settingsWidgetSection: "Widget",
         settingsWidgetHint: "Mantén pulsada la pantalla de inicio, toca Editar, luego Añadir widget y elige Kudao.",
-        settingsSharingNote: "Los perfiles sorpresa quedarán fuera de cualquier compartición con la persona homenajeada."
+        settingsSharingNote: "Los perfiles sorpresa quedarán fuera de cualquier compartición con la persona homenajeada.",
+        lastNameLabel: "Apellido",
+        lastNamePlaceholder: "Apellido (opcional)",
+        noLastNameLabel: "Apellido no indicado",
+        addressLabel: "Direcci\u{00F3}n",
+        addressPlaceholder: "Calle, ciudad (opcional)",
+        phoneLabel: "Tel\u{00E9}fono",
+        phonePlaceholder: "N\u{00FA}mero de tel\u{00E9}fono (opcional)",
+        emailLabel: "Correo",
+        emailPlaceholder: "Correo electr\u{00F3}nico (opcional)",
+        contactsSectionTitle: "Contacto",
+        birthLabel: "Nacimiento",
+        ageLabel: "Edad",
+        ageYearsFormat: "%d a\u{00F1}os",
+        notificationActiveLabel: "Aviso activo",
+        notificationOffLabel: "Aviso desactivado",
+        daysBeforeShortLabel: "d\u{00ED}as antes:",
+        hourShortLabel: "hora:",
+        editAction: "Editar",
+        sendWishesAction: "Enviar felicitaci\u{00F3}n",
+        messageTab: "Mensaje",
+        messageSectionTitle: "Mensaje de cumplea\u{00F1}os",
+        messageGeneratingTitle: "Escribiendo la felicitaci\u{00F3}n\u{2026}",
+        messageGeneratingMessage: "Uso las notas del diario para que sea realmente personal.",
+        messageEmptyTitle: "Sin mensaje",
+        messageEmptyMessage: "Genera un mensaje de cumplea\u{00F1}os personal a partir de las palabras clave del diario.",
+        messageToneLabel: "Tono",
+        toneWarm: "Cari\u{00F1}oso",
+        toneFunny: "Divertido",
+        toneElegant: "Elegante",
+        messageRegenerateAction: "Regenerar",
+        messageCopyAction: "Copiar",
+        messageCopiedLabel: "Copiado",
+        messageShareAction: "Compartir",
+        messageSMSAction: "Mensajes",
+        messageEmailAction: "Correo",
+        messageEmailSubjectFormat: "\u{00A1}Feliz cumplea\u{00F1}os %@!",
+        messageBasedOnNote: "Escrito con las palabras clave del diario",
+        buyOnlineAction: "Comprar online",
+        findStoreAction: "Buscar una tienda cerca de ti",
+        noPlanAlertTitle: "Sin idea de regalo",
+        noPlanAlertMessage: "Genera primero las sugerencias en la pesta\u{00F1}a Sugerencias.",
+        giftFromPlanFormat: "Idea de regalo: %@",
+        storesTitle: "Tiendas cercanas",
+        storesSearchingLabel: "Buscando tiendas\u{2026}",
+        storesEmptyTitle: "Ninguna tienda encontrada",
+        storesEmptyMessage: "No hay tiendas de este tipo a menos de 5 km de ti.",
+        storesPermissionTitle: "Se necesita la ubicaci\u{00F3}n",
+        storesPermissionMessage: "Kudao usa tu ubicaci\u{00F3}n solo para buscar tiendas cercanas.",
+        storesPermissionAction: "Permitir la ubicaci\u{00F3}n",
+        storesDeniedTitle: "Ubicaci\u{00F3}n no disponible",
+        storesDeniedMessage: "Activa los servicios de localizaci\u{00F3}n para Kudao en Ajustes.",
+        storesFailedTitle: "B\u{00FA}squeda fallida",
+        storesFailedMessage: "Ahora no puedo buscar tiendas. Int\u{00E9}ntalo en un momento.",
+        storesRadiusNote: "A menos de 5 km de ti",
+        storesSearchingCategoryFormat: "Buscando: %@",
+        openInMapsAction: "Abrir en Mapas",
+        distanceKmFormat: "%.1f km",
+        distanceMetersFormat: "%d m"
     )
 }

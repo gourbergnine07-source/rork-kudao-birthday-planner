@@ -16,6 +16,7 @@ struct ProfileDetailView: View {
     @Environment(NotificationService.self) private var notifications
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.openURL) private var openURL
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     @State private var selectedTab: ProfileTab?
@@ -25,6 +26,9 @@ struct ProfileDetailView: View {
     @State private var pendingDeletion: Bool = false
     @State private var analyzer = DiaryAnalyzer()
     @State private var suggestionEngine = SuggestionEngine()
+    @State private var composer = GreetingComposer()
+    @State private var isShowingStores: Bool = false
+    @State private var noGiftIdeaAlert: Bool = false
     @State private var exportingFormat: DiaryExportFormat?
     @State private var exportedFile: ExportedFile?
     @State private var exportFailed: Bool = false
@@ -39,6 +43,7 @@ struct ProfileDetailView: View {
         case diary
         case preferences
         case suggestions
+        case message
 
         var id: String { rawValue }
 
@@ -47,6 +52,7 @@ struct ProfileDetailView: View {
             case .diary: "book.closed.fill"
             case .preferences: "tag.fill"
             case .suggestions: "sparkles"
+            case .message: "paperplane.fill"
             }
         }
 
@@ -55,6 +61,7 @@ struct ProfileDetailView: View {
             case .diary: strings.diaryTab
             case .preferences: strings.preferencesTab
             case .suggestions: strings.suggestionsTab
+            case .message: strings.messageTab
             }
         }
     }
@@ -63,23 +70,29 @@ struct ProfileDetailView: View {
         ZStack {
             WarmBackdrop()
 
-            ScrollView {
-                VStack(spacing: 20) {
-                    header
-                    statsRow
-                    tabSelector
-                    tabContent
-                        .padding(.bottom, 32)
+            ScrollViewReader { proxy in
+                ScrollView {
+                    VStack(spacing: 18) {
+                        header
+                        statsRow
+                        contactCard
+                        sendWishesButton(proxy)
+                        giftActionsRow
+                        tabSelector
+                            .id(Self.tabsAnchor)
+                        tabContent
+                            .padding(.bottom, 32)
+                    }
+                    .padding(.horizontal, 20)
                 }
-                .padding(.horizontal, 20)
+                .scrollIndicators(.hidden)
+                .scrollDismissesKeyboard(.interactively)
             }
-            .scrollIndicators(.hidden)
-            .scrollDismissesKeyboard(.interactively)
         }
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .principal) {
-                Text(profile.name)
+                Text(profile.fullName)
                     .font(.system(.headline, design: .rounded, weight: .semibold))
             }
             ToolbarItem(placement: .topBarTrailing) {
@@ -94,6 +107,21 @@ struct ProfileDetailView: View {
         }
         .sheet(item: $exportedFile) { file in
             ShareSheet(url: file.url)
+        }
+        .sheet(isPresented: $isShowingStores) {
+            if let plan = profile.partyPlan, plan.hasGiftIdea {
+                NearbyStoresView(category: plan.shopSearchTerm, giftIdea: plan.giftIdea)
+            }
+        }
+        .alert(strings.noPlanAlertTitle, isPresented: $noGiftIdeaAlert) {
+            Button(strings.suggestionsTab) {
+                withAnimation(reduceMotion ? nil : .smooth(duration: 0.3)) {
+                    selectedTab = .suggestions
+                }
+            }
+            Button(strings.cancelAction, role: .cancel) {}
+        } message: {
+            Text(strings.noPlanAlertMessage)
         }
         .alert(strings.exportFailedTitle, isPresented: $exportFailed) {
             Button(strings.doneAction, role: .cancel) {}
@@ -196,68 +224,91 @@ struct ProfileDetailView: View {
 
     // MARK: - Header
 
+    /// Anchor the "Send wishes" button scrolls to.
+    private static let tabsAnchor = "kudao.profile.tabs"
+
     private var header: some View {
-        ZStack(alignment: .bottomLeading) {
-            RoundedRectangle(cornerRadius: 30, style: .continuous)
-                .fill(Palette.warmGradient)
-
-            if let photoData = profile.photoData, let image = UIImage(data: photoData) {
-                Image(uiImage: image)
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .allowsHitTesting(false)
-                    .clipShape(.rect(cornerRadius: 30, style: .continuous))
+        VStack(spacing: 14) {
+            ZStack(alignment: .top) {
+                RoundedRectangle(cornerRadius: 30, style: .continuous)
+                    .fill(Palette.warmGradient)
+                    .frame(height: 116)
                     .overlay {
-                        LinearGradient(
-                            colors: [.clear, .black.opacity(0.25), .black.opacity(0.75)],
-                            startPoint: .top,
-                            endPoint: .bottom
-                        )
-                        .clipShape(.rect(cornerRadius: 30, style: .continuous))
+                        if countdown.isToday {
+                            ConfettiView()
+                                .clipShape(.rect(cornerRadius: 30, style: .continuous))
+                        }
                     }
+                    .overlay(alignment: .topTrailing) {
+                        editButton
+                            .padding(14)
+                    }
+                    .padding(.bottom, 60)
+
+                AvatarView(
+                    name: profile.name,
+                    photoData: profile.photoData,
+                    size: 116,
+                    ringColor: Palette.background,
+                    ringWidth: 5
+                )
+                .shadow(color: Palette.coral.opacity(0.3), radius: 14, y: 8)
+                .padding(.top, 58)
             }
 
-            if countdown.isToday {
-                ConfettiView()
-                    .clipShape(.rect(cornerRadius: 30, style: .continuous))
-            }
-
-            VStack(alignment: .leading, spacing: 12) {
-                Spacer(minLength: 0)
-
-                if profile.photoData == nil {
-                    AvatarView(
-                        name: profile.name,
-                        photoData: nil,
-                        size: 66,
-                        ringColor: .white.opacity(0.5),
-                        ringWidth: 2
-                    )
-                }
-
-                Text(profile.name)
-                    .font(.system(size: 30, weight: .heavy, design: .rounded))
-                    .foregroundStyle(.white)
+            VStack(spacing: 5) {
+                Text(profile.fullName)
+                    .font(.system(size: 28, weight: .heavy, design: .rounded))
+                    .foregroundStyle(.primary)
+                    .multilineTextAlignment(.center)
                     .lineLimit(2)
+                    .minimumScaleFactor(0.8)
+
+                if !profile.hasLastName {
+                    Text(strings.noLastNameLabel)
+                        .font(.system(.subheadline, design: .rounded))
+                        .foregroundStyle(.secondary)
+                }
 
                 HStack(spacing: 6) {
                     KudaoChip(
                         title: profile.relationship.title(strings),
                         systemImage: profile.relationship.symbolName,
-                        onDark: true
+                        tint: profile.relationship.accent
                     )
                     if profile.isSurpriseMode {
-                        KudaoChip(title: strings.surpriseBadge, systemImage: "eye.slash.fill", onDark: true)
+                        KudaoChip(
+                            title: strings.surpriseBadge,
+                            systemImage: "eye.slash.fill",
+                            tint: Palette.berry
+                        )
                     }
                 }
+                .padding(.top, 3)
 
                 countdownBanner
+                    .padding(.top, 5)
             }
-            .padding(20)
         }
-        .frame(height: 300)
-        .clipShape(.rect(cornerRadius: 30, style: .continuous))
-        .shadow(color: Palette.coral.opacity(0.28), radius: 20, y: 12)
+    }
+
+    private var editButton: some View {
+        Button {
+            isEditing = true
+        } label: {
+            HStack(spacing: 5) {
+                Image(systemName: "pencil")
+                    .font(.system(size: 11, weight: .heavy))
+                Text(strings.editAction)
+                    .font(.system(.footnote, design: .rounded, weight: .bold))
+            }
+            .foregroundStyle(.white)
+            .padding(.horizontal, 13)
+            .padding(.vertical, 8)
+            .background(Capsule().fill(.white.opacity(0.24)))
+            .overlay(Capsule().strokeBorder(.white.opacity(0.45), lineWidth: 1))
+        }
+        .buttonStyle(PressableCardStyle())
     }
 
     private var countdownBanner: some View {
@@ -282,28 +333,303 @@ struct ProfileDetailView: View {
                 }
             }
         }
-        .foregroundStyle(.white)
+        .foregroundStyle(Palette.coral)
         .padding(.horizontal, 14)
-        .padding(.vertical, 10)
-        .background(Capsule().fill(.ultraThinMaterial.opacity(0.85)))
-        .overlay(Capsule().strokeBorder(.white.opacity(0.3), lineWidth: 1))
+        .padding(.vertical, 9)
+        .background(Capsule().fill(Palette.coral.opacity(0.13)))
+        .overlay(Capsule().strokeBorder(Palette.coral.opacity(0.28), lineWidth: 1))
     }
 
+    /// "Nascita" and "Et\u{00E0}" side by side, exactly the two facts people look for first.
     private var statsRow: some View {
         HStack(spacing: 12) {
             StatTile(
-                icon: "calendar",
-                caption: strings.nextBirthdayLabel,
-                value: settings.dayMonth(countdown.nextDate),
-                tint: Palette.coral
+                icon: "sunrise.fill",
+                caption: strings.birthLabel,
+                value: settings.dayMonthYear(profile.birthDate),
+                tint: Palette.amber
             )
             StatTile(
-                icon: "birthday.cake.fill",
-                caption: settings.dayMonthYear(profile.birthDate),
-                value: String(format: strings.ageNowFormat, countdown.turningAge),
+                icon: "figure.walk",
+                caption: strings.ageLabel,
+                value: String(format: strings.ageYearsFormat, profile.currentAge),
                 tint: Palette.berry
             )
         }
+    }
+
+    // MARK: - Contacts & reminder summary
+
+    /// Address, phone and email appear only when filled in; the reminder recap always shows.
+    private var contactCard: some View {
+        VStack(spacing: 0) {
+            if !trimmed(profile.address).isEmpty {
+                contactRow(icon: "house.fill", tint: Palette.violet, text: trimmed(profile.address))
+            }
+
+            if !trimmed(profile.contactPhone).isEmpty {
+                contactDivider(after: !trimmed(profile.address).isEmpty)
+                contactRow(
+                    icon: "phone.fill",
+                    tint: Palette.teal,
+                    text: trimmed(profile.contactPhone),
+                    link: URL(string: "tel:\(trimmed(profile.contactPhone).filter { $0.isNumber || $0 == "+" })")
+                )
+            }
+
+            if !trimmed(profile.contactEmail).isEmpty {
+                contactDivider(after: profile.hasContactDetails)
+                contactRow(
+                    icon: "envelope.fill",
+                    tint: Palette.amber,
+                    text: trimmed(profile.contactEmail),
+                    link: URL(string: "mailto:\(trimmed(profile.contactEmail))")
+                )
+            }
+
+            contactDivider(after: profile.hasContactDetails)
+            reminderSummary
+        }
+        .padding(.vertical, 4)
+        .background(
+            RoundedRectangle(cornerRadius: 24, style: .continuous)
+                .fill(Palette.surface)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 24, style: .continuous)
+                .strokeBorder(Palette.hairline, lineWidth: 1)
+        )
+        .shadow(color: .black.opacity(0.04), radius: 10, y: 5)
+    }
+
+    @ViewBuilder
+    private func contactDivider(after shouldShow: Bool) -> some View {
+        if shouldShow {
+            Divider()
+                .overlay(Palette.hairline)
+                .padding(.leading, 52)
+        }
+    }
+
+    @ViewBuilder
+    private func contactRow(icon: String, tint: Color, text: String, link: URL? = nil) -> some View {
+        let row = HStack(spacing: 12) {
+            Image(systemName: icon)
+                .font(.system(size: 14, weight: .bold))
+                .foregroundStyle(tint)
+                .frame(width: 24)
+
+            Text(text)
+                .font(.system(.subheadline, design: .rounded, weight: .medium))
+                .foregroundStyle(.primary)
+                .lineLimit(2)
+                .multilineTextAlignment(.leading)
+
+            Spacer(minLength: 0)
+
+            if link != nil {
+                Image(systemName: "arrow.up.right")
+                    .font(.system(size: 10, weight: .heavy))
+                    .foregroundStyle(.tertiary)
+            }
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 13)
+        .contentShape(Rectangle())
+
+        if let link {
+            Button {
+                openURL(link)
+            } label: { row }
+            .buttonStyle(PressableCardStyle())
+        } else {
+            row
+        }
+    }
+
+    /// Recap of the reminder set in the profile settings: days before and fire time.
+    private var reminderSummary: some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: profile.isReminderEnabled ? "bell.fill" : "bell.slash.fill")
+                .font(.system(size: 14, weight: .bold))
+                .foregroundStyle(profile.isReminderEnabled ? Palette.coral : .secondary)
+                .frame(width: 24)
+
+            VStack(alignment: .leading, spacing: 3) {
+                Text(profile.isReminderEnabled ? strings.notificationActiveLabel : strings.notificationOffLabel)
+                    .font(.system(.subheadline, design: .rounded, weight: .bold))
+                    .foregroundStyle(.primary)
+
+                if profile.isReminderEnabled {
+                    HStack(spacing: 6) {
+                        Text(strings.daysBeforeShortLabel)
+                            .foregroundStyle(.secondary)
+                        Text("\(profile.reminderDaysBefore)")
+                            .foregroundStyle(Palette.coral)
+                            .contentTransition(.numericText())
+                    }
+                    .font(.system(.footnote, design: .rounded, weight: .semibold))
+
+                    HStack(spacing: 6) {
+                        Text(strings.hourShortLabel)
+                            .foregroundStyle(.secondary)
+                        Text(reminderTimeLabel)
+                            .foregroundStyle(Palette.coral)
+                    }
+                    .font(.system(.footnote, design: .rounded, weight: .semibold))
+                }
+            }
+
+            Spacer(minLength: 0)
+
+            Button {
+                isShowingSettings = true
+            } label: {
+                Image(systemName: "slider.horizontal.3")
+                    .font(.system(size: 12, weight: .bold))
+                    .foregroundStyle(Palette.coral)
+                    .frame(width: 32, height: 32)
+                    .background(Circle().fill(Palette.coral.opacity(0.12)))
+            }
+            .buttonStyle(PressableCardStyle())
+            .accessibilityLabel(strings.remindersMenuTitle)
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 13)
+    }
+
+    /// Reminders always fire at the same local hour, shown in the user's format.
+    private var reminderTimeLabel: String {
+        var components = DateComponents()
+        components.hour = BirthdayProfile.reminderHour
+        components.minute = 0
+        let date = Calendar.current.date(from: components) ?? Date()
+        return date.formatted(
+            Date.FormatStyle(locale: settings.locale)
+                .hour(.defaultDigits(amPM: .abbreviated))
+                .minute(.twoDigits)
+        )
+    }
+
+    private func trimmed(_ value: String) -> String {
+        value.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    // MARK: - Wishes & gift actions
+
+    private func sendWishesButton(_ proxy: ScrollViewProxy) -> some View {
+        Button {
+            withAnimation(reduceMotion ? nil : .smooth(duration: 0.35)) {
+                selectedTab = .message
+            }
+            composer.generateIfNeeded(for: profile, language: settings.language)
+            withAnimation(reduceMotion ? nil : .smooth(duration: 0.45)) {
+                proxy.scrollTo(Self.tabsAnchor, anchor: .top)
+            }
+        } label: {
+            HStack(spacing: 9) {
+                Image(systemName: "paperplane.fill")
+                    .font(.system(size: 15, weight: .bold))
+                Text(strings.sendWishesAction)
+                    .font(.system(.headline, design: .rounded, weight: .bold))
+            }
+            .foregroundStyle(.white)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 16)
+            .background(Capsule().fill(Palette.warmGradient))
+            .shadow(color: Palette.coral.opacity(0.35), radius: 14, y: 8)
+        }
+        .buttonStyle(PressableCardStyle())
+    }
+
+    /// Both actions read the gift straight from the generated plan, never from a manual field.
+    private var giftActionsRow: some View {
+        HStack(spacing: 12) {
+            giftActionTile(
+                title: strings.buyOnlineAction,
+                systemImage: "cart.fill",
+                tint: Palette.berry
+            ) {
+                openShopping()
+            }
+
+            giftActionTile(
+                title: strings.findStoreAction,
+                systemImage: "map.fill",
+                tint: Palette.violet
+            ) {
+                openNearbyStores()
+            }
+        }
+    }
+
+    private func giftActionTile(
+        title: String,
+        systemImage: String,
+        tint: Color,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            VStack(spacing: 8) {
+                Image(systemName: systemImage)
+                    .font(.system(size: 18, weight: .bold))
+                    .foregroundStyle(tint)
+                Text(title)
+                    .font(.system(.footnote, design: .rounded, weight: .bold))
+                    .foregroundStyle(.primary)
+                    .multilineTextAlignment(.center)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.85)
+
+                if let idea = giftIdea {
+                    Text(idea)
+                        .font(.system(.caption2, design: .rounded, weight: .medium))
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                } else {
+                    Text(strings.suggestionsTab)
+                        .font(.system(.caption2, design: .rounded, weight: .medium))
+                        .foregroundStyle(.tertiary)
+                        .lineLimit(1)
+                }
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 16)
+            .padding(.horizontal, 10)
+            .background(
+                RoundedRectangle(cornerRadius: 22, style: .continuous)
+                    .fill(Palette.surface)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 22, style: .continuous)
+                    .strokeBorder(giftIdea == nil ? Palette.hairline : tint.opacity(0.3), lineWidth: 1)
+            )
+            .shadow(color: .black.opacity(0.04), radius: 8, y: 4)
+        }
+        .buttonStyle(PressableCardStyle())
+    }
+
+    /// The single source of truth for both gift actions: the AI-generated plan.
+    private var giftIdea: String? {
+        guard let plan = profile.partyPlan, plan.hasGiftIdea else { return nil }
+        return plan.giftIdea
+    }
+
+    private func openShopping() {
+        guard let idea = giftIdea,
+              let url = GiftShopping.searchURL(for: idea, language: settings.language) else {
+            noGiftIdeaAlert = true
+            return
+        }
+        openURL(url)
+    }
+
+    private func openNearbyStores() {
+        guard giftIdea != nil else {
+            noGiftIdeaAlert = true
+            return
+        }
+        isShowingStores = true
     }
 
     // MARK: - Tabs
@@ -361,6 +687,9 @@ struct ProfileDetailView: View {
                 .transition(.opacity.combined(with: .offset(y: 8)))
         case .suggestions:
             SuggestionsTabView(profile: profile, engine: suggestionEngine)
+                .transition(.opacity.combined(with: .offset(y: 8)))
+        case .message:
+            MessageTabView(profile: profile, composer: composer)
                 .transition(.opacity.combined(with: .offset(y: 8)))
         }
     }

@@ -57,6 +57,7 @@ struct SuggestionsTabView: View {
 
     private static let emptySuggestion = PartySuggestion(
         giftIdea: "",
+        giftCategory: "",
         giftPriceBand: .medium,
         giftReason: "",
         cakeType: "",

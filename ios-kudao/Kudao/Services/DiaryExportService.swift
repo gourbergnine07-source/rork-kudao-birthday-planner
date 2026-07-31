@@ -65,6 +65,7 @@ nonisolated struct DiaryExportSnapshot: Sendable {
 
     struct Plan: Sendable {
         let giftIdea: String
+        let giftCategory: String
         let giftPriceBand: PriceBand
         let giftReason: String
         let cakeType: String
@@ -136,6 +137,7 @@ enum DiaryExportService {
         let plan = profile.partyPlan.map { stored in
             DiaryExportSnapshot.Plan(
                 giftIdea: stored.giftIdea,
+                giftCategory: stored.giftCategory,
                 giftPriceBand: PriceBand(rawValue: stored.giftPriceRaw) ?? .medium,
                 giftReason: stored.giftReason,
                 cakeType: stored.cakeType,

@@ -13,6 +13,8 @@ final class PartyPlan {
     var profile: BirthdayProfile?
 
     var giftIdea: String = ""
+    /// Shop category suggested for the gift, used by the nearby-store search.
+    var giftCategory: String = ""
     var giftPriceRaw: String = PriceBand.medium.rawValue
     var giftReason: String = ""
 
@@ -44,6 +46,7 @@ final class PartyPlan {
     var suggestion: PartySuggestion {
         PartySuggestion(
             giftIdea: giftIdea,
+            giftCategory: giftCategory,
             giftPriceBand: PriceBand(rawValue: giftPriceRaw) ?? .medium,
             giftReason: giftReason,
             cakeType: cakeType,
@@ -58,6 +61,7 @@ final class PartyPlan {
     /// Writes a suggestion into the plan. Any change invalidates a previous confirmation.
     func apply(_ suggestion: PartySuggestion) {
         giftIdea = suggestion.giftIdea
+        giftCategory = suggestion.giftCategory
         giftPriceRaw = suggestion.giftPriceBand.rawValue
         giftReason = suggestion.giftReason
         cakeType = suggestion.cakeType
@@ -70,4 +74,15 @@ final class PartyPlan {
     }
 
     var isConfirmed: Bool { confirmedAt != nil }
+
+    /// True once the AI produced an actual gift idea to shop for.
+    var hasGiftIdea: Bool {
+        !giftIdea.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
+    /// Search term for shops: the suggested category, falling back to the idea itself.
+    var shopSearchTerm: String {
+        let category = giftCategory.trimmingCharacters(in: .whitespacesAndNewlines)
+        return category.isEmpty ? giftIdea.trimmingCharacters(in: .whitespacesAndNewlines) : category
+    }
 }

@@ -153,6 +153,8 @@ nonisolated enum PlanSection: String, CaseIterable, Identifiable, Sendable {
 /// In-memory shape of one generated party plan.
 nonisolated struct PartySuggestion: Sendable, Equatable {
     var giftIdea: String
+    /// Kind of shop that sells the idea, e.g. "profumeria" — drives the nearby-store search.
+    var giftCategory: String
     var giftPriceBand: PriceBand
     var giftReason: String
     var cakeType: String

@@ -19,6 +19,10 @@ struct ProfileFormView: View {
     @Environment(\.dismiss) private var dismiss
 
     @State private var name: String = ""
+    @State private var lastName: String = ""
+    @State private var address: String = ""
+    @State private var phone: String = ""
+    @State private var email: String = ""
     @State private var birthDate: Date = Calendar.current.date(byAdding: .year, value: -30, to: Date()) ?? Date()
     @State private var relationship: RelationshipKind = .friend
     @State private var isSurpriseMode: Bool = false
@@ -43,7 +47,15 @@ struct ProfileFormView: View {
                         FormCard(title: strings.nameLabel, systemImage: "person.text.rectangle") {
                             TextField(strings.namePlaceholder, text: $name)
                                 .font(.system(.body, design: .rounded, weight: .medium))
-                                .textContentType(.name)
+                                .textContentType(.givenName)
+                                .textInputAutocapitalization(.words)
+                                .submitLabel(.next)
+
+                            Divider().overlay(Palette.hairline)
+
+                            TextField(strings.lastNamePlaceholder, text: $lastName)
+                                .font(.system(.body, design: .rounded, weight: .medium))
+                                .textContentType(.familyName)
                                 .textInputAutocapitalization(.words)
                                 .submitLabel(.done)
                         }
@@ -85,6 +97,8 @@ struct ProfileFormView: View {
                                 .contentShape(Rectangle())
                             }
                         }
+
+                        contactCard
 
                         surpriseToggle
 
@@ -185,6 +199,72 @@ struct ProfileFormView: View {
         .padding(.top, 8)
     }
 
+    // MARK: - Contacts
+
+    /// Optional contact details; every field is free text and safe to leave empty.
+    private var contactCard: some View {
+        FormCard(title: strings.contactsSectionTitle, systemImage: "person.crop.rectangle.stack.fill") {
+            contactField(
+                icon: "house.fill",
+                tint: Palette.violet,
+                placeholder: strings.addressPlaceholder,
+                text: $address,
+                contentType: .fullStreetAddress,
+                keyboard: .default,
+                capitalization: .words
+            )
+
+            Divider().overlay(Palette.hairline)
+
+            contactField(
+                icon: "phone.fill",
+                tint: Palette.teal,
+                placeholder: strings.phonePlaceholder,
+                text: $phone,
+                contentType: .telephoneNumber,
+                keyboard: .phonePad,
+                capitalization: .never
+            )
+
+            Divider().overlay(Palette.hairline)
+
+            contactField(
+                icon: "envelope.fill",
+                tint: Palette.amber,
+                placeholder: strings.emailPlaceholder,
+                text: $email,
+                contentType: .emailAddress,
+                keyboard: .emailAddress,
+                capitalization: .never
+            )
+        }
+    }
+
+    private func contactField(
+        icon: String,
+        tint: Color,
+        placeholder: String,
+        text: Binding<String>,
+        contentType: UITextContentType,
+        keyboard: UIKeyboardType,
+        capitalization: TextInputAutocapitalization
+    ) -> some View {
+        HStack(spacing: 11) {
+            Image(systemName: icon)
+                .font(.system(size: 13, weight: .bold))
+                .foregroundStyle(tint)
+                .frame(width: 22)
+
+            TextField(placeholder, text: text)
+                .font(.system(.body, design: .rounded, weight: .medium))
+                .textContentType(contentType)
+                .keyboardType(keyboard)
+                .textInputAutocapitalization(capitalization)
+                .autocorrectionDisabled(keyboard == .emailAddress)
+                .submitLabel(.done)
+        }
+    }
+
     private var surpriseToggle: some View {
         VStack(alignment: .leading, spacing: 8) {
             Toggle(isOn: $isSurpriseMode) {
@@ -227,6 +307,10 @@ struct ProfileFormView: View {
         }
         guard !didSave, name.isEmpty else { return }
         name = profile.name
+        lastName = profile.lastName
+        address = profile.address
+        phone = profile.contactPhone
+        email = profile.contactEmail
         birthDate = profile.birthDate
         relationship = profile.relationship
         isSurpriseMode = profile.isSurpriseMode
@@ -240,6 +324,10 @@ struct ProfileFormView: View {
         let saved: BirthdayProfile
         if let profile {
             profile.name = trimmed
+            profile.lastName = cleaned(lastName)
+            profile.address = cleaned(address)
+            profile.contactPhone = cleaned(phone)
+            profile.contactEmail = cleaned(email)
             profile.birthDate = birthDate
             profile.relationship = relationship
             profile.isSurpriseMode = isSurpriseMode
@@ -250,6 +338,10 @@ struct ProfileFormView: View {
                 name: trimmed,
                 birthDate: birthDate,
                 relationship: relationship,
+                lastName: cleaned(lastName),
+                address: cleaned(address),
+                contactPhone: cleaned(phone),
+                contactEmail: cleaned(email),
                 photoData: photoData,
                 isSurpriseMode: isSurpriseMode
             )
@@ -262,6 +354,10 @@ struct ProfileFormView: View {
 
         didSave = true
         dismiss()
+    }
+
+    private func cleaned(_ value: String) -> String {
+        value.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
     /// Creating or editing a profile (re)plans its local reminders and refreshes the widget.
