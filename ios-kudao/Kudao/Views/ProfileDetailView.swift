@@ -9,19 +9,28 @@ import SwiftData
 /// Full profile screen: header with countdown, diary, preferences and suggestions.
 struct ProfileDetailView: View {
     let profile: BirthdayProfile
+    /// Tab opened first, used when arriving from a reminder or the home badge.
+    var initialTab: ProfileTab = .diary
 
     @Environment(AppSettings.self) private var settings
+    @Environment(NotificationService.self) private var notifications
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
-    @State private var selectedTab: ProfileTab = .diary
+    @State private var selectedTab: ProfileTab?
     @State private var isEditing: Bool = false
+    @State private var isShowingSettings: Bool = false
     @State private var isConfirmingDelete: Bool = false
     @State private var pendingDeletion: Bool = false
     @State private var analyzer = DiaryAnalyzer()
     @State private var suggestionEngine = SuggestionEngine()
+    @State private var exportingFormat: DiaryExportFormat?
+    @State private var exportedFile: ExportedFile?
+    @State private var exportFailed: Bool = false
     @Namespace private var tabNamespace
+
+    private var activeTab: ProfileTab { selectedTab ?? initialTab }
 
     private var strings: Strings { settings.strings }
     private var countdown: BirthdayCountdown { profile.countdown }
@@ -74,27 +83,22 @@ struct ProfileDetailView: View {
                     .font(.system(.headline, design: .rounded, weight: .semibold))
             }
             ToolbarItem(placement: .topBarTrailing) {
-                Menu {
-                    Button {
-                        isEditing = true
-                    } label: {
-                        Label(strings.editData, systemImage: "pencil")
-                    }
-                    Button(role: .destructive) {
-                        isConfirmingDelete = true
-                    } label: {
-                        Label(strings.deleteProfile, systemImage: "trash")
-                    }
-                } label: {
-                    Image(systemName: "gearshape.fill")
-                        .font(.system(size: 15, weight: .semibold))
-                        .foregroundStyle(Palette.coral)
-                }
-                .accessibilityLabel(strings.profileSettings)
+                settingsMenu
             }
         }
         .sheet(isPresented: $isEditing) {
             ProfileFormView(profile: profile)
+        }
+        .sheet(isPresented: $isShowingSettings) {
+            ProfileSettingsView(profile: profile)
+        }
+        .sheet(item: $exportedFile) { file in
+            ShareSheet(url: file.url)
+        }
+        .alert(strings.exportFailedTitle, isPresented: $exportFailed) {
+            Button(strings.doneAction, role: .cancel) {}
+        } message: {
+            Text(strings.exportFailedMessage)
         }
         .alert(strings.deleteConfirmTitle, isPresented: $isConfirmingDelete) {
             Button(strings.cancelAction, role: .cancel) {}
@@ -107,10 +111,87 @@ struct ProfileDetailView: View {
         }
         .onDisappear {
             guard pendingDeletion else { return }
+            notifications.cancelReminders(for: profile.id)
             modelContext.delete(profile)
         }
         .environment(\.locale, settings.locale)
         .tint(Palette.coral)
+    }
+
+    // MARK: - Settings menu
+
+    private var settingsMenu: some View {
+        Menu {
+            Button {
+                isEditing = true
+            } label: {
+                Label(strings.editData, systemImage: "pencil")
+            }
+
+            Button {
+                isShowingSettings = true
+            } label: {
+                Label(strings.remindersMenuTitle, systemImage: "bell.badge")
+            }
+
+            Menu {
+                ForEach(DiaryExportFormat.allCases) { format in
+                    Button {
+                        export(format)
+                    } label: {
+                        Label(format.title(strings), systemImage: format.symbolName)
+                    }
+                }
+            } label: {
+                Label(strings.exportSectionTitle, systemImage: "square.and.arrow.up")
+            }
+
+            Divider()
+
+            Button(role: .destructive) {
+                isConfirmingDelete = true
+            } label: {
+                Label(strings.deleteProfile, systemImage: "trash")
+            }
+        } label: {
+            if exportingFormat != nil {
+                ProgressView()
+                    .controlSize(.small)
+                    .tint(Palette.coral)
+            } else {
+                Image(systemName: "gearshape.fill")
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundStyle(Palette.coral)
+            }
+        }
+        .accessibilityLabel(strings.profileSettings)
+    }
+
+    /// Builds the diary file off the main actor, then hands it to the share sheet.
+    private func export(_ format: DiaryExportFormat) {
+        guard exportingFormat == nil else { return }
+        exportingFormat = format
+
+        let snapshot = DiaryExportService.snapshot(of: profile)
+        let strings = self.strings
+        let locale = settings.locale
+
+        Task {
+            defer { exportingFormat = nil }
+            do {
+                let url = try await Task.detached(priority: .userInitiated) {
+                    try DiaryExportService.writeFile(
+                        snapshot,
+                        format: format,
+                        strings: strings,
+                        locale: locale
+                    )
+                }.value
+                exportedFile = ExportedFile(url: url)
+            } catch {
+                exportFailed = true
+            }
+        }
     }
 
     // MARK: - Header
@@ -230,7 +311,7 @@ struct ProfileDetailView: View {
     private var tabSelector: some View {
         HStack(spacing: 4) {
             ForEach(ProfileTab.allCases) { tab in
-                let isSelected = tab == selectedTab
+                let isSelected = tab == activeTab
                 Button {
                     withAnimation(reduceMotion ? nil : .spring(response: 0.35, dampingFraction: 0.8)) {
                         selectedTab = tab
@@ -266,12 +347,12 @@ struct ProfileDetailView: View {
         .padding(5)
         .background(Capsule().fill(Palette.surface))
         .overlay(Capsule().strokeBorder(Palette.hairline, lineWidth: 1))
-        .sensoryFeedback(.selection, trigger: selectedTab)
+        .sensoryFeedback(.selection, trigger: activeTab)
     }
 
     @ViewBuilder
     private var tabContent: some View {
-        switch selectedTab {
+        switch activeTab {
         case .diary:
             DiaryTabView(profile: profile, analyzer: analyzer)
                 .transition(.opacity.combined(with: .offset(y: 8)))

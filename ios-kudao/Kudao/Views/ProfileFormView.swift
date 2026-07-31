@@ -12,6 +12,7 @@ struct ProfileFormView: View {
     let profile: BirthdayProfile?
 
     @Environment(AppSettings.self) private var settings
+    @Environment(NotificationService.self) private var notifications
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
 
@@ -228,12 +229,14 @@ struct ProfileFormView: View {
         let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return }
 
+        let saved: BirthdayProfile
         if let profile {
             profile.name = trimmed
             profile.birthDate = birthDate
             profile.relationship = relationship
             profile.isSurpriseMode = isSurpriseMode
             profile.photoData = photoData
+            saved = profile
         } else {
             let newProfile = BirthdayProfile(
                 name: trimmed,
@@ -243,9 +246,22 @@ struct ProfileFormView: View {
                 isSurpriseMode: isSurpriseMode
             )
             modelContext.insert(newProfile)
+            saved = newProfile
         }
+
+        try? modelContext.save()
+        scheduleReminders(for: saved)
+
         didSave = true
         dismiss()
+    }
+
+    /// Creating or editing a profile (re)plans its local reminders right away.
+    private func scheduleReminders(for profile: BirthdayProfile) {
+        let strings = self.strings
+        Task {
+            await notifications.sync(profiles: [profile], strings: strings)
+        }
     }
 }
 
@@ -280,5 +296,6 @@ private struct FormCard<Content: View>: View {
 #Preview {
     ProfileFormView(profile: nil)
         .environment(AppSettings())
+        .environment(NotificationService.shared)
         .modelContainer(KudaoModelContainer.preview())
 }

@@ -58,6 +58,7 @@ enum ProfileSortOrder: String, CaseIterable, Identifiable {
 /// Root screen: every celebration profile ordered by how close the birthday is.
 struct HomeView: View {
     @Environment(AppSettings.self) private var settings
+    @Environment(NotificationService.self) private var notifications
     @Query private var profiles: [BirthdayProfile]
 
     @State private var isCreatingProfile: Bool = false
@@ -65,8 +66,12 @@ struct HomeView: View {
     @State private var appeared: Bool = false
     @State private var searchText: String = ""
     @State private var sortOrder: ProfileSortOrder = .nearestBirthday
+    @State private var reviewProfile: BirthdayProfile?
+    /// Profile that must open straight on the suggestions tab after "Edit".
+    @State private var suggestionsProfileID: UUID?
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.scenePhase) private var scenePhase
 
     private var strings: Strings { settings.strings }
 
@@ -89,6 +94,11 @@ struct HomeView: View {
     /// The closest birthday always leads the hero card, whatever the list order is.
     private var nextUp: BirthdayProfile? {
         ProfileSortOrder.nearestBirthday.sorted(profiles).first
+    }
+
+    /// Profiles inside their reminder window whose party plan is still unconfirmed.
+    private var pendingReviews: [BirthdayProfile] {
+        ProfileSortOrder.nearestBirthday.sorted(profiles).filter(\.needsPlanConfirmation)
     }
 
     var body: some View {
@@ -122,14 +132,54 @@ struct HomeView: View {
                 }
             }
             .navigationDestination(for: BirthdayProfile.self) { profile in
-                ProfileDetailView(profile: profile)
+                ProfileDetailView(
+                    profile: profile,
+                    initialTab: suggestionsProfileID == profile.id ? .suggestions : .diary
+                )
             }
             .sheet(isPresented: $isCreatingProfile) {
                 ProfileFormView(profile: nil)
             }
+            .sheet(item: $reviewProfile) { profile in
+                PlanConfirmationView(profile: profile) {
+                    openSuggestions(for: profile)
+                }
+            }
             .environment(\.locale, settings.locale)
         }
         .tint(Palette.coral)
+        .task(id: profiles.count) {
+            await syncReminders()
+        }
+        .onChange(of: scenePhase) { _, phase in
+            guard phase == .active else { return }
+            Task { await syncReminders() }
+        }
+        .onChange(of: notifications.pendingReviewProfileID) { _, pending in
+            handleReminderTap(pending)
+        }
+        .onAppear {
+            handleReminderTap(notifications.pendingReviewProfileID)
+        }
+    }
+
+    // MARK: - Reminders
+
+    private func syncReminders() async {
+        await notifications.sync(profiles: profiles, strings: strings)
+    }
+
+    /// A tapped reminder opens the confirmation sheet for that profile.
+    private func handleReminderTap(_ pending: UUID?) {
+        guard let pending, let match = profiles.first(where: { $0.id == pending }) else { return }
+        notifications.consumePendingReview()
+        path = []
+        reviewProfile = match
+    }
+
+    private func openSuggestions(for profile: BirthdayProfile) {
+        suggestionsProfileID = profile.id
+        path = [profile]
     }
 
     // MARK: - Sections
@@ -151,6 +201,7 @@ struct HomeView: View {
                 if isSearching {
                     searchResults
                 } else {
+                    reviewBanner
                     upcomingSections
                 }
             }
@@ -210,6 +261,78 @@ struct HomeView: View {
         }
         .accessibilityLabel("\(strings.sortLabel): \(sortOrder.title(strings))")
         .sensoryFeedback(.selection, trigger: sortOrder)
+    }
+
+    @ViewBuilder
+    private var reviewBanner: some View {
+        let pending = pendingReviews
+
+        if !pending.isEmpty {
+            VStack(alignment: .leading, spacing: 12) {
+                HStack(spacing: 9) {
+                    ZStack {
+                        Circle()
+                            .fill(Palette.coral.opacity(0.16))
+                            .frame(width: 30, height: 30)
+                        Image(systemName: "bell.badge.fill")
+                            .font(.system(size: 13, weight: .bold))
+                            .foregroundStyle(Palette.coral)
+                            .symbolEffect(
+                                .bounce,
+                                options: reduceMotion ? .nonRepeating : .repeat(.periodic(delay: 3))
+                            )
+                    }
+
+                    VStack(alignment: .leading, spacing: 1) {
+                        Text(strings.reviewBannerTitle)
+                            .font(.system(.subheadline, design: .rounded, weight: .bold))
+                        Text(String(format: strings.reviewBannerSubtitleFormat, pending.count))
+                            .font(.system(.caption, design: .rounded))
+                            .foregroundStyle(.secondary)
+                    }
+
+                    Spacer(minLength: 0)
+                }
+
+                ScrollView(.horizontal) {
+                    HStack(spacing: 8) {
+                        ForEach(pending) { profile in
+                            Button {
+                                reviewProfile = profile
+                            } label: {
+                                HStack(spacing: 8) {
+                                    AvatarView(name: profile.name, photoData: profile.photoData, size: 26)
+                                    Text(profile.name)
+                                        .font(.system(.footnote, design: .rounded, weight: .bold))
+                                        .lineLimit(1)
+                                    Image(systemName: "chevron.right")
+                                        .font(.system(size: 9, weight: .heavy))
+                                        .foregroundStyle(.tertiary)
+                                }
+                                .foregroundStyle(.primary)
+                                .padding(.leading, 6)
+                                .padding(.trailing, 12)
+                                .padding(.vertical, 6)
+                                .background(Capsule().fill(Palette.surfaceRaised))
+                                .overlay(Capsule().strokeBorder(Palette.coral.opacity(0.28), lineWidth: 1))
+                            }
+                            .buttonStyle(PressableCardStyle())
+                        }
+                    }
+                }
+                .scrollIndicators(.hidden)
+            }
+            .padding(14)
+            .background(
+                RoundedRectangle(cornerRadius: 22, style: .continuous)
+                    .fill(Palette.surface)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 22, style: .continuous)
+                    .strokeBorder(Palette.coral.opacity(0.3), lineWidth: 1)
+            )
+            .shadow(color: Palette.coral.opacity(0.12), radius: 12, y: 6)
+        }
     }
 
     @ViewBuilder
@@ -354,8 +477,6 @@ struct PressableCardStyle: ButtonStyle {
 #Preview {
     HomeView()
         .environment(AppSettings())
-        .modelContainer(
-            for: [BirthdayProfile.self, DiaryEntry.self, DiaryTag.self, PartyPlan.self],
-            inMemory: true
-        )
+        .environment(NotificationService.shared)
+        .modelContainer(KudaoModelContainer.preview())
 }

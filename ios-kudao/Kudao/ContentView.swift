@@ -15,5 +15,6 @@ struct ContentView: View {
 #Preview {
     ContentView()
         .environment(AppSettings())
+        .environment(NotificationService.shared)
         .modelContainer(KudaoModelContainer.preview())
 }

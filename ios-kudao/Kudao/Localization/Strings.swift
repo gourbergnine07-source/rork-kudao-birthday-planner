@@ -134,6 +134,53 @@ nonisolated struct Strings: Sendable {
     let languageLabel: String
     let profilesCountFormat: String
     let ageNowFormat: String
+
+    let remindersMenuTitle: String
+    let remindersSectionTitle: String
+    let reminderToggleTitle: String
+    let reminderToggleDescription: String
+    let reminderDaysTitle: String
+    let dayBeforeFormat: String
+    let daysBeforeFormat: String
+    let giftReminderToggleTitle: String
+    let giftReminderDescription: String
+    let giftReminderDaysTitle: String
+    let reminderScheduledFormat: String
+    let reminderDisabledLabel: String
+    let notificationsDeniedTitle: String
+    let notificationsDeniedMessage: String
+    let openSettingsAction: String
+    let notificationBirthdayTitle: String
+    let notificationBirthdayBodyFormat: String
+    let notificationGiftTitle: String
+    let notificationGiftBodyFormat: String
+    let notificationGiftBodyFallbackFormat: String
+
+    let exportSectionTitle: String
+    let exportSectionDescription: String
+    let exportPDFAction: String
+    let exportJSONAction: String
+    let exportPreparing: String
+    let exportFailedTitle: String
+    let exportFailedMessage: String
+    let exportDocumentTitleFormat: String
+    let exportGeneratedAtFormat: String
+    let exportProfileSection: String
+    let exportPlanSection: String
+    let exportNotesSection: String
+    let exportNoNotes: String
+    let exportNoPlan: String
+
+    let reviewBannerTitle: String
+    let reviewBannerSubtitleFormat: String
+    let planReviewTitle: String
+    let planReviewSubtitleFormat: String
+    let planReviewTodayFormat: String
+    let planReviewNoPlanTitle: String
+    let planReviewNoPlanMessage: String
+    let confirmAction: String
+    let modifyAction: String
+    let pendingBadgeLabel: String
 }
 
 extension Strings {
@@ -252,7 +299,51 @@ extension Strings {
         deleteConfirmMessageFormat: "Il profilo di %@ e tutte le note del diario verranno eliminati.",
         languageLabel: "Lingua",
         profilesCountFormat: "%d profili",
-        ageNowFormat: "%d anni"
+        ageNowFormat: "%d anni",
+        remindersMenuTitle: "Promemoria e notifiche",
+        remindersSectionTitle: "Promemoria",
+        reminderToggleTitle: "Promemoria compleanno",
+        reminderToggleDescription: "Un avviso locale quando il compleanno si avvicina, con i suggerimenti pronti.",
+        reminderDaysTitle: "Ricordami",
+        dayBeforeFormat: "%d giorno prima",
+        daysBeforeFormat: "%d giorni prima",
+        giftReminderToggleTitle: "Notifica promemoria regalo separata",
+        giftReminderDescription: "Un avviso in più, prima del promemoria compleanno, per comprare il regalo in tempo.",
+        giftReminderDaysTitle: "Promemoria regalo",
+        reminderScheduledFormat: "Prossimo avviso: %@",
+        reminderDisabledLabel: "Nessun promemoria pianificato",
+        notificationsDeniedTitle: "Notifiche disattivate",
+        notificationsDeniedMessage: "Attiva le notifiche di Kudao nelle impostazioni di iOS per ricevere i promemoria.",
+        openSettingsAction: "Apri Impostazioni",
+        notificationBirthdayTitle: "Compleanno in arrivo",
+        notificationBirthdayBodyFormat: "Il compleanno di %@ si avvicina! Controlla i suggerimenti su Kudao",
+        notificationGiftTitle: "Promemoria regalo",
+        notificationGiftBodyFormat: "Non dimenticare il regalo per %@: %@",
+        notificationGiftBodyFallbackFormat: "Non dimenticare il regalo per %@. Apri Kudao per scegliere un'idea.",
+        exportSectionTitle: "Esporta diario",
+        exportSectionDescription: "Salva note e parole chiave di questo profilo in un file da condividere o archiviare.",
+        exportPDFAction: "Esporta in PDF",
+        exportJSONAction: "Esporta in JSON",
+        exportPreparing: "Preparo il file…",
+        exportFailedTitle: "Esportazione non riuscita",
+        exportFailedMessage: "Non è stato possibile creare il file. Riprova.",
+        exportDocumentTitleFormat: "Diario di %@",
+        exportGeneratedAtFormat: "Esportato il %@",
+        exportProfileSection: "Profilo",
+        exportPlanSection: "Piano festa",
+        exportNotesSection: "Note del diario",
+        exportNoNotes: "Nessuna nota nel diario.",
+        exportNoPlan: "Nessun piano festa salvato.",
+        reviewBannerTitle: "Da confermare",
+        reviewBannerSubtitleFormat: "%d piani festa aspettano il tuo ok",
+        planReviewTitle: "Tutto pronto?",
+        planReviewSubtitleFormat: "Il compleanno di %@ è tra %d giorni. Conferma il piano o modificalo.",
+        planReviewTodayFormat: "Oggi è il compleanno di %@. Conferma il piano o modificalo.",
+        planReviewNoPlanTitle: "Nessun piano ancora",
+        planReviewNoPlanMessage: "Apri i suggerimenti per creare il piano festa di questo profilo.",
+        confirmAction: "Conferma",
+        modifyAction: "Modifica",
+        pendingBadgeLabel: "Piano da confermare"
     )
 
     static let english = Strings(
@@ -370,7 +461,51 @@ extension Strings {
         deleteConfirmMessageFormat: "%@'s profile and all diary notes will be deleted.",
         languageLabel: "Language",
         profilesCountFormat: "%d profiles",
-        ageNowFormat: "%d years old"
+        ageNowFormat: "%d years old",
+        remindersMenuTitle: "Reminders & notifications",
+        remindersSectionTitle: "Reminders",
+        reminderToggleTitle: "Birthday reminder",
+        reminderToggleDescription: "A local alert when the birthday gets close, with the suggestions ready.",
+        reminderDaysTitle: "Remind me",
+        dayBeforeFormat: "%d day before",
+        daysBeforeFormat: "%d days before",
+        giftReminderToggleTitle: "Separate gift reminder",
+        giftReminderDescription: "An extra alert, earlier than the birthday reminder, to buy the gift in time.",
+        giftReminderDaysTitle: "Gift reminder",
+        reminderScheduledFormat: "Next alert: %@",
+        reminderDisabledLabel: "No reminder scheduled",
+        notificationsDeniedTitle: "Notifications are off",
+        notificationsDeniedMessage: "Turn on Kudao notifications in iOS settings to get your reminders.",
+        openSettingsAction: "Open Settings",
+        notificationBirthdayTitle: "Birthday coming up",
+        notificationBirthdayBodyFormat: "%@'s birthday is coming up! Check your suggestions on Kudao",
+        notificationGiftTitle: "Gift reminder",
+        notificationGiftBodyFormat: "Don't forget %@'s gift: %@",
+        notificationGiftBodyFallbackFormat: "Don't forget %@'s gift. Open Kudao to pick an idea.",
+        exportSectionTitle: "Export diary",
+        exportSectionDescription: "Save this profile's notes and keywords as a file you can share or archive.",
+        exportPDFAction: "Export as PDF",
+        exportJSONAction: "Export as JSON",
+        exportPreparing: "Preparing the file…",
+        exportFailedTitle: "Export failed",
+        exportFailedMessage: "The file could not be created. Please try again.",
+        exportDocumentTitleFormat: "%@'s diary",
+        exportGeneratedAtFormat: "Exported on %@",
+        exportProfileSection: "Profile",
+        exportPlanSection: "Party plan",
+        exportNotesSection: "Diary notes",
+        exportNoNotes: "No diary notes yet.",
+        exportNoPlan: "No party plan saved.",
+        reviewBannerTitle: "Needs confirming",
+        reviewBannerSubtitleFormat: "%d party plans are waiting for your go-ahead",
+        planReviewTitle: "All set?",
+        planReviewSubtitleFormat: "%@'s birthday is in %d days. Confirm the plan or tweak it.",
+        planReviewTodayFormat: "Today is %@'s birthday. Confirm the plan or tweak it.",
+        planReviewNoPlanTitle: "No plan yet",
+        planReviewNoPlanMessage: "Open the suggestions to build this profile's party plan.",
+        confirmAction: "Confirm",
+        modifyAction: "Edit",
+        pendingBadgeLabel: "Plan to confirm"
     )
 
     static let french = Strings(
@@ -488,7 +623,51 @@ extension Strings {
         deleteConfirmMessageFormat: "Le profil de %@ et toutes les notes du journal seront supprimés.",
         languageLabel: "Langue",
         profilesCountFormat: "%d profils",
-        ageNowFormat: "%d ans"
+        ageNowFormat: "%d ans",
+        remindersMenuTitle: "Rappels et notifications",
+        remindersSectionTitle: "Rappels",
+        reminderToggleTitle: "Rappel d'anniversaire",
+        reminderToggleDescription: "Une alerte locale quand l'anniversaire approche, avec les suggestions prêtes.",
+        reminderDaysTitle: "Me rappeler",
+        dayBeforeFormat: "%d jour avant",
+        daysBeforeFormat: "%d jours avant",
+        giftReminderToggleTitle: "Rappel cadeau séparé",
+        giftReminderDescription: "Une alerte supplémentaire, avant le rappel d'anniversaire, pour acheter le cadeau à temps.",
+        giftReminderDaysTitle: "Rappel cadeau",
+        reminderScheduledFormat: "Prochaine alerte : %@",
+        reminderDisabledLabel: "Aucun rappel programmé",
+        notificationsDeniedTitle: "Notifications désactivées",
+        notificationsDeniedMessage: "Activez les notifications de Kudao dans les réglages iOS pour recevoir les rappels.",
+        openSettingsAction: "Ouvrir les Réglages",
+        notificationBirthdayTitle: "Anniversaire imminent",
+        notificationBirthdayBodyFormat: "L'anniversaire de %@ approche ! Consultez les suggestions sur Kudao",
+        notificationGiftTitle: "Rappel cadeau",
+        notificationGiftBodyFormat: "N'oubliez pas le cadeau de %@ : %@",
+        notificationGiftBodyFallbackFormat: "N'oubliez pas le cadeau de %@. Ouvrez Kudao pour choisir une idée.",
+        exportSectionTitle: "Exporter le journal",
+        exportSectionDescription: "Enregistrez les notes et mots-clés de ce profil dans un fichier à partager ou archiver.",
+        exportPDFAction: "Exporter en PDF",
+        exportJSONAction: "Exporter en JSON",
+        exportPreparing: "Préparation du fichier…",
+        exportFailedTitle: "Export impossible",
+        exportFailedMessage: "Le fichier n'a pas pu être créé. Réessayez.",
+        exportDocumentTitleFormat: "Journal de %@",
+        exportGeneratedAtFormat: "Exporté le %@",
+        exportProfileSection: "Profil",
+        exportPlanSection: "Plan de fête",
+        exportNotesSection: "Notes du journal",
+        exportNoNotes: "Aucune note dans le journal.",
+        exportNoPlan: "Aucun plan de fête enregistré.",
+        reviewBannerTitle: "À confirmer",
+        reviewBannerSubtitleFormat: "%d plans de fête attendent votre validation",
+        planReviewTitle: "Tout est prêt ?",
+        planReviewSubtitleFormat: "L'anniversaire de %@ est dans %d jours. Confirmez le plan ou modifiez-le.",
+        planReviewTodayFormat: "C'est aujourd'hui l'anniversaire de %@. Confirmez le plan ou modifiez-le.",
+        planReviewNoPlanTitle: "Pas encore de plan",
+        planReviewNoPlanMessage: "Ouvrez les suggestions pour créer le plan de fête de ce profil.",
+        confirmAction: "Confirmer",
+        modifyAction: "Modifier",
+        pendingBadgeLabel: "Plan à confirmer"
     )
 
     static let spanish = Strings(
@@ -606,6 +785,50 @@ extension Strings {
         deleteConfirmMessageFormat: "Se eliminarán el perfil de %@ y todas las notas del diario.",
         languageLabel: "Idioma",
         profilesCountFormat: "%d perfiles",
-        ageNowFormat: "%d años"
+        ageNowFormat: "%d años",
+        remindersMenuTitle: "Recordatorios y notificaciones",
+        remindersSectionTitle: "Recordatorios",
+        reminderToggleTitle: "Recordatorio de cumpleaños",
+        reminderToggleDescription: "Un aviso local cuando el cumpleaños se acerca, con las sugerencias listas.",
+        reminderDaysTitle: "Recordarme",
+        dayBeforeFormat: "%d día antes",
+        daysBeforeFormat: "%d días antes",
+        giftReminderToggleTitle: "Recordatorio de regalo aparte",
+        giftReminderDescription: "Un aviso extra, antes del recordatorio de cumpleaños, para comprar el regalo a tiempo.",
+        giftReminderDaysTitle: "Recordatorio de regalo",
+        reminderScheduledFormat: "Próximo aviso: %@",
+        reminderDisabledLabel: "Ningún recordatorio programado",
+        notificationsDeniedTitle: "Notificaciones desactivadas",
+        notificationsDeniedMessage: "Activa las notificaciones de Kudao en los ajustes de iOS para recibir los recordatorios.",
+        openSettingsAction: "Abrir Ajustes",
+        notificationBirthdayTitle: "Cumpleaños a la vista",
+        notificationBirthdayBodyFormat: "¡El cumpleaños de %@ se acerca! Revisa las sugerencias en Kudao",
+        notificationGiftTitle: "Recordatorio de regalo",
+        notificationGiftBodyFormat: "No olvides el regalo para %@: %@",
+        notificationGiftBodyFallbackFormat: "No olvides el regalo para %@. Abre Kudao para elegir una idea.",
+        exportSectionTitle: "Exportar diario",
+        exportSectionDescription: "Guarda las notas y palabras clave de este perfil en un archivo para compartir o archivar.",
+        exportPDFAction: "Exportar en PDF",
+        exportJSONAction: "Exportar en JSON",
+        exportPreparing: "Preparando el archivo…",
+        exportFailedTitle: "Error al exportar",
+        exportFailedMessage: "No se pudo crear el archivo. Inténtalo de nuevo.",
+        exportDocumentTitleFormat: "Diario de %@",
+        exportGeneratedAtFormat: "Exportado el %@",
+        exportProfileSection: "Perfil",
+        exportPlanSection: "Plan de fiesta",
+        exportNotesSection: "Notas del diario",
+        exportNoNotes: "Todavía no hay notas en el diario.",
+        exportNoPlan: "No hay plan de fiesta guardado.",
+        reviewBannerTitle: "Por confirmar",
+        reviewBannerSubtitleFormat: "%d planes de fiesta esperan tu confirmación",
+        planReviewTitle: "¿Todo listo?",
+        planReviewSubtitleFormat: "El cumpleaños de %@ es en %d días. Confirma el plan o modifícalo.",
+        planReviewTodayFormat: "Hoy es el cumpleaños de %@. Confirma el plan o modifícalo.",
+        planReviewNoPlanTitle: "Todavía no hay plan",
+        planReviewNoPlanMessage: "Abre las sugerencias para crear el plan de fiesta de este perfil.",
+        confirmAction: "Confirmar",
+        modifyAction: "Editar",
+        pendingBadgeLabel: "Plan por confirmar"
     )
 }

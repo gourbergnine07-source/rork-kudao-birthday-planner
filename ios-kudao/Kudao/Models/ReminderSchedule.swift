@@ -1,0 +1,58 @@
+//
+//  ReminderSchedule.swift
+//  Kudao
+//
+
+import Foundation
+
+/// Calendar math for the local reminder fire dates of a profile.
+extension BirthdayProfile {
+    /// Hour of the day every reminder fires at, local time.
+    static let reminderHour: Int = 9
+
+    /// The next fire date for a reminder placed `daysBefore` the birthday.
+    ///
+    /// If this year's window has already passed, the next year's birthday is used,
+    /// so a reminder is always scheduled for a future date.
+    func reminderFireDate(
+        daysBefore: Int,
+        reference: Date = Date(),
+        calendar: Calendar = .current
+    ) -> Date? {
+        let components = calendar.dateComponents([.month, .day], from: birthDate)
+        let currentYear = calendar.component(.year, from: reference)
+
+        for offset in 0...2 {
+            var target = DateComponents()
+            target.year = currentYear + offset
+            target.month = components.month
+            target.day = components.day
+
+            guard let occurrence = calendar.date(from: target),
+                  let shifted = calendar.date(byAdding: .day, value: -max(0, daysBefore), to: occurrence),
+                  let fire = calendar.date(
+                      bySettingHour: Self.reminderHour,
+                      minute: 0,
+                      second: 0,
+                      of: shifted
+                  ),
+                  fire > reference
+            else { continue }
+
+            return fire
+        }
+        return nil
+    }
+
+    /// Fire date of the main birthday reminder, when enabled.
+    var birthdayReminderDate: Date? {
+        guard isReminderEnabled else { return nil }
+        return reminderFireDate(daysBefore: reminderDaysBefore)
+    }
+
+    /// Fire date of the separate gift reminder, when enabled.
+    var giftReminderDate: Date? {
+        guard isReminderEnabled, isGiftReminderEnabled else { return nil }
+        return reminderFireDate(daysBefore: giftReminderDaysBefore)
+    }
+}

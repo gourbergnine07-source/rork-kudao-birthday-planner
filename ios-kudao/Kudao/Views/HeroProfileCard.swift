@@ -42,6 +42,16 @@ struct HeroProfileCard: View {
                         ringColor: .white.opacity(0.55),
                         ringWidth: 2
                     )
+                    .overlay(alignment: .topTrailing) {
+                        if profile.needsPlanConfirmation {
+                            Circle()
+                                .fill(Color.red)
+                                .frame(width: 15, height: 15)
+                                .overlay(Circle().strokeBorder(.white.opacity(0.9), lineWidth: 2.5))
+                                .offset(x: 2, y: -1)
+                                .accessibilityLabel(strings.pendingBadgeLabel)
+                        }
+                    }
 
                     VStack(alignment: .leading, spacing: 6) {
                         Text(profile.name)

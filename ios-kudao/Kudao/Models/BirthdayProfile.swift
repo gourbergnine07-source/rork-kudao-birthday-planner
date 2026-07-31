@@ -19,6 +19,16 @@ final class BirthdayProfile {
     var isSurpriseMode: Bool = false
     var createdAt: Date = Date()
 
+    // MARK: Reminders
+
+    /// Master switch for the birthday reminder notification.
+    var isReminderEnabled: Bool = true
+    /// How many days before the birthday the main reminder fires.
+    var reminderDaysBefore: Int = 7
+    /// Optional earlier notification dedicated to buying the gift.
+    var isGiftReminderEnabled: Bool = true
+    var giftReminderDaysBefore: Int = 10
+
     @Relationship(deleteRule: .cascade, inverse: \DiaryEntry.profile)
     var diaryEntries: [DiaryEntry] = []
 
@@ -53,6 +63,12 @@ final class BirthdayProfile {
 
     var countdown: BirthdayCountdown {
         BirthdayCountdown(birthDate: birthDate)
+    }
+
+    /// True while the birthday sits inside the reminder window and the plan is still unconfirmed.
+    var needsPlanConfirmation: Bool {
+        guard isReminderEnabled else { return false }
+        return countdown.daysRemaining <= max(1, reminderDaysBefore) && !(partyPlan?.isConfirmed ?? false)
     }
 
     /// First grapheme of every word, max two characters, used for the avatar fallback.

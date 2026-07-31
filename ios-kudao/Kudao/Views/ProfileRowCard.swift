@@ -21,6 +21,16 @@ struct ProfileRowCard: View {
     var body: some View {
         HStack(spacing: 14) {
             AvatarView(name: profile.name, photoData: profile.photoData, size: 52)
+                .overlay(alignment: .topTrailing) {
+                    if profile.needsPlanConfirmation {
+                        Circle()
+                            .fill(Color.red)
+                            .frame(width: 13, height: 13)
+                            .overlay(Circle().strokeBorder(Palette.surface, lineWidth: 2.5))
+                            .offset(x: 2, y: -1)
+                            .accessibilityLabel(strings.pendingBadgeLabel)
+                    }
+                }
 
             VStack(alignment: .leading, spacing: 5) {
                 HStack(spacing: 6) {
