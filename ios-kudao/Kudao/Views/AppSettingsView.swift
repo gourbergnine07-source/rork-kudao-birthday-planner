@@ -454,5 +454,7 @@ private struct AppSettingsCard<Content: View>: View {
         .environment(CollaborationService())
         .environment(CloudBackupService())
         .environment(NotificationService.shared)
+        .environment(SubscriptionService())
+        .environment(AdsService())
         .modelContainer(KudaoModelContainer.preview())
 }

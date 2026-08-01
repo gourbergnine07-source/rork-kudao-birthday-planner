@@ -39,24 +39,42 @@ final class AdsService {
         static let interstitial: String = "EXPO_PUBLIC_ADMOB_IOS_INTERSTITIAL_UNIT_ID"
     }
 
-    /// The application identifier compiled into Info.plist as
-    /// `GADApplicationIdentifier`. Kept here only so the app can warn when the
-    /// two drift apart: the SDK reads the plist, never this value.
-    static var appID: String { setting(Keys.appID, fallback: TestIdentifiers.appID) }
-    static var bannerUnitID: String { setting(Keys.banner, fallback: TestIdentifiers.banner) }
-    static var interstitialUnitID: String { setting(Keys.interstitial, fallback: TestIdentifiers.interstitial) }
+    /// The identifier the SDK actually uses: it reads `GADApplicationIdentifier`
+    /// from Info.plist and ignores anything set in code.
+    static var plistAppID: String {
+        let value = Bundle.main.object(forInfoDictionaryKey: "GADApplicationIdentifier") as? String
+        return (value ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    /// Live inventory is requested only when all three identifiers are present
+    /// **and** the account compiled into Info.plist is the same one that owns the
+    /// ad units. A mismatch would mean requests billed to nobody and, worse, the
+    /// kind of invalid traffic that gets AdMob accounts suspended, so the app
+    /// quietly falls back to demo inventory instead.
+    static var isLiveInventoryReady: Bool {
+        guard let app = setting(Keys.appID),
+              setting(Keys.banner) != nil,
+              setting(Keys.interstitial) != nil else { return false }
+        return app == plistAppID
+    }
+
+    static var appID: String { isLiveInventoryReady ? (setting(Keys.appID) ?? "") : TestIdentifiers.appID }
+    static var bannerUnitID: String { isLiveInventoryReady ? (setting(Keys.banner) ?? "") : TestIdentifiers.banner }
+    static var interstitialUnitID: String {
+        isLiveInventoryReady ? (setting(Keys.interstitial) ?? "") : TestIdentifiers.interstitial
+    }
 
     /// True while the build is still serving Google's demo inventory.
-    static var isUsingTestInventory: Bool { bannerUnitID == TestIdentifiers.banner }
+    static var isUsingTestInventory: Bool { !isLiveInventoryReady }
 
-    /// Reads a project setting, falling back when it is absent or blank.
+    /// Reads a project setting, returning `nil` when it is absent or blank.
     ///
     /// `Config.allValues` is a dictionary rather than a named constant because
     /// the file behind it is regenerated at build time: a lookup degrades to the
     /// fallback instead of failing to compile.
-    private static func setting(_ name: String, fallback: String) -> String {
+    private static func setting(_ name: String) -> String? {
         let value = (Config.allValues[name] ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
-        return value.isEmpty ? fallback : value
+        return value.isEmpty ? nil : value
     }
 
     // MARK: - State
@@ -97,7 +115,12 @@ final class AdsService {
         canRequestAds = ConsentInformation.shared.canRequestAds
 
         if Self.isUsingTestInventory {
-            print("[Kudao] AdMob is serving test ads — set \(Keys.banner) and \(Keys.interstitial) to earn.")
+            let configured = Self.setting(Keys.appID)
+            if let configured, configured != Self.plistAppID {
+                print("[Kudao] AdMob app id mismatch: Info.plist has \(Self.plistAppID), settings have \(configured). Serving test ads.")
+            } else {
+                print("[Kudao] AdMob is serving test ads — set \(Keys.banner) and \(Keys.interstitial) to earn.")
+            }
         }
 
         await loadInterstitial()

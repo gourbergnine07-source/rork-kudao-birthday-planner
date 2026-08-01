@@ -103,6 +103,7 @@ struct MessageTabView: View {
         } message: {
             Text(strings.messageSentConfirmMessage)
         }
+        .pausesInterstitials()
     }
 
     /// Changes that must be mirrored into the scheduled send reminder.
