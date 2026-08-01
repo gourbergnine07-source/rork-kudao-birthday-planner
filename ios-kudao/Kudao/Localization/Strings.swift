@@ -667,6 +667,17 @@ nonisolated struct Strings: Sendable {
     let affiliateActiveBadge: String
     let affiliateFallbackNote: String
     let affiliateDisclosure: String
+    let linkPreviewTitle: String
+    let linkPreviewBadgeLabel: String
+    let linkPreviewStoreLabel: String
+    let linkPreviewQueryLabel: String
+    let linkPreviewNoTag: String
+    let linkPreviewNoTagHint: String
+    let linkPreviewUrlLabel: String
+    let linkPreviewOpenAction: String
+    let linkPreviewCopyAction: String
+    let linkPreviewCopiedLabel: String
+    let linkPreviewGoogleAction: String
 }
 
 extension Strings {
@@ -1284,8 +1295,19 @@ extension Strings {
         affiliateCaption: "Ogni mercato Amazon ha il suo tag: quello di amazon.it non guadagna nulla su amazon.fr. Il mercato viene scelto dalla lingua dell\u{2019}app, o da quella del dispositivo.",
         affiliateTagLabel: "Tag affiliato",
         affiliateActiveBadge: "In uso",
-        affiliateFallbackNote: "Senza tag, il pulsante apre la ricerca Google Shopping come prima.",
-        affiliateDisclosure: "Come Affiliato Amazon, Kudao riceve un guadagno dagli acquisti idonei, senza costi aggiuntivi per te"
+        affiliateFallbackNote: "Senza tag il pulsante apre comunque Amazon, ma senza commissione.",
+        affiliateDisclosure: "Come Affiliato Amazon, Kudao riceve un guadagno dagli acquisti idonei, senza costi aggiuntivi per te",
+        linkPreviewTitle: "Anteprima link",
+        linkPreviewBadgeLabel: "Vedi il link prima di aprirlo",
+        linkPreviewStoreLabel: "Negozio",
+        linkPreviewQueryLabel: "Ricerca",
+        linkPreviewNoTag: "Nessun tag per questo mercato",
+        linkPreviewNoTagHint: "Il link apre lo stesso Amazon, ma non genera commissioni. Aggiungi il tag in Il mio profilo \u{203A} Affiliazione Amazon.",
+        linkPreviewUrlLabel: "URL di destinazione",
+        linkPreviewOpenAction: "Apri in Safari",
+        linkPreviewCopyAction: "Copia link",
+        linkPreviewCopiedLabel: "Copiato",
+        linkPreviewGoogleAction: "Cerca invece su Google Shopping"
     )
 
     static let english = Strings(
@@ -1902,8 +1924,19 @@ extension Strings {
         affiliateCaption: "Every Amazon marketplace needs its own tag: an amazon.it tag earns nothing on amazon.fr. The marketplace follows the app language, or the device one.",
         affiliateTagLabel: "Associates tag",
         affiliateActiveBadge: "In use",
-        affiliateFallbackNote: "Without a tag the button opens the Google Shopping search, exactly as before.",
-        affiliateDisclosure: "As an Amazon Associate, Kudao earns from qualifying purchases, at no extra cost to you"
+        affiliateFallbackNote: "Without a tag the button still opens Amazon, it just earns no commission.",
+        affiliateDisclosure: "As an Amazon Associate, Kudao earns from qualifying purchases, at no extra cost to you",
+        linkPreviewTitle: "Link preview",
+        linkPreviewBadgeLabel: "See the link before opening it",
+        linkPreviewStoreLabel: "Store",
+        linkPreviewQueryLabel: "Search",
+        linkPreviewNoTag: "No tag for this marketplace",
+        linkPreviewNoTagHint: "The link still opens Amazon, it just earns nothing. Add the tag in My profile \u{203A} Amazon affiliation.",
+        linkPreviewUrlLabel: "Destination URL",
+        linkPreviewOpenAction: "Open in Safari",
+        linkPreviewCopyAction: "Copy link",
+        linkPreviewCopiedLabel: "Copied",
+        linkPreviewGoogleAction: "Search on Google Shopping instead"
     )
 
     static let french = Strings(
@@ -2520,8 +2553,19 @@ extension Strings {
         affiliateCaption: "Chaque march\u{00E9} Amazon a son propre tag : celui d\u{2019}amazon.fr ne rapporte rien sur amazon.it. Le march\u{00E9} suit la langue de l\u{2019}app, ou celle de l\u{2019}appareil.",
         affiliateTagLabel: "Tag partenaire",
         affiliateActiveBadge: "Utilis\u{00E9}",
-        affiliateFallbackNote: "Sans tag, le bouton ouvre la recherche Google Shopping comme avant.",
-        affiliateDisclosure: "En tant que Partenaire Amazon, Kudao r\u{00E9}alise un b\u{00E9}n\u{00E9}fice sur les achats remplissant les conditions requises, sans co\u{00FB}t suppl\u{00E9}mentaire pour vous"
+        affiliateFallbackNote: "Sans tag, le bouton ouvre quand m\u{00EA}me Amazon, mais sans commission.",
+        affiliateDisclosure: "En tant que Partenaire Amazon, Kudao r\u{00E9}alise un b\u{00E9}n\u{00E9}fice sur les achats remplissant les conditions requises, sans co\u{00FB}t suppl\u{00E9}mentaire pour vous",
+        linkPreviewTitle: "Aper\u{00E7}u du lien",
+        linkPreviewBadgeLabel: "Voir le lien avant de l\u{2019}ouvrir",
+        linkPreviewStoreLabel: "Boutique",
+        linkPreviewQueryLabel: "Recherche",
+        linkPreviewNoTag: "Aucun tag pour ce march\u{00E9}",
+        linkPreviewNoTagHint: "Le lien ouvre quand m\u{00EA}me Amazon, mais ne rapporte rien. Ajoutez le tag dans Mon profil \u{203A} Affiliation Amazon.",
+        linkPreviewUrlLabel: "URL de destination",
+        linkPreviewOpenAction: "Ouvrir dans Safari",
+        linkPreviewCopyAction: "Copier le lien",
+        linkPreviewCopiedLabel: "Copi\u{00E9}",
+        linkPreviewGoogleAction: "Chercher plut\u{00F4}t sur Google Shopping"
     )
 
     static let spanish = Strings(
@@ -3138,7 +3182,18 @@ extension Strings {
         affiliateCaption: "Cada mercado de Amazon tiene su propio tag: el de amazon.es no gana nada en amazon.fr. El mercado sigue el idioma de la app, o el del dispositivo.",
         affiliateTagLabel: "Tag de afiliado",
         affiliateActiveBadge: "En uso",
-        affiliateFallbackNote: "Sin tag, el bot\u{00F3}n abre la b\u{00FA}squeda de Google Shopping como antes.",
-        affiliateDisclosure: "Como Afiliado de Amazon, Kudao obtiene ingresos por las compras adscritas que cumplen los requisitos aplicables, sin coste adicional para ti"
+        affiliateFallbackNote: "Sin tag el bot\u{00F3}n abre igualmente Amazon, pero sin comisi\u{00F3}n.",
+        affiliateDisclosure: "Como Afiliado de Amazon, Kudao obtiene ingresos por las compras adscritas que cumplen los requisitos aplicables, sin coste adicional para ti",
+        linkPreviewTitle: "Vista previa del enlace",
+        linkPreviewBadgeLabel: "Ver el enlace antes de abrirlo",
+        linkPreviewStoreLabel: "Tienda",
+        linkPreviewQueryLabel: "B\u{00FA}squeda",
+        linkPreviewNoTag: "Sin tag para este mercado",
+        linkPreviewNoTagHint: "El enlace abre igualmente Amazon, pero no genera comisiones. A\u{00F1}ade el tag en Mi perfil \u{203A} Afiliaci\u{00F3}n de Amazon.",
+        linkPreviewUrlLabel: "URL de destino",
+        linkPreviewOpenAction: "Abrir en Safari",
+        linkPreviewCopyAction: "Copiar enlace",
+        linkPreviewCopiedLabel: "Copiado",
+        linkPreviewGoogleAction: "Buscar en Google Shopping"
     )
 }

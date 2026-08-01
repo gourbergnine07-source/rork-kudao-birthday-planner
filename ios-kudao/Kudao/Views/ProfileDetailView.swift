@@ -32,6 +32,7 @@ struct ProfileDetailView: View {
     @State private var gallery = GalleryService()
     @State private var isShowingStores: Bool = false
     @State private var noGiftIdeaAlert: Bool = false
+    @State private var linkPreview: GiftLinkPreview?
     @State private var exportingFormat: DiaryExportFormat?
     @State private var exportedFile: ExportedFile?
     @State private var exportFailed: Bool = false
@@ -142,6 +143,9 @@ struct ProfileDetailView: View {
         }
         .sheet(isPresented: $isShowingParticipants) {
             ParticipantsView(profile: profile)
+        }
+        .sheet(item: $linkPreview) { preview in
+            GiftLinkPreviewView(preview: preview)
         }
         .sheet(isPresented: $isShowingStores) {
             if let plan = profile.partyPlan, plan.hasGiftIdea {
@@ -881,6 +885,10 @@ struct ProfileDetailView: View {
         VStack(spacing: 10) {
             giftActionsRow
 
+            if shoppingPreview != nil {
+                previewBadge
+            }
+
             if isAffiliateLink {
                 Label(strings.affiliateDisclosure, systemImage: "info.circle")
                     .font(.system(.caption2, design: .rounded))
@@ -896,6 +904,55 @@ struct ProfileDetailView: View {
     /// True when the shopping button carries an Associates tag for the active storefront.
     private var isAffiliateLink: Bool {
         settings.earnsAmazonCommission
+    }
+
+    /// Chip that reveals the exact URL the shopping button is about to open.
+    ///
+    /// Affiliate links are opaque, so the destination stays one tap away from
+    /// being inspected instead of being taken on trust.
+    private var previewBadge: some View {
+        Button {
+            linkPreview = shoppingPreview
+        } label: {
+            HStack(spacing: 6) {
+                Image(systemName: "eye.fill")
+                    .font(.system(size: 11, weight: .bold))
+                Text(shoppingHost)
+                    .font(.system(.caption2, design: .monospaced))
+                    .lineLimit(1)
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 9, weight: .bold))
+                    .foregroundStyle(.tertiary)
+            }
+            .foregroundStyle(Palette.clay)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 7)
+            .background(Capsule().fill(Palette.surfaceRaised))
+            .overlay(Capsule().strokeBorder(Palette.hairline, lineWidth: 1))
+        }
+        .buttonStyle(PressableCardStyle())
+        .accessibilityLabel(strings.linkPreviewBadgeLabel)
+    }
+
+    /// Host of the pending shopping link, shown on the badge as a spoiler.
+    private var shoppingHost: String {
+        shoppingPreview?.amazon.url.host()?.replacingOccurrences(of: "www.", with: "") ?? ""
+    }
+
+    /// Everything the preview sheet needs, or nil while there is no gift idea yet.
+    private var shoppingPreview: GiftLinkPreview? {
+        guard let idea = giftIdea,
+              let amazon = GiftShopping.destination(
+                  for: idea,
+                  language: settings.language,
+                  affiliateTags: settings.amazonTags
+              ) else { return nil }
+
+        return GiftLinkPreview(
+            query: idea,
+            amazon: amazon,
+            web: GiftShopping.webDestination(for: idea, language: settings.language)
+        )
     }
 
     /// Both actions read the gift straight from the generated plan, never from a manual field.
@@ -971,21 +1028,17 @@ struct ProfileDetailView: View {
         return plan.giftIdea
     }
 
-    /// Opens the gift search in the system browser: Amazon when tagged, Google otherwise.
+    /// Opens the Amazon search for the gift idea in the system browser.
     ///
     /// The query is always the AI-generated `giftIdea`, and the link always leaves
-    /// the app — an in-app web view would break the Associates attribution.
+    /// the app — an in-app web view would break the Associates attribution. A
+    /// missing tag only drops the commission, it never changes the destination.
     private func openShopping() {
-        guard let idea = giftIdea,
-              let destination = GiftShopping.destination(
-                  for: idea,
-                  language: settings.language,
-                  affiliateTags: settings.amazonTags
-              ) else {
+        guard let preview = shoppingPreview else {
             noGiftIdeaAlert = true
             return
         }
-        ExternalLink.open(destination.url)
+        ExternalLink.open(preview.amazon.url)
     }
 
     private func openNearbyStores() {

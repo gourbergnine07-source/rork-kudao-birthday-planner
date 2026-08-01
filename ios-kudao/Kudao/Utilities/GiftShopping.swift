@@ -7,14 +7,18 @@ import Foundation
 
 /// Where the "buy online" button sends the user for one gift idea.
 nonisolated enum GiftDestination: Equatable, Sendable {
-    /// Amazon search on a storefront Kudao has an Associates tag for.
-    case amazon(URL, marketplace: AmazonMarketplace)
-    /// Plain Google Shopping search, used when no tag is configured.
+    /// Amazon search on the storefront that matches the language.
+    ///
+    /// `tag` is the Associates tag actually attached to the URL. It is `nil`
+    /// when no tag is configured for that storefront: the link still goes to
+    /// Amazon, it simply earns nothing.
+    case amazon(URL, marketplace: AmazonMarketplace, tag: String?)
+    /// Plain Google Shopping search, offered as the alternative.
     case webSearch(URL)
 
     var url: URL {
         switch self {
-        case .amazon(let url, _): url
+        case .amazon(let url, _, _): url
         case .webSearch(let url): url
         }
     }
@@ -22,8 +26,23 @@ nonisolated enum GiftDestination: Equatable, Sendable {
     /// True when the link earns a commission and therefore needs the disclosure.
     var isAffiliate: Bool {
         switch self {
-        case .amazon: true
+        case .amazon(_, _, let tag): tag?.isEmpty == false
         case .webSearch: false
+        }
+    }
+
+    /// Storefront the link points at, `nil` for the Google search.
+    var marketplace: AmazonMarketplace? {
+        switch self {
+        case .amazon(_, let marketplace, _): marketplace
+        case .webSearch: nil
+        }
+    }
+
+    var tag: String? {
+        switch self {
+        case .amazon(_, _, let tag): tag
+        case .webSearch: nil
         }
     }
 }
@@ -33,7 +52,10 @@ nonisolated enum GiftDestination: Equatable, Sendable {
 /// The query always comes from `PartyPlan.giftIdea`: Kudao never lets the user
 /// type a gift by hand outside the diary → suggestions flow.
 nonisolated enum GiftShopping {
-    /// Best destination for a gift idea: Amazon when a tag exists, Google otherwise.
+    /// Amazon search for a gift idea, carrying the Associates tag when there is one.
+    ///
+    /// The button always lands on Amazon. A missing tag only costs the commission,
+    /// it never redirects the user somewhere else than they expect.
     ///
     /// - Parameter affiliateTags: Associates tags keyed by `AmazonMarketplace.rawValue`.
     static func destination(
@@ -42,34 +64,41 @@ nonisolated enum GiftShopping {
         affiliateTags: [String: String]
     ) -> GiftDestination? {
         let marketplace = AmazonMarketplace.resolve(language: language)
-        let tag = affiliateTags[marketplace.rawValue]?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        let raw = affiliateTags[marketplace.rawValue]?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        let tag = raw.isEmpty ? nil : raw
 
-        if !tag.isEmpty, let url = amazonSearchURL(for: giftIdea, marketplace: marketplace, tag: tag) {
-            return .amazon(url, marketplace: marketplace)
+        guard let url = amazonSearchURL(for: giftIdea, marketplace: marketplace, tag: tag) else {
+            return nil
         }
-
-        guard let fallback = searchURL(for: giftIdea, language: language) else { return nil }
-        return .webSearch(fallback)
+        return .amazon(url, marketplace: marketplace, tag: tag)
     }
 
-    /// Amazon search on one storefront, carrying the Associates tag.
+    /// Google Shopping destination for the same idea, used as the manual alternative.
+    static func webDestination(for giftIdea: String, language: AppLanguage) -> GiftDestination? {
+        guard let url = searchURL(for: giftIdea, language: language) else { return nil }
+        return .webSearch(url)
+    }
+
+    /// Amazon search on one storefront, with the Associates tag when provided.
     static func amazonSearchURL(
         for giftIdea: String,
         marketplace: AmazonMarketplace,
-        tag: String
+        tag: String?
     ) -> URL? {
         let trimmed = giftIdea.trimmingCharacters(in: .whitespacesAndNewlines)
-        let cleanTag = tag.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty, !cleanTag.isEmpty else { return nil }
+        guard !trimmed.isEmpty else { return nil }
 
         var components = URLComponents()
         components.scheme = "https"
         components.host = marketplace.host
         components.path = "/s"
-        components.queryItems = [
-            URLQueryItem(name: "k", value: trimmed),
-            URLQueryItem(name: "tag", value: cleanTag)
-        ]
+
+        var items = [URLQueryItem(name: "k", value: trimmed)]
+        if let tag, !tag.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            items.append(URLQueryItem(name: "tag", value: tag.trimmingCharacters(in: .whitespacesAndNewlines)))
+        }
+        components.queryItems = items
+
         return components.url
     }
 
