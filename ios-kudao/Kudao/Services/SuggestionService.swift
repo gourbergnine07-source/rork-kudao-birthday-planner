@@ -23,6 +23,13 @@ nonisolated struct SuggestionInput: Sendable {
     /// Short summaries of notes flagged as gift-relevant.
     let giftLeads: [String]
     let keywordCount: Int
+    /// Gift ideas already used in previous cycles, newest first.
+    ///
+    /// The archive is what makes the engine improve year after year: it must
+    /// never propose the same present twice.
+    var pastGifts: [String] = []
+    /// How many cycles of this profile are already in the library.
+    var archivedYears: Int = 0
 }
 
 private nonisolated struct GiftPayload: Decodable, Sendable {
@@ -110,7 +117,10 @@ nonisolated enum SuggestionService {
         - When a favourite character is given, it is a strong hint for the cake theme and a good one \
         for the gift; use it at most once and never force it.
         - "confidenza" reflects how much evidence the keywords give you: few or vague keywords \
-        means "bassa", a rich and coherent list means "alta".
+        means "bassa", a rich and coherent list means "alta". Keywords collected over several \
+        years are stronger evidence than a handful of recent ones.
+        - When previous years' gifts are listed, they are off limits: propose something new that \
+        builds on what those years revealed about the person.
         - Write every text value in \(language.promptName). Keep the JSON keys exactly as above, in Italian.
         """
     }
@@ -183,6 +193,13 @@ nonisolated enum SuggestionService {
         if !input.giftLeads.isEmpty {
             lines.append("Notes flagged as gift-relevant:")
             lines.append(contentsOf: input.giftLeads.map { "- \($0)" })
+        }
+        if !input.pastGifts.isEmpty {
+            lines.append("Gifts already given in previous years (NEVER repeat these, and avoid close variants):")
+            lines.append(contentsOf: input.pastGifts.map { "- \($0)" })
+        }
+        if input.archivedYears > 0 {
+            lines.append("Years already celebrated with this app: \(input.archivedYears)")
         }
         lines.append("Total distinct keywords: \(input.keywordCount)")
         return lines.joined(separator: "\n")

@@ -65,11 +65,20 @@ nonisolated enum AmazonMarketplace: String, CaseIterable, Identifiable, Sendable
     /// Where the tag for this storefront is stored.
     var defaultsKey: String { "kudao.affiliate.amazon.\(rawValue)" }
 
-    /// Tag compiled into the build. Left empty: tags are entered in the settings.
+    /// Environment variable that carries this storefront's tag into the build.
+    var configKey: String { "EXPO_PUBLIC_AMAZON_TAG_\(rawValue.uppercased())" }
+
+    /// Tag compiled into the build, used until the user types one of their own.
     ///
-    /// Filling one of these in ships a default for everybody who has not typed
-    /// their own tag, which is what a single-account install wants.
-    var shippedTag: String { "" }
+    /// Kudao ships as a single Associates account, so the tags belong to the
+    /// build rather than to each install: they are injected as public
+    /// environment variables (`EXPO_PUBLIC_AMAZON_TAG_IT`, `..._FR`, `..._DE`,
+    /// `..._ES`, `..._COM`). The lookup goes through `Config.allValues` on
+    /// purpose, so a storefront without a configured variable simply earns
+    /// nothing instead of breaking the build.
+    var shippedTag: String {
+        (Config.allValues[configKey] ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+    }
 
     /// Storefront for a gift search, from the profile language and, failing that, the device.
     ///

@@ -151,6 +151,10 @@ final class SuggestionEngine {
     // MARK: - Input building
 
     /// Collapses the diary tags into the compact context the model receives.
+    ///
+    /// Every tag the profile ever collected takes part, not just this year's:
+    /// the archive keeps the diary growing across cycles, and the past gifts
+    /// stored in the library are handed over so nothing is proposed twice.
     static func makeInput(for profile: BirthdayProfile) -> SuggestionInput {
         let tags = profile.diaryTags.sorted { $0.createdAt > $1.createdAt }
         var buckets: [DiaryCategory: [String]] = [:]
@@ -186,7 +190,9 @@ final class SuggestionEngine {
             favoriteCharacter: profile.trimmedFavoriteCharacter,
             tagLines: tagLines,
             giftLeads: Array(giftLeads),
-            keywordCount: buckets.values.reduce(0) { $0 + $1.count }
+            keywordCount: buckets.values.reduce(0) { $0 + $1.count },
+            pastGifts: Array(profile.pastGiftIdeas.prefix(8)),
+            archivedYears: profile.eventHistory.count
         )
     }
 

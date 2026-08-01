@@ -22,6 +22,7 @@ enum KudaoModelContainer {
         ProfileShare.self,
         SuggestionVote.self,
         GalleryItem.self,
+        EventRecord.self,
     ])
 
     static func make() -> ModelContainer {

@@ -678,6 +678,27 @@ nonisolated struct Strings: Sendable {
     let linkPreviewCopyAction: String
     let linkPreviewCopiedLabel: String
     let linkPreviewGoogleAction: String
+
+    // MARK: Library of past events
+
+    let libraryTitle: String
+    let libraryEmptyTitle: String
+    let libraryEmptyMessage: String
+    let libraryProfileEmptyMessage: String
+    let libraryFilterEmptyMessage: String
+    let libraryAllProfiles: String
+    let libraryCountFormat: String
+    let libraryYearsCountFormat: String
+    let libraryPlanSection: String
+    let libraryNoPlanLabel: String
+    let librarySentBadge: String
+    let libraryNotSentBadge: String
+    let libraryMemoriesSection: String
+    let libraryMediaSection: String
+    let libraryMediaCountFormat: String
+    let libraryNotesCountFormat: String
+    let libraryKeywordsSection: String
+    let libraryArchivedOnFormat: String
 }
 
 extension Strings {
@@ -1307,7 +1328,25 @@ extension Strings {
         linkPreviewOpenAction: "Apri in Safari",
         linkPreviewCopyAction: "Copia link",
         linkPreviewCopiedLabel: "Copiato",
-        linkPreviewGoogleAction: "Cerca invece su Google Shopping"
+        linkPreviewGoogleAction: "Cerca invece su Google Shopping",
+        libraryTitle: "Libreria",
+        libraryEmptyTitle: "La libreria \u{00E8} ancora vuota",
+        libraryEmptyMessage: "Quando una data passa, Kudao la archivia qui: piano, messaggio e foto di quell\u{2019}anno restano per sempre.",
+        libraryProfileEmptyMessage: "Il primo anno finir\u{00E0} in libreria subito dopo la prossima data.",
+        libraryFilterEmptyMessage: "Nessun evento archiviato con questi filtri.",
+        libraryAllProfiles: "Tutti i profili",
+        libraryCountFormat: "%d eventi archiviati",
+        libraryYearsCountFormat: "%d anni in archivio",
+        libraryPlanSection: "Il piano di quell\u{2019}anno",
+        libraryNoPlanLabel: "Nessun piano salvato per quell\u{2019}anno",
+        librarySentBadge: "Inviato",
+        libraryNotSentBadge: "Mai inviato",
+        libraryMemoriesSection: "Note dell\u{2019}anno",
+        libraryMediaSection: "Foto e video",
+        libraryMediaCountFormat: "%d ricordi raccolti",
+        libraryNotesCountFormat: "%d note scritte in quell\u{2019}anno",
+        libraryKeywordsSection: "Cosa sapevamo allora",
+        libraryArchivedOnFormat: "Archiviato il %@"
     )
 
     static let english = Strings(
@@ -1936,7 +1975,25 @@ extension Strings {
         linkPreviewOpenAction: "Open in Safari",
         linkPreviewCopyAction: "Copy link",
         linkPreviewCopiedLabel: "Copied",
-        linkPreviewGoogleAction: "Search on Google Shopping instead"
+        linkPreviewGoogleAction: "Search on Google Shopping instead",
+        libraryTitle: "Library",
+        libraryEmptyTitle: "The library is still empty",
+        libraryEmptyMessage: "Once a date goes by, Kudao files it here: that year\u{2019}s plan, message and photos stay forever.",
+        libraryProfileEmptyMessage: "The first year lands in the library right after the next date.",
+        libraryFilterEmptyMessage: "No archived event matches these filters.",
+        libraryAllProfiles: "All profiles",
+        libraryCountFormat: "%d archived events",
+        libraryYearsCountFormat: "%d years archived",
+        libraryPlanSection: "That year\u{2019}s plan",
+        libraryNoPlanLabel: "No plan was saved that year",
+        librarySentBadge: "Sent",
+        libraryNotSentBadge: "Never sent",
+        libraryMemoriesSection: "Notes from that year",
+        libraryMediaSection: "Photos and videos",
+        libraryMediaCountFormat: "%d memories collected",
+        libraryNotesCountFormat: "%d notes written that year",
+        libraryKeywordsSection: "What we knew back then",
+        libraryArchivedOnFormat: "Archived on %@"
     )
 
     static let french = Strings(
@@ -2565,7 +2622,25 @@ extension Strings {
         linkPreviewOpenAction: "Ouvrir dans Safari",
         linkPreviewCopyAction: "Copier le lien",
         linkPreviewCopiedLabel: "Copi\u{00E9}",
-        linkPreviewGoogleAction: "Chercher plut\u{00F4}t sur Google Shopping"
+        linkPreviewGoogleAction: "Chercher plut\u{00F4}t sur Google Shopping",
+        libraryTitle: "Biblioth\u{00E8}que",
+        libraryEmptyTitle: "La biblioth\u{00E8}que est encore vide",
+        libraryEmptyMessage: "Une fois la date pass\u{00E9}e, Kudao l\u{2019}archive ici : le plan, le message et les photos de cette ann\u{00E9}e restent pour toujours.",
+        libraryProfileEmptyMessage: "La premi\u{00E8}re ann\u{00E9}e arrivera dans la biblioth\u{00E8}que juste apr\u{00E8}s la prochaine date.",
+        libraryFilterEmptyMessage: "Aucun \u{00E9}v\u{00E9}nement archiv\u{00E9} avec ces filtres.",
+        libraryAllProfiles: "Tous les profils",
+        libraryCountFormat: "%d \u{00E9}v\u{00E9}nements archiv\u{00E9}s",
+        libraryYearsCountFormat: "%d ann\u{00E9}es archiv\u{00E9}es",
+        libraryPlanSection: "Le plan de cette ann\u{00E9}e-l\u{00E0}",
+        libraryNoPlanLabel: "Aucun plan enregistr\u{00E9} cette ann\u{00E9}e-l\u{00E0}",
+        librarySentBadge: "Envoy\u{00E9}",
+        libraryNotSentBadge: "Jamais envoy\u{00E9}",
+        libraryMemoriesSection: "Notes de l\u{2019}ann\u{00E9}e",
+        libraryMediaSection: "Photos et vid\u{00E9}os",
+        libraryMediaCountFormat: "%d souvenirs collect\u{00E9}s",
+        libraryNotesCountFormat: "%d notes \u{00E9}crites cette ann\u{00E9}e-l\u{00E0}",
+        libraryKeywordsSection: "Ce que l\u{2019}on savait alors",
+        libraryArchivedOnFormat: "Archiv\u{00E9} le %@"
     )
 
     static let spanish = Strings(
@@ -3194,6 +3269,24 @@ extension Strings {
         linkPreviewOpenAction: "Abrir en Safari",
         linkPreviewCopyAction: "Copiar enlace",
         linkPreviewCopiedLabel: "Copiado",
-        linkPreviewGoogleAction: "Buscar en Google Shopping"
+        linkPreviewGoogleAction: "Buscar en Google Shopping",
+        libraryTitle: "Biblioteca",
+        libraryEmptyTitle: "La biblioteca todav\u{00ED}a est\u{00E1} vac\u{00ED}a",
+        libraryEmptyMessage: "Cuando una fecha pasa, Kudao la archiva aqu\u{00ED}: el plan, el mensaje y las fotos de ese a\u{00F1}o se quedan para siempre.",
+        libraryProfileEmptyMessage: "El primer a\u{00F1}o llegar\u{00E1} a la biblioteca justo despu\u{00E9}s de la pr\u{00F3}xima fecha.",
+        libraryFilterEmptyMessage: "Ning\u{00FA}n evento archivado con estos filtros.",
+        libraryAllProfiles: "Todos los perfiles",
+        libraryCountFormat: "%d eventos archivados",
+        libraryYearsCountFormat: "%d a\u{00F1}os archivados",
+        libraryPlanSection: "El plan de aquel a\u{00F1}o",
+        libraryNoPlanLabel: "No se guard\u{00F3} ning\u{00FA}n plan ese a\u{00F1}o",
+        librarySentBadge: "Enviado",
+        libraryNotSentBadge: "Nunca enviado",
+        libraryMemoriesSection: "Notas del a\u{00F1}o",
+        libraryMediaSection: "Fotos y v\u{00ED}deos",
+        libraryMediaCountFormat: "%d recuerdos recogidos",
+        libraryNotesCountFormat: "%d notas escritas ese a\u{00F1}o",
+        libraryKeywordsSection: "Lo que sab\u{00ED}amos entonces",
+        libraryArchivedOnFormat: "Archivado el %@"
     )
 }

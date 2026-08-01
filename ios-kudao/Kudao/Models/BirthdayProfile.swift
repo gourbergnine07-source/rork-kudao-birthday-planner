@@ -74,6 +74,10 @@ final class BirthdayProfile {
     @Relationship(deleteRule: .cascade, inverse: \GalleryItem.profile)
     var galleryItems: [GalleryItem] = []
 
+    /// Every cycle of this profile that has already happened, oldest to newest.
+    @Relationship(deleteRule: .cascade, inverse: \EventRecord.profile)
+    var eventHistory: [EventRecord] = []
+
     // MARK: Collaboration
 
     /// Kudao id of the person who owns the profile; empty until it is shared.
@@ -254,6 +258,27 @@ final class BirthdayProfile {
     var needsPlanConfirmation: Bool {
         guard isReminderEnabled, occasion.wantsSuggestions else { return false }
         return countdown.daysRemaining <= max(1, reminderDaysBefore) && !(partyPlan?.isConfirmed ?? false)
+    }
+
+    // MARK: Archive
+
+    /// Past cycles, most recent year first.
+    var archivedCycles: [EventRecord] {
+        eventHistory.sorted { $0.eventDate > $1.eventDate }
+    }
+
+    /// True once at least one cycle of this profile has been archived.
+    var hasHistory: Bool { !eventHistory.isEmpty }
+
+    /// Gift ideas already used in past years, newest first.
+    ///
+    /// Feeding these back into the engine is what stops the same present from
+    /// being suggested twice.
+    var pastGiftIdeas: [String] {
+        archivedCycles.compactMap { record in
+            let idea = record.plan?.giftIdea.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+            return idea.isEmpty ? nil : idea
+        }
     }
 
     /// First grapheme of every word, max two characters, used for the avatar fallback.

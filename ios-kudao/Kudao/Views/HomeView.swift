@@ -116,6 +116,8 @@ struct HomeView: View {
     @Environment(KudaoIdentity.self) private var identity
     @Query private var profiles: [BirthdayProfile]
     @Query private var shares: [ProfileShare]
+    @Query private var archive: [EventRecord]
+    @Environment(\.modelContext) private var modelContext
 
     @State private var isCreatingProfile: Bool = false
     /// Occasion pre-picked by an empty category card.
@@ -181,6 +183,7 @@ struct HomeView: View {
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     HStack(spacing: 14) {
+                        libraryButton
                         languageButton
                         settingsButton
                     }
@@ -202,7 +205,12 @@ struct HomeView: View {
                     }
                 case .profile(let profile):
                     ProfileDetailView(profile: profile, initialTab: initialTab(for: profile))
+                case .library:
+                    LibraryView()
                 }
+            }
+            .navigationDestination(for: EventRecord.self) { record in
+                EventRecordDetailView(record: record)
             }
             .sheet(isPresented: $isCreatingProfile, onDismiss: { newProfileOccasion = nil }) {
                 ProfileFormView(profile: nil, initialOccasion: newProfileOccasion)
@@ -276,6 +284,8 @@ struct HomeView: View {
 
     private func syncReminders() async {
         ReminderDefaults.migrateLeadTimes(profiles)
+        // A date that has gone by closes its cycle before anything else is scheduled.
+        EventArchivist.sync(profiles: profiles, records: archive, context: modelContext)
         await notifications.sync(
             profiles: profiles,
             strings: strings,
@@ -478,6 +488,26 @@ struct HomeView: View {
         }
         .buttonStyle(PressableCardStyle())
         .accessibilityLabel(strings.myProfileTitle)
+    }
+
+    /// Way into the archive of everything that has already happened.
+    private var libraryButton: some View {
+        Button {
+            path.append(.library)
+        } label: {
+            Image(systemName: "books.vertical.fill")
+                .font(.system(size: 16, weight: .semibold))
+                .foregroundStyle(Palette.clay)
+                .overlay(alignment: .topTrailing) {
+                    if !archive.isEmpty {
+                        Circle()
+                            .fill(Palette.amber)
+                            .frame(width: 6, height: 6)
+                            .offset(x: 4, y: -2)
+                    }
+                }
+        }
+        .accessibilityLabel(strings.libraryTitle)
     }
 
     /// Quick language switch, kept separate from everything else.

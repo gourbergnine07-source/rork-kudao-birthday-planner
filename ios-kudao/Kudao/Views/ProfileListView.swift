@@ -67,6 +67,8 @@ enum ProfileListScope: Hashable {
 enum HomeRoute: Hashable {
     case list(ProfileListScope)
     case profile(BirthdayProfile)
+    /// The archive of every cycle that has already been closed.
+    case library
 }
 
 /// The classic Kudao list: search, the hero "up next" card and everything after it.

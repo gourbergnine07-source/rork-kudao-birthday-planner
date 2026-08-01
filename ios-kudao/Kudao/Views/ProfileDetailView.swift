@@ -51,8 +51,11 @@ struct ProfileDetailView: View {
     private var countdown: BirthdayCountdown { profile.countdown }
     private var occasion: OccasionKind { profile.occasion }
 
-    /// Tabs available for this occasion. A remembrance has nothing to plan.
-    private var tabs: [ProfileTab] { ProfileTab.tabs(for: profile.occasion) }
+    /// Tabs available for this occasion. A remembrance has nothing to plan, and
+    /// the library only appears once a first cycle has been archived.
+    private var tabs: [ProfileTab] {
+        ProfileTab.tabs(for: profile.occasion, hasHistory: profile.hasHistory)
+    }
 
     enum ProfileTab: String, CaseIterable, Identifiable {
         case diary
@@ -60,12 +63,20 @@ struct ProfileDetailView: View {
         case suggestions
         case message
         case gallery
+        case library
 
         var id: String { rawValue }
 
-        /// The gift engine is dropped entirely for a remembrance.
-        static func tabs(for occasion: OccasionKind) -> [ProfileTab] {
-            occasion.wantsSuggestions ? allCases : allCases.filter { $0 != .suggestions }
+        /// The gift engine is dropped entirely for a remembrance, and an archive
+        /// tab would be an empty promise before the first cycle closes.
+        static func tabs(for occasion: OccasionKind, hasHistory: Bool) -> [ProfileTab] {
+            allCases.filter { tab in
+                switch tab {
+                case .suggestions: occasion.wantsSuggestions
+                case .library: hasHistory
+                default: true
+                }
+            }
         }
 
         func symbolName(for occasion: OccasionKind) -> String {
@@ -75,6 +86,7 @@ struct ProfileDetailView: View {
             case .suggestions: "sparkles"
             case .message: occasion.messageSymbolName
             case .gallery: "photo.stack.fill"
+            case .library: "books.vertical.fill"
             }
         }
 
@@ -85,6 +97,7 @@ struct ProfileDetailView: View {
             case .suggestions: strings.suggestionsTab
             case .message: occasion.messageTabTitle(strings)
             case .gallery: strings.galleryTab
+            case .library: strings.libraryTitle
             }
         }
     }
@@ -1110,6 +1123,9 @@ struct ProfileDetailView: View {
                 .transition(.opacity.combined(with: .offset(y: 8)))
         case .gallery:
             GalleryTabView(profile: profile, gallery: gallery)
+                .transition(.opacity.combined(with: .offset(y: 8)))
+        case .library:
+            ProfileLibraryTabView(profile: profile)
                 .transition(.opacity.combined(with: .offset(y: 8)))
         }
     }
