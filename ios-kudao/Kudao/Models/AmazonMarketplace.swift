@@ -77,7 +77,18 @@ nonisolated enum AmazonMarketplace: String, CaseIterable, Identifiable, Sendable
     /// purpose, so a storefront without a configured variable simply earns
     /// nothing instead of breaking the build.
     var shippedTag: String {
-        (Config.allValues[configKey] ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        Self.sanitize(Config.allValues[configKey] ?? "")
+    }
+
+    /// Keeps only the characters an Associates tag is allowed to contain.
+    ///
+    /// Tags are copied out of a web page, which drags along stray spaces and
+    /// invisible control characters. Anything that is not a letter, a digit, a
+    /// dot, an underscore or a hyphen would corrupt the search URL, so it is
+    /// dropped instead of being handed to Amazon.
+    static func sanitize(_ raw: String) -> String {
+        let allowed = CharacterSet.alphanumerics.union(CharacterSet(charactersIn: "-_."))
+        return String(raw.unicodeScalars.filter { allowed.contains($0) })
     }
 
     /// Storefront for a gift search, from the profile language and, failing that, the device.

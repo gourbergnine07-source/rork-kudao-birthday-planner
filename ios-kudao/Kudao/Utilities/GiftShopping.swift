@@ -64,7 +64,7 @@ nonisolated enum GiftShopping {
         affiliateTags: [String: String]
     ) -> GiftDestination? {
         let marketplace = AmazonMarketplace.resolve(language: language)
-        let raw = affiliateTags[marketplace.rawValue]?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        let raw = AmazonMarketplace.sanitize(affiliateTags[marketplace.rawValue] ?? "")
         let tag = raw.isEmpty ? nil : raw
 
         guard let url = amazonSearchURL(for: giftIdea, marketplace: marketplace, tag: tag) else {
