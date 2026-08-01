@@ -23,6 +23,9 @@ final class SubscriptionService {
     private(set) var offerings: Offerings?
     private(set) var isLoadingOfferings: Bool = false
     private(set) var isPurchasing: Bool = false
+    /// Last entitlement snapshot received from RevenueCat, kept for the debug
+    /// screen so a tester can read the real store answer instead of guessing.
+    private(set) var lastCustomerInfo: CustomerInfo?
     /// True once the first entitlement check has come back, so the UI can avoid
     /// flashing a paywall at a subscriber during launch.
     private(set) var hasResolvedStatus: Bool = false
@@ -81,6 +84,45 @@ final class SubscriptionService {
         return ""
     }
 
+    /// Which storefront the current build talks to. Debug builds prefer the
+    /// RevenueCat Test Store (purchases work in the simulator, no Apple ID
+    /// needed); TestFlight and release builds use the real App Store, where
+    /// purchases run against Apple's sandbox until the app ships.
+    enum StoreEnvironment {
+        case testStore
+        case appStore
+        case unconfigured
+
+        var label: String {
+            switch self {
+            case .testStore: "RevenueCat Test Store"
+            case .appStore: "App Store"
+            case .unconfigured: "Not configured"
+            }
+        }
+    }
+
+    static var environment: StoreEnvironment {
+        let key = apiKey
+        if key.isEmpty { return .unconfigured }
+        return key.hasPrefix("test_") ? .testStore : .appStore
+    }
+
+    /// First characters of the active key, enough to tell the stores apart in
+    /// a diagnostics dump without writing a usable secret to the log.
+    static var apiKeyFingerprint: String {
+        let key = apiKey
+        guard !key.isEmpty else { return "—" }
+        return String(key.prefix(9)) + "…"
+    }
+
+    /// Anonymous RevenueCat identifier for this install, needed when looking a
+    /// test purchase up in the dashboard.
+    var appUserID: String? {
+        guard Purchases.isConfigured else { return nil }
+        return Purchases.shared.appUserID
+    }
+
     // MARK: - Access rules
 
     /// Weddings and generic events are the paid family.
@@ -116,6 +158,13 @@ final class SubscriptionService {
         let ordered = [current.monthly, current.annual].compactMap { $0 }
         guard ordered.isEmpty else { return ordered }
         return current.availablePackages
+    }
+
+    /// Drops the cached offering so the next load asks RevenueCat again.
+    /// Used by the debug screen after changing something in the dashboard.
+    func reloadOfferings() async {
+        offerings = nil
+        await loadOfferings()
     }
 
     func loadOfferings() async {
@@ -187,7 +236,36 @@ final class SubscriptionService {
     }
 
     private func apply(_ info: CustomerInfo) {
-        isPremium = info.entitlements[Self.entitlementID]?.isActive == true
+        lastCustomerInfo = info
+        let isEntitled = info.entitlements[Self.entitlementID]?.isActive == true
+        #if DEBUG
+        isPremium = debugPremiumOverride ?? isEntitled
+        #else
+        isPremium = isEntitled
+        #endif
         hasResolvedStatus = true
     }
+
+    #if DEBUG
+    // MARK: - Debug override
+
+    /// Local-only forcing of the entitlement, driven by `SubscriptionDebugView`.
+    /// It never touches RevenueCat or the App Store: it exists so the locked and
+    /// unlocked states of the UI can be compared without burning a test purchase.
+    private(set) var debugPremiumOverride: Bool?
+
+    /// `nil` hands control back to the real entitlement.
+    func applyDebugPremiumOverride(_ value: Bool?) {
+        debugPremiumOverride = value
+        guard let value else {
+            if let info = lastCustomerInfo {
+                isPremium = info.entitlements[Self.entitlementID]?.isActive == true
+            } else {
+                Task { await refresh() }
+            }
+            return
+        }
+        isPremium = value
+    }
+    #endif
 }

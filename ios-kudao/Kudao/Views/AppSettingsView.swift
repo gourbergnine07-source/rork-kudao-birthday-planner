@@ -20,6 +20,9 @@ struct AppSettingsView: View {
 
     @State private var isShowingPaywall: Bool = false
     @State private var isJoining: Bool = false
+    #if DEBUG
+    @State private var isShowingPurchaseDebug: Bool = false
+    #endif
     @State private var isManagingBackup: Bool = false
     @State private var isShowingMyProfile: Bool = false
     @State private var isEditingNotifications: Bool = false
@@ -70,6 +73,11 @@ struct AppSettingsView: View {
             .sheet(isPresented: $isEditingNotifications) {
                 NotificationSettingsView()
             }
+            #if DEBUG
+            .sheet(isPresented: $isShowingPurchaseDebug) {
+                SubscriptionDebugView()
+            }
+            #endif
         }
         .tint(Palette.coral)
     }
@@ -136,6 +144,37 @@ struct AppSettingsView: View {
                 }
                 .buttonStyle(.plain)
             }
+
+            #if DEBUG
+            Divider().overlay(Palette.hairline)
+
+            Button {
+                isShowingPurchaseDebug = true
+            } label: {
+                HStack(spacing: 10) {
+                    Image(systemName: "ladybug.fill")
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(Palette.violet)
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Purchase debug")
+                            .font(.system(.body, design: .rounded, weight: .semibold))
+                            .foregroundStyle(.primary)
+                        Text("Developer build only")
+                            .font(.system(.caption2, design: .rounded))
+                            .foregroundStyle(.tertiary)
+                    }
+
+                    Spacer(minLength: 0)
+
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 11, weight: .heavy))
+                        .foregroundStyle(.tertiary)
+                }
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            #endif
         }
     }
 
