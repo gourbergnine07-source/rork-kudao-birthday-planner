@@ -442,7 +442,7 @@
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				EXCLUDED_SOURCE_FILE_NAMES = "Config.swift */Config.swift";
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_GADApplicationIdentifier = "ca-app-pub-3940256099942544~1458002511";
+				INFOPLIST_KEY_GADApplicationIdentifier = "ca-app-pub-7245682186872516~8858650298";
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "Kudao usa Face ID per proteggere i profili in modalità sorpresa.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Kudao usa la tua posizione solo per trovare negozi vicini dove comprare il regalo.";
@@ -484,7 +484,7 @@
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				EXCLUDED_SOURCE_FILE_NAMES = "Config.swift */Config.swift";
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_GADApplicationIdentifier = "ca-app-pub-3940256099942544~1458002511";
+				INFOPLIST_KEY_GADApplicationIdentifier = "ca-app-pub-7245682186872516~8858650298";
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "Kudao usa Face ID per proteggere i profili in modalità sorpresa.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Kudao usa la tua posizione solo per trovare negozi vicini dove comprare il regalo.";
