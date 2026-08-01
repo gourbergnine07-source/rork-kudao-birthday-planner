@@ -641,6 +641,22 @@ nonisolated struct Strings: Sendable {
     let quickNoteCaption: String
     let quickNoteEmptyMessage: String
     let quickNoteSaveAction: String
+
+    // MARK: Home grid
+
+    let gridCategoriesTitle: String
+    let gridNextEventTitle: String
+    let gridNextEventEmpty: String
+    let gridPendingCountFormat: String
+    let gridPendingEmpty: String
+    let gridProfileCountFormat: String
+    let gridProfileCountOne: String
+    let gridCategoryEmptyHint: String
+    let gridAnniversaryInFormat: String
+    let gridSharedCountFormat: String
+    let sharedListTitle: String
+    let pendingScopeEmptyMessage: String
+    let sharedScopeEmptyMessage: String
 }
 
 extension Strings {
@@ -1239,7 +1255,20 @@ extension Strings {
         quickNoteTitle: "Nota al volo",
         quickNoteCaption: "Scegli la persona e scrivi: bastano poche parole.",
         quickNoteEmptyMessage: "Nessun profilo disponibile per una nota. Creane uno e torna qui.",
-        quickNoteSaveAction: "Salva"
+        quickNoteSaveAction: "Salva",
+        gridCategoriesTitle: "Categorie",
+        gridNextEventTitle: "Prossimo evento",
+        gridNextEventEmpty: "Nessuna data",
+        gridPendingCountFormat: "%d piani",
+        gridPendingEmpty: "Tutto ok",
+        gridProfileCountFormat: "%d profili",
+        gridProfileCountOne: "1 profilo",
+        gridCategoryEmptyHint: "Nessun profilo, tocca per aggiungere",
+        gridAnniversaryInFormat: "Anniversario tra %d g",
+        gridSharedCountFormat: "%d profili condivisi",
+        sharedListTitle: "Condivisi con te",
+        pendingScopeEmptyMessage: "Nessun piano festa in attesa: sei in pari.",
+        sharedScopeEmptyMessage: "Non stai ancora organizzando niente insieme ad altri."
     )
 
     static let english = Strings(
@@ -1837,7 +1866,20 @@ extension Strings {
         quickNoteTitle: "Quick note",
         quickNoteCaption: "Pick the person and write: a few words are enough.",
         quickNoteEmptyMessage: "No profile available for a note yet. Create one and come back.",
-        quickNoteSaveAction: "Save"
+        quickNoteSaveAction: "Save",
+        gridCategoriesTitle: "Categories",
+        gridNextEventTitle: "Next up",
+        gridNextEventEmpty: "No date yet",
+        gridPendingCountFormat: "%d plans",
+        gridPendingEmpty: "All clear",
+        gridProfileCountFormat: "%d profiles",
+        gridProfileCountOne: "1 profile",
+        gridCategoryEmptyHint: "No profile yet, tap to add one",
+        gridAnniversaryInFormat: "Anniversary in %d d",
+        gridSharedCountFormat: "%d shared profiles",
+        sharedListTitle: "Shared with you",
+        pendingScopeEmptyMessage: "No party plan is waiting for you. All caught up.",
+        sharedScopeEmptyMessage: "You are not planning anything together with others yet."
     )
 
     static let french = Strings(
@@ -2435,7 +2477,20 @@ extension Strings {
         quickNoteTitle: "Note rapide",
         quickNoteCaption: "Choisissez la personne et \u{00E9}crivez : quelques mots suffisent.",
         quickNoteEmptyMessage: "Aucun profil disponible pour une note. Cr\u{00E9}ez-en un et revenez.",
-        quickNoteSaveAction: "Enregistrer"
+        quickNoteSaveAction: "Enregistrer",
+        gridCategoriesTitle: "Cat\u{00E9}gories",
+        gridNextEventTitle: "Prochain \u{00E9}v\u{00E9}nement",
+        gridNextEventEmpty: "Aucune date",
+        gridPendingCountFormat: "%d plans",
+        gridPendingEmpty: "Tout est bon",
+        gridProfileCountFormat: "%d profils",
+        gridProfileCountOne: "1 profil",
+        gridCategoryEmptyHint: "Aucun profil, touchez pour ajouter",
+        gridAnniversaryInFormat: "Anniversaire dans %d j",
+        gridSharedCountFormat: "%d profils partag\u{00E9}s",
+        sharedListTitle: "Partag\u{00E9}s avec vous",
+        pendingScopeEmptyMessage: "Aucun plan de f\u{00EA}te en attente : tout est \u{00E0} jour.",
+        sharedScopeEmptyMessage: "Vous n\u{2019}organisez encore rien \u{00E0} plusieurs."
     )
 
     static let spanish = Strings(
@@ -3033,6 +3088,19 @@ extension Strings {
         quickNoteTitle: "Nota r\u{00E1}pida",
         quickNoteCaption: "Elige a la persona y escribe: bastan unas pocas palabras.",
         quickNoteEmptyMessage: "Todav\u{00ED}a no hay perfiles para una nota. Crea uno y vuelve.",
-        quickNoteSaveAction: "Guardar"
+        quickNoteSaveAction: "Guardar",
+        gridCategoriesTitle: "Categor\u{00ED}as",
+        gridNextEventTitle: "Pr\u{00F3}ximo evento",
+        gridNextEventEmpty: "Sin fechas",
+        gridPendingCountFormat: "%d planes",
+        gridPendingEmpty: "Todo listo",
+        gridProfileCountFormat: "%d perfiles",
+        gridProfileCountOne: "1 perfil",
+        gridCategoryEmptyHint: "Sin perfiles, toca para a\u{00F1}adir",
+        gridAnniversaryInFormat: "Aniversario en %d d",
+        gridSharedCountFormat: "%d perfiles compartidos",
+        sharedListTitle: "Compartidos contigo",
+        pendingScopeEmptyMessage: "No hay ning\u{00FA}n plan de fiesta pendiente: est\u{00E1}s al d\u{00ED}a.",
+        sharedScopeEmptyMessage: "Todav\u{00ED}a no est\u{00E1}s organizando nada con otras personas."
     )
 }

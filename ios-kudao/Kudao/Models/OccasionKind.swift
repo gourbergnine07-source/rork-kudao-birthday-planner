@@ -70,7 +70,7 @@ nonisolated enum OccasionKind: String, Codable, CaseIterable, Identifiable, Send
         case .birthday: Palette.coral
         case .wedding: Palette.berry
         case .remembrance: Palette.sage
-        case .other: Palette.violet
+        case .other: Palette.dusk
         }
     }
 

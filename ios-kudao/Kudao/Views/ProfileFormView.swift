@@ -12,6 +12,8 @@ import SwiftData
 /// fields, the wording, even which questions are worth asking — follows from it.
 struct ProfileFormView: View {
     let profile: BirthdayProfile?
+    /// Occasion already chosen by the caller, so the picker step can be skipped.
+    var initialOccasion: OccasionKind?
 
     @Environment(AppSettings.self) private var settings
     @Environment(NotificationService.self) private var notifications
@@ -104,7 +106,7 @@ struct ProfileFormView: View {
             .environment(\.locale, settings.locale)
         }
         .tint(accent)
-        .onAppear(perform: loadExisting)
+        .onAppear(perform: loadInitialState)
     }
 
     private var navigationTitle: String {
@@ -601,8 +603,15 @@ struct ProfileFormView: View {
 
     // MARK: - Actions
 
-    private func loadExisting() {
-        guard let profile else { return }
+    private func loadInitialState() {
+        guard let profile else {
+            // A card tapped on the home grid already told us what this is about.
+            if let initialOccasion, !hasPickedOccasion, !didSave {
+                occasion = initialOccasion
+                hasPickedOccasion = true
+            }
+            return
+        }
         guard !didSave, name.isEmpty, !hasPickedOccasion else { return }
         occasion = profile.occasion
         isSelfProfile = profile.isSelfProfile

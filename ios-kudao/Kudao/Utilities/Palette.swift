@@ -52,10 +52,10 @@ enum Palette {
         )
     }
 
-    /// Generic event gradient: indigo into violet.
+    /// Generic event gradient: dusty blue drifting into slate, the "other" family.
     nonisolated static var eventGradient: LinearGradient {
         LinearGradient(
-            colors: [dynamic(0x4A3A8C, 0x413080), dynamic(0x6B45A6, 0x5C3C94), dynamic(0x8E63C4, 0x7A55AC)],
+            colors: [dynamic(0x3F5D74, 0x354F63), dynamic(0x4F6E86, 0x415F73), dynamic(0x7092A8, 0x577487)],
             startPoint: .topLeading,
             endPoint: .bottomTrailing
         )

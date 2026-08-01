@@ -55,7 +55,7 @@ enum ProfileSortOrder: String, CaseIterable, Identifiable {
     }
 }
 
-/// Which occasions the home list is showing.
+/// Which occasions a list screen is showing.
 enum OccasionFilter: Hashable, Identifiable {
     case all
     case kind(OccasionKind)
@@ -104,7 +104,11 @@ struct QuickNoteTarget: Identifiable {
     let id: UUID
 }
 
-/// Root screen: the countdown list of saved celebrations.
+/// Root screen: the grid of occasion cards, plus everything the app schedules.
+///
+/// The grid is only the surface. This view still owns the navigation stack, the
+/// reminder syncing and the routing of every notification tap; the list of
+/// profiles now lives one push away, pre-filtered on the card that was tapped.
 struct HomeView: View {
     @Environment(AppSettings.self) private var settings
     @Environment(NotificationService.self) private var notifications
@@ -114,11 +118,9 @@ struct HomeView: View {
     @Query private var shares: [ProfileShare]
 
     @State private var isCreatingProfile: Bool = false
-    @State private var path: [BirthdayProfile] = []
-    @State private var appeared: Bool = false
-    @State private var searchText: String = ""
-    @State private var sortOrder: ProfileSortOrder = .nearestBirthday
-    @State private var occasionFilter: OccasionFilter = .all
+    /// Occasion pre-picked by an empty category card.
+    @State private var newProfileOccasion: OccasionKind?
+    @State private var path: [HomeRoute] = []
     @State private var reviewProfile: BirthdayProfile?
     /// Profile that must open straight on the suggestions tab after "Edit".
     @State private var suggestionsProfileID: UUID?
@@ -133,57 +135,13 @@ struct HomeView: View {
     @State private var isJoiningShare: Bool = false
     @State private var unlockFailed: Bool = false
 
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.scenePhase) private var scenePhase
 
     private var strings: Strings { settings.strings }
 
-    private var query: String {
-        searchText.trimmingCharacters(in: .whitespacesAndNewlines)
-    }
-
-    private var isSearching: Bool { !query.isEmpty }
-
-    /// Profiles matching the search field, keeping the date-proximity order.
-    private var results: [BirthdayProfile] {
-        guard isSearching else { return ordered }
-        return ordered.filter { $0.name.localizedStandardContains(query) }
-    }
-
-    /// Everything the active occasion filter lets through.
-    private var visibleProfiles: [BirthdayProfile] {
-        profiles.filter { occasionFilter.matches($0) }
-    }
-
-    private var ordered: [BirthdayProfile] {
-        sortOrder.sorted(visibleProfiles)
-    }
-
-    /// The closest date always leads the hero card, whatever the list order is.
-    private var nextUp: BirthdayProfile? {
-        ProfileSortOrder.nearestBirthday.sorted(visibleProfiles).first
-    }
-
-    /// Profiles inside their reminder window whose party plan is still unconfirmed.
-    private var pendingReviews: [BirthdayProfile] {
-        ProfileSortOrder.nearestBirthday.sorted(profiles).filter(\.needsPlanConfirmation)
-    }
-
-    /// Occasions actually present in the list; a lone-birthday library hides the filter.
-    private var presentOccasions: [OccasionKind] {
-        OccasionKind.allCases.filter { kind in profiles.contains { $0.occasion == kind } }
-    }
-
-    private var showsOccasionFilter: Bool { presentOccasions.count > 1 }
-
     /// One summary per shared profile, computed once for the whole screen.
     private var collaborationMap: [UUID: CollaborationSummary] {
         CollaborationSummary.map(profiles: profiles, shares: shares)
-    }
-
-    /// Profiles that live in a share room, closest date first.
-    private var collaborativeProfiles: [BirthdayProfile] {
-        ProfileSortOrder.nearestBirthday.sorted(profiles.filter(\.isCollaborative))
     }
 
     var body: some View {
@@ -194,7 +152,21 @@ struct HomeView: View {
                 if profiles.isEmpty {
                     emptyState
                 } else {
-                    content
+                    HomeGridView(
+                        profiles: profiles,
+                        collaboration: collaborationMap,
+                        onOpenProfile: { profile in
+                            open(profile) { push(profile) }
+                        },
+                        onOpenList: { scope in
+                            path.append(.list(scope))
+                        },
+                        onCreateProfile: { occasion in
+                            newProfileOccasion = occasion
+                            isCreatingProfile = true
+                        },
+                        onJoinShare: { isJoiningShare = true }
+                    )
                 }
             }
             .navigationBarTitleDisplayMode(.inline)
@@ -222,11 +194,18 @@ struct HomeView: View {
                         .frame(maxWidth: .infinity, alignment: .trailing)
                 }
             }
-            .navigationDestination(for: BirthdayProfile.self) { profile in
-                ProfileDetailView(profile: profile, initialTab: initialTab(for: profile))
+            .navigationDestination(for: HomeRoute.self) { route in
+                switch route {
+                case .list(let scope):
+                    ProfileListView(scope: scope, path: $path) { profile in
+                        openSuggestions(for: profile)
+                    }
+                case .profile(let profile):
+                    ProfileDetailView(profile: profile, initialTab: initialTab(for: profile))
+                }
             }
-            .sheet(isPresented: $isCreatingProfile) {
-                ProfileFormView(profile: nil)
+            .sheet(isPresented: $isCreatingProfile, onDismiss: { newProfileOccasion = nil }) {
+                ProfileFormView(profile: nil, initialOccasion: newProfileOccasion)
             }
             .sheet(item: $reviewProfile) { profile in
                 PlanConfirmationView(profile: profile) {
@@ -334,6 +313,8 @@ struct HomeView: View {
         ].joined(separator: "|")
     }
 
+    // MARK: - Notification routing
+
     /// A tapped reminder opens the confirmation sheet for that profile.
     private func handleReminderTap(_ pending: UUID?) {
         guard let pending, let match = profiles.first(where: { $0.id == pending }) else { return }
@@ -350,7 +331,7 @@ struct HomeView: View {
         open(match) {
             suggestionsProfileID = nil
             messageProfileID = match.id
-            path = [match]
+            path = [.profile(match)]
         }
     }
 
@@ -363,11 +344,11 @@ struct HomeView: View {
             suggestionsProfileID = nil
             messageProfileID = nil
             galleryProfileID = match.id
-            path = [match]
+            path = [.profile(match)]
         }
     }
 
-    /// A tapped diary invitation opens the quick composer, skipping the home list.
+    /// A tapped diary invitation opens the quick composer, skipping the home grid.
     private func handleDiaryTap(_ pending: UUID?) {
         guard let pending else { return }
         notifications.consumePendingDiary()
@@ -385,7 +366,13 @@ struct HomeView: View {
         messageProfileID = nil
         galleryProfileID = nil
         suggestionsProfileID = profile.id
-        path = [profile]
+        push(profile)
+    }
+
+    /// Pushes a profile without disturbing the screens already on the stack.
+    private func push(_ profile: BirthdayProfile) {
+        guard path.last != .profile(profile) else { return }
+        path.append(.profile(profile))
     }
 
     /// Reminder taps and the plan review decide which tab the detail screen opens on.
@@ -420,481 +407,7 @@ struct HomeView: View {
         }
     }
 
-    /// Regular rows push straight away; protected surprises authenticate first.
-    @ViewBuilder
-    private func profileLink<Content: View>(
-        _ profile: BirthdayProfile,
-        @ViewBuilder label: () -> Content
-    ) -> some View {
-        if isLocked(profile) {
-            Button {
-                open(profile) { path.append(profile) }
-            } label: {
-                label()
-            }
-            .buttonStyle(PressableCardStyle())
-            .accessibilityHint(strings.lockedBadgeLabel)
-        } else {
-            NavigationLink(value: profile) {
-                label()
-            }
-            .buttonStyle(PressableCardStyle())
-        }
-    }
-
-    // MARK: - Sections
-
-    private var content: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 18) {
-                header
-
-                HStack(spacing: 10) {
-                    SearchField(
-                        placeholder: strings.searchPlaceholder,
-                        clearLabel: strings.searchClear,
-                        text: $searchText
-                    )
-                    sortMenu
-                }
-
-                if showsOccasionFilter {
-                    occasionFilterStrip
-                }
-
-                if isSearching {
-                    searchResults
-                } else if visibleProfiles.isEmpty {
-                    filteredEmptyState
-                } else {
-                    reviewBanner
-                    collaborationHub
-                    upcomingSections
-                }
-            }
-            .padding(.horizontal, 20)
-            .padding(.bottom, 90)
-        }
-        .scrollIndicators(.hidden)
-        .scrollDismissesKeyboard(.immediately)
-        .onAppear { appeared = true }
-    }
-
-    /// Horizontal chips: Tutti, Compleanni, Matrimoni, Commemorazioni, Altro.
-    private var occasionFilterStrip: some View {
-        ScrollView(.horizontal) {
-            HStack(spacing: 8) {
-                ForEach(availableFilters) { filter in
-                    occasionChip(filter)
-                }
-            }
-            .padding(.vertical, 2)
-        }
-        .scrollIndicators(.hidden)
-        .scrollClipDisabled()
-        .sensoryFeedback(.selection, trigger: occasionFilter)
-    }
-
-    /// Only offer a chip for an occasion the user actually has.
-    private var availableFilters: [OccasionFilter] {
-        [.all] + presentOccasions.map { OccasionFilter.kind($0) }
-    }
-
-    private func occasionChip(_ filter: OccasionFilter) -> some View {
-        let isActive = occasionFilter == filter
-        let count = filter == .all ? profiles.count : profiles.filter { filter.matches($0) }.count
-
-        return Button {
-            withAnimation(reduceMotion ? nil : .smooth(duration: 0.28)) {
-                occasionFilter = filter
-            }
-        } label: {
-            HStack(spacing: 6) {
-                Image(systemName: filter.symbolName)
-                    .font(.system(size: 11, weight: .bold))
-                Text(filter.title(strings))
-                    .font(.system(.footnote, design: .rounded, weight: .bold))
-                    .lineLimit(1)
-                Text("\(count)")
-                    .font(.system(.caption2, design: .rounded, weight: .heavy).monospacedDigit())
-                    .opacity(0.7)
-            }
-            .foregroundStyle(isActive ? Color.white : filter.accent)
-            .padding(.horizontal, 13)
-            .padding(.vertical, 9)
-            .background(
-                Capsule().fill(
-                    isActive
-                        ? AnyShapeStyle(filter.accent)
-                        : AnyShapeStyle(filter.accent.opacity(0.12))
-                )
-            )
-            .overlay(
-                Capsule().strokeBorder(
-                    isActive ? Color.clear : filter.accent.opacity(0.28),
-                    lineWidth: 1
-                )
-            )
-        }
-        .buttonStyle(PressableCardStyle())
-        .accessibilityAddTraits(isActive ? [.isSelected] : [])
-    }
-
-    /// The library is not empty, this corner of it is.
-    private var filteredEmptyState: some View {
-        PlaceholderPanel(
-            icon: occasionFilter.symbolName,
-            title: strings.filterEmptyTitle,
-            message: String(format: strings.filterEmptyMessageFormat, occasionFilter.title(strings))
-        )
-        .padding(.top, 4)
-    }
-
-    @ViewBuilder
-    private var searchResults: some View {
-        if results.isEmpty {
-            PlaceholderPanel(
-                icon: "magnifyingglass",
-                title: strings.noResultsTitle,
-                message: String(format: strings.noResultsMessageFormat, query)
-            )
-            .padding(.top, 4)
-        } else {
-            Text(strings.resultsSection.uppercased())
-                .font(.system(.caption, design: .rounded, weight: .bold))
-                .tracking(1.1)
-                .foregroundStyle(.secondary)
-
-            VStack(spacing: 12) {
-                ForEach(results) { profile in
-                    profileLink(profile) {
-                        ProfileRowCard(
-                            profile: profile,
-                            settings: settings,
-                            isLocked: isLocked(profile),
-                            collaboration: summary(for: profile)
-                        )
-                    }
-                }
-            }
-        }
-    }
-
-    private func summary(for profile: BirthdayProfile) -> CollaborationSummary {
-        collaborationMap[profile.id] ?? .none
-    }
-
-    private var sortMenu: some View {
-        Menu {
-            Picker(strings.sortLabel, selection: $sortOrder) {
-                ForEach(ProfileSortOrder.allCases) { order in
-                    Label(order.title(strings), systemImage: order.symbolName).tag(order)
-                }
-            }
-        } label: {
-            Image(systemName: "arrow.up.arrow.down")
-                .font(.system(size: 15, weight: .bold))
-                .foregroundStyle(sortOrder == .nearestBirthday ? Color.secondary : Palette.coral)
-                .frame(width: 44, height: 44)
-                .background(Circle().fill(Palette.surface))
-                .overlay(
-                    Circle().strokeBorder(
-                        sortOrder == .nearestBirthday ? Palette.hairline : Palette.coral.opacity(0.5),
-                        lineWidth: 1
-                    )
-                )
-        }
-        .accessibilityLabel("\(strings.sortLabel): \(sortOrder.title(strings))")
-        .sensoryFeedback(.selection, trigger: sortOrder)
-    }
-
-    // MARK: - Collaboration
-
-    /// Everyone the user is planning with, plus the way in for a new collaboration.
-    @ViewBuilder
-    private var collaborationHub: some View {
-        let rooms = collaborativeProfiles
-
-        if rooms.isEmpty {
-            joinDiscoveryRow
-        } else {
-            VStack(alignment: .leading, spacing: 12) {
-                HStack(spacing: 9) {
-                    ZStack {
-                        Circle()
-                            .fill(Palette.violet.opacity(0.16))
-                            .frame(width: 30, height: 30)
-                        Image(systemName: "person.2.fill")
-                            .font(.system(size: 13, weight: .bold))
-                            .foregroundStyle(Palette.violet)
-                    }
-
-                    VStack(alignment: .leading, spacing: 1) {
-                        Text(strings.collaborationHubTitle)
-                            .font(.system(.subheadline, design: .rounded, weight: .bold))
-                        Text(String(format: strings.collaborationHubCountFormat, rooms.count))
-                            .font(.system(.caption, design: .rounded))
-                            .foregroundStyle(.secondary)
-                    }
-
-                    Spacer(minLength: 0)
-
-                    Button {
-                        isJoiningShare = true
-                    } label: {
-                        Image(systemName: "person.badge.key.fill")
-                            .font(.system(size: 13, weight: .bold))
-                            .foregroundStyle(Palette.violet)
-                            .frame(width: 32, height: 32)
-                            .background(Circle().fill(Palette.violet.opacity(0.12)))
-                    }
-                    .buttonStyle(PressableCardStyle())
-                    .accessibilityLabel(strings.joinShareMenuTitle)
-                }
-
-                ScrollView(.horizontal) {
-                    HStack(spacing: 8) {
-                        ForEach(rooms) { profile in
-                            collaborationChip(profile)
-                        }
-                    }
-                }
-                .scrollIndicators(.hidden)
-                .scrollClipDisabled()
-            }
-            .padding(14)
-            .background(
-                RoundedRectangle(cornerRadius: 22, style: .continuous)
-                    .fill(Palette.surface)
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 22, style: .continuous)
-                    .strokeBorder(Palette.violet.opacity(0.28), lineWidth: 1)
-            )
-            .shadow(color: Palette.violet.opacity(0.1), radius: 12, y: 6)
-        }
-    }
-
-    private func collaborationChip(_ profile: BirthdayProfile) -> some View {
-        let summary = self.summary(for: profile)
-
-        return Button {
-            open(profile) { path = [profile] }
-        } label: {
-            HStack(spacing: 9) {
-                AvatarView(name: profile.name, photoData: profile.photoData, size: 30)
-
-                VStack(alignment: .leading, spacing: 1) {
-                    Text(profile.name)
-                        .font(.system(.footnote, design: .rounded, weight: .bold))
-                        .foregroundStyle(.primary)
-                        .lineLimit(1)
-                    Text(summary.caption(strings))
-                        .font(.system(.caption2, design: .rounded))
-                        .foregroundStyle(.secondary)
-                        .lineLimit(1)
-                }
-
-                ParticipantStack(
-                    names: summary.participantNames,
-                    size: 20,
-                    ringColor: Palette.surfaceRaised,
-                    maxVisible: 3
-                )
-            }
-            .padding(.leading, 7)
-            .padding(.trailing, 11)
-            .padding(.vertical, 7)
-            .background(Capsule().fill(Palette.surfaceRaised))
-            .overlay(Capsule().strokeBorder(Palette.violet.opacity(0.22), lineWidth: 1))
-        }
-        .buttonStyle(PressableCardStyle())
-        .accessibilityElement(children: .combine)
-    }
-
-    /// Shown while nobody collaborates yet: explains the feature and opens the code sheet.
-    private var joinDiscoveryRow: some View {
-        Button {
-            isJoiningShare = true
-        } label: {
-            HStack(spacing: 11) {
-                ZStack {
-                    Circle()
-                        .fill(Palette.violet.opacity(0.14))
-                        .frame(width: 34, height: 34)
-                    Image(systemName: "person.2.badge.key.fill")
-                        .font(.system(size: 14, weight: .bold))
-                        .foregroundStyle(Palette.violet)
-                }
-
-                VStack(alignment: .leading, spacing: 1) {
-                    Text(strings.collaborationInviteTitle)
-                        .font(.system(.subheadline, design: .rounded, weight: .bold))
-                        .foregroundStyle(.primary)
-                    Text(strings.collaborationInviteMessage)
-                        .font(.system(.caption, design: .rounded))
-                        .foregroundStyle(.secondary)
-                        .multilineTextAlignment(.leading)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-
-                Spacer(minLength: 0)
-
-                Image(systemName: "chevron.right")
-                    .font(.system(size: 11, weight: .heavy))
-                    .foregroundStyle(.tertiary)
-            }
-            .padding(14)
-            .background(
-                RoundedRectangle(cornerRadius: 22, style: .continuous)
-                    .fill(Palette.surface)
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 22, style: .continuous)
-                    .strokeBorder(Palette.violet.opacity(0.24), lineWidth: 1)
-            )
-        }
-        .buttonStyle(PressableCardStyle())
-    }
-
-    @ViewBuilder
-    private var reviewBanner: some View {
-        let pending = pendingReviews
-
-        if !pending.isEmpty {
-            VStack(alignment: .leading, spacing: 12) {
-                HStack(spacing: 9) {
-                    ZStack {
-                        Circle()
-                            .fill(Palette.coral.opacity(0.16))
-                            .frame(width: 30, height: 30)
-                        Image(systemName: "bell.badge.fill")
-                            .font(.system(size: 13, weight: .bold))
-                            .foregroundStyle(Palette.coral)
-                            .symbolEffect(
-                                .bounce,
-                                options: reduceMotion ? .nonRepeating : .repeat(.periodic(delay: 3))
-                            )
-                    }
-
-                    VStack(alignment: .leading, spacing: 1) {
-                        Text(strings.reviewBannerTitle)
-                            .font(.system(.subheadline, design: .rounded, weight: .bold))
-                        Text(String(format: strings.reviewBannerSubtitleFormat, pending.count))
-                            .font(.system(.caption, design: .rounded))
-                            .foregroundStyle(.secondary)
-                    }
-
-                    Spacer(minLength: 0)
-                }
-
-                ScrollView(.horizontal) {
-                    HStack(spacing: 8) {
-                        ForEach(pending) { profile in
-                            Button {
-                                open(profile) { reviewProfile = profile }
-                            } label: {
-                                HStack(spacing: 8) {
-                                    AvatarView(name: profile.name, photoData: profile.photoData, size: 26)
-                                    Text(profile.name)
-                                        .font(.system(.footnote, design: .rounded, weight: .bold))
-                                        .lineLimit(1)
-                                    Image(systemName: "chevron.right")
-                                        .font(.system(size: 9, weight: .heavy))
-                                        .foregroundStyle(.tertiary)
-                                }
-                                .foregroundStyle(.primary)
-                                .padding(.leading, 6)
-                                .padding(.trailing, 12)
-                                .padding(.vertical, 6)
-                                .background(Capsule().fill(Palette.surfaceRaised))
-                                .overlay(Capsule().strokeBorder(Palette.coral.opacity(0.28), lineWidth: 1))
-                            }
-                            .buttonStyle(PressableCardStyle())
-                        }
-                    }
-                }
-                .scrollIndicators(.hidden)
-            }
-            .padding(14)
-            .background(
-                RoundedRectangle(cornerRadius: 22, style: .continuous)
-                    .fill(Palette.surface)
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 22, style: .continuous)
-                    .strokeBorder(Palette.coral.opacity(0.3), lineWidth: 1)
-            )
-            .shadow(color: Palette.coral.opacity(0.12), radius: 12, y: 6)
-        }
-    }
-
-    @ViewBuilder
-    private var upcomingSections: some View {
-        if let hero = nextUp {
-            Text(strings.upNext.uppercased())
-                .font(.system(.caption, design: .rounded, weight: .bold))
-                .tracking(1.1)
-                .foregroundStyle(.secondary)
-
-            profileLink(hero) {
-                HeroProfileCard(
-                    profile: hero,
-                    settings: settings,
-                    isLocked: isLocked(hero),
-                    collaboration: summary(for: hero)
-                )
-            }
-        }
-
-        let rest = ordered.filter { $0.id != nextUp?.id }
-
-        if !rest.isEmpty {
-            HStack(spacing: 6) {
-                Text(strings.othersSection.uppercased())
-                    .font(.system(.caption, design: .rounded, weight: .bold))
-                    .tracking(1.1)
-                Text("·")
-                    .font(.system(.caption, design: .rounded, weight: .bold))
-                Text(sortOrder.title(strings))
-                    .font(.system(.caption, design: .rounded, weight: .medium))
-            }
-            .foregroundStyle(.secondary)
-            .padding(.top, 6)
-
-            VStack(spacing: 12) {
-                ForEach(Array(rest.enumerated()), id: \.element.id) { index, profile in
-                    profileLink(profile) {
-                        ProfileRowCard(
-                            profile: profile,
-                            settings: settings,
-                            isLocked: isLocked(profile),
-                            collaboration: summary(for: profile)
-                        )
-                    }
-                    .opacity(appeared ? 1 : 0)
-                    .offset(y: appeared ? 0 : 18)
-                    .animation(
-                        reduceMotion ? nil : .smooth(duration: 0.45).delay(Double(index) * 0.05),
-                        value: appeared
-                    )
-                }
-            }
-        }
-    }
-
-    private var header: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            Text(strings.homeTitle)
-                .font(.system(size: 34, weight: .heavy, design: .rounded))
-                .foregroundStyle(.primary)
-            Text(strings.homeSubtitle)
-                .font(.system(.subheadline, design: .rounded))
-                .foregroundStyle(.secondary)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.top, 4)
-    }
+    // MARK: - Chrome
 
     private var emptyState: some View {
         VStack(spacing: 24) {
@@ -918,6 +431,7 @@ struct HomeView: View {
             }
 
             Button {
+                newProfileOccasion = nil
                 isCreatingProfile = true
             } label: {
                 Label(strings.emptyAction, systemImage: "plus")
@@ -935,6 +449,7 @@ struct HomeView: View {
 
     private var addButton: some View {
         Button {
+            newProfileOccasion = nil
             isCreatingProfile = true
         } label: {
             Image(systemName: "plus")
