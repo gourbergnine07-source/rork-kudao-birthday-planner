@@ -11,20 +11,29 @@
 #
 #   error: unprintable ASCII character found in source file
 #
+# One of this project's Associates tags is stored as a literal tab followed by a
+# space (0x09 0x20) before the tag itself, which is exactly what triggered that
+# error. Tabs are therefore stripped like any other control character; nothing
+# in a URL, key or tag ever needs one.
+#
 # Config.swift is excluded from compilation (EXCLUDED_SOURCE_FILE_NAMES), and
 # the app reads its values from the file produced here instead, so a stray byte
 # in one variable can no longer break the whole build.
 #
 # Values are reduced to printable ASCII minus the two characters that would
-# escape a Swift string literal, `"` and `\`. URLs, API keys and Associates tags
-# are ASCII by definition, so nothing meaningful is lost.
+# escape a Swift string literal, `"` and `\`, then trimmed of surrounding
+# spaces. URLs, API keys and Associates tags are ASCII by definition, so nothing
+# meaningful is lost.
 
 SOURCE="${SRCROOT}/Kudao/Config.swift"
 TARGET="${SRCROOT}/Kudao/Utilities/EnvConfig.swift"
 DRAFT="${TMPDIR:-/tmp}/kudao-env-config.swift"
 
-# Printable ASCII except " (042) and \ (134).
+# Printable ASCII except " (042) and \ (134). Tabs, newlines and every other
+# control character fall outside this set and are removed.
 SAFE='\040-\041\043-\133\135-\176'
+# Drops the spaces left at either end once invisible characters are gone.
+TRIM='s/^ *//; s/ *$//'
 # Matches `    static let NAME = "value"` and prints NAME=value.
 EXTRACT='s/^[[:space:]]*static let \([A-Za-z_][A-Za-z0-9_]*\)[[:space:]]*=[[:space:]]*"\(.*\)"[[:space:]]*$/\1=\2/p'
 
@@ -58,7 +67,8 @@ fi
       | grep "^${NAME}=" \
       | head -1 \
       | cut -d= -f2- \
-      | LC_ALL=C tr -cd "$SAFE")
+      | LC_ALL=C tr -cd "$SAFE" \
+      | LC_ALL=C sed "$TRIM")
     printf '    static let %s = "%s"\n' "$NAME" "$VALUE"
   done
 
