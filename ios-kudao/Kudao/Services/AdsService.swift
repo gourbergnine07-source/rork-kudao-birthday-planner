@@ -110,6 +110,15 @@ final class AdsService {
         guard !hasStarted else { return }
         hasStarted = true
 
+        // The SDK raises an uncaught exception — a crash on launch, before the
+        // first screen — when Info.plist carries no application identifier. A
+        // build that somehow ships without it runs without advertising instead
+        // of not running at all.
+        guard !Self.plistAppID.isEmpty else {
+            print("[Kudao] AdMob disabled: Info.plist has no GADApplicationIdentifier.")
+            return
+        }
+
         await gatherConsent()
         MobileAds.shared.start(completionHandler: nil)
         canRequestAds = ConsentInformation.shared.canRequestAds
