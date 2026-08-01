@@ -45,6 +45,7 @@ struct MyProfileView: View {
                         heroCard
                         remindersCard
                         privacyCard
+                        affiliateCard
                         accountCard
                         aboutCard
                     }
@@ -333,6 +334,87 @@ struct MyProfileView: View {
                 .font(.system(.caption2, design: .rounded))
                 .foregroundStyle(.tertiary)
                 .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+
+    // MARK: - Amazon affiliation
+
+    /// One Associates tag per storefront, plus the disclosure Amazon requires.
+    private var affiliateCard: some View {
+        MyProfileCard(
+            title: strings.affiliateSectionTitle,
+            systemImage: "cart.badge.plus",
+            tint: Palette.amber
+        ) {
+            Text(strings.affiliateCaption)
+                .font(.system(.footnote, design: .rounded))
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+
+            ForEach(AmazonMarketplace.allCases) { market in
+                Divider().overlay(Palette.hairline)
+                affiliateRow(market)
+            }
+
+            Divider().overlay(Palette.hairline)
+
+            Text(strings.affiliateFallbackNote)
+                .font(.system(.caption, design: .rounded))
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+
+            Label(strings.affiliateDisclosure, systemImage: "info.circle.fill")
+                .font(.system(.caption2, design: .rounded))
+                .foregroundStyle(.tertiary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+
+    private func affiliateRow(_ market: AmazonMarketplace) -> some View {
+        let isActive = market == settings.amazonMarketplace
+        let tag = Binding<String>(
+            get: { settings.amazonTag(for: market) },
+            set: { settings.setAmazonTag($0, for: market) }
+        )
+
+        return HStack(alignment: .center, spacing: 10) {
+            Text(market.flag)
+                .font(.system(size: 20))
+                .frame(width: 26)
+
+            VStack(alignment: .leading, spacing: 3) {
+                HStack(spacing: 6) {
+                    Text(market.displayName)
+                        .font(.system(.subheadline, design: .rounded, weight: .semibold))
+
+                    if isActive {
+                        Text(strings.affiliateActiveBadge)
+                            .font(.system(size: 10, weight: .heavy, design: .rounded))
+                            .foregroundStyle(Palette.amber)
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 2)
+                            .background(Capsule().fill(Palette.amber.opacity(0.14)))
+                    }
+                }
+
+                TextField(market.tagPlaceholder, text: tag)
+                    .font(.system(.footnote, design: .monospaced))
+                    .textInputAutocapitalization(.never)
+                    .autocorrectionDisabled()
+                    .textContentType(.none)
+                    .submitLabel(.done)
+                    .accessibilityLabel("\(strings.affiliateTagLabel) \(market.displayName)")
+            }
+
+            Spacer(minLength: 0)
+
+            Image(systemName: settings.amazonTag(for: market).isEmpty
+                ? "circle.dashed"
+                : "checkmark.circle.fill")
+                .font(.system(size: 15, weight: .semibold))
+                .foregroundStyle(settings.amazonTag(for: market).isEmpty
+                    ? Color.secondary.opacity(0.5)
+                    : Palette.amber)
         }
     }
 

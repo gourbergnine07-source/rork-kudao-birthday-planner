@@ -657,6 +657,16 @@ nonisolated struct Strings: Sendable {
     let sharedListTitle: String
     let pendingScopeEmptyMessage: String
     let sharedScopeEmptyMessage: String
+
+    // MARK: Amazon affiliation
+
+    let buyOnAmazonAction: String
+    let affiliateSectionTitle: String
+    let affiliateCaption: String
+    let affiliateTagLabel: String
+    let affiliateActiveBadge: String
+    let affiliateFallbackNote: String
+    let affiliateDisclosure: String
 }
 
 extension Strings {
@@ -1268,7 +1278,14 @@ extension Strings {
         gridSharedCountFormat: "%d profili condivisi",
         sharedListTitle: "Condivisi con te",
         pendingScopeEmptyMessage: "Nessun piano festa in attesa: sei in pari.",
-        sharedScopeEmptyMessage: "Non stai ancora organizzando niente insieme ad altri."
+        sharedScopeEmptyMessage: "Non stai ancora organizzando niente insieme ad altri.",
+        buyOnAmazonAction: "Acquista su Amazon",
+        affiliateSectionTitle: "Affiliazione Amazon",
+        affiliateCaption: "Ogni mercato Amazon ha il suo tag: quello di amazon.it non guadagna nulla su amazon.fr. Il mercato viene scelto dalla lingua dell\u{2019}app, o da quella del dispositivo.",
+        affiliateTagLabel: "Tag affiliato",
+        affiliateActiveBadge: "In uso",
+        affiliateFallbackNote: "Senza tag, il pulsante apre la ricerca Google Shopping come prima.",
+        affiliateDisclosure: "Come Affiliato Amazon, Kudao riceve un guadagno dagli acquisti idonei, senza costi aggiuntivi per te"
     )
 
     static let english = Strings(
@@ -1879,7 +1896,14 @@ extension Strings {
         gridSharedCountFormat: "%d shared profiles",
         sharedListTitle: "Shared with you",
         pendingScopeEmptyMessage: "No party plan is waiting for you. All caught up.",
-        sharedScopeEmptyMessage: "You are not planning anything together with others yet."
+        sharedScopeEmptyMessage: "You are not planning anything together with others yet.",
+        buyOnAmazonAction: "Buy on Amazon",
+        affiliateSectionTitle: "Amazon affiliation",
+        affiliateCaption: "Every Amazon marketplace needs its own tag: an amazon.it tag earns nothing on amazon.fr. The marketplace follows the app language, or the device one.",
+        affiliateTagLabel: "Associates tag",
+        affiliateActiveBadge: "In use",
+        affiliateFallbackNote: "Without a tag the button opens the Google Shopping search, exactly as before.",
+        affiliateDisclosure: "As an Amazon Associate, Kudao earns from qualifying purchases, at no extra cost to you"
     )
 
     static let french = Strings(
@@ -2490,7 +2514,14 @@ extension Strings {
         gridSharedCountFormat: "%d profils partag\u{00E9}s",
         sharedListTitle: "Partag\u{00E9}s avec vous",
         pendingScopeEmptyMessage: "Aucun plan de f\u{00EA}te en attente : tout est \u{00E0} jour.",
-        sharedScopeEmptyMessage: "Vous n\u{2019}organisez encore rien \u{00E0} plusieurs."
+        sharedScopeEmptyMessage: "Vous n\u{2019}organisez encore rien \u{00E0} plusieurs.",
+        buyOnAmazonAction: "Acheter sur Amazon",
+        affiliateSectionTitle: "Affiliation Amazon",
+        affiliateCaption: "Chaque march\u{00E9} Amazon a son propre tag : celui d\u{2019}amazon.fr ne rapporte rien sur amazon.it. Le march\u{00E9} suit la langue de l\u{2019}app, ou celle de l\u{2019}appareil.",
+        affiliateTagLabel: "Tag partenaire",
+        affiliateActiveBadge: "Utilis\u{00E9}",
+        affiliateFallbackNote: "Sans tag, le bouton ouvre la recherche Google Shopping comme avant.",
+        affiliateDisclosure: "En tant que Partenaire Amazon, Kudao r\u{00E9}alise un b\u{00E9}n\u{00E9}fice sur les achats remplissant les conditions requises, sans co\u{00FB}t suppl\u{00E9}mentaire pour vous"
     )
 
     static let spanish = Strings(
@@ -3101,6 +3132,13 @@ extension Strings {
         gridSharedCountFormat: "%d perfiles compartidos",
         sharedListTitle: "Compartidos contigo",
         pendingScopeEmptyMessage: "No hay ning\u{00FA}n plan de fiesta pendiente: est\u{00E1}s al d\u{00ED}a.",
-        sharedScopeEmptyMessage: "Todav\u{00ED}a no est\u{00E1}s organizando nada con otras personas."
+        sharedScopeEmptyMessage: "Todav\u{00ED}a no est\u{00E1}s organizando nada con otras personas.",
+        buyOnAmazonAction: "Comprar en Amazon",
+        affiliateSectionTitle: "Afiliaci\u{00F3}n de Amazon",
+        affiliateCaption: "Cada mercado de Amazon tiene su propio tag: el de amazon.es no gana nada en amazon.fr. El mercado sigue el idioma de la app, o el del dispositivo.",
+        affiliateTagLabel: "Tag de afiliado",
+        affiliateActiveBadge: "En uso",
+        affiliateFallbackNote: "Sin tag, el bot\u{00F3}n abre la b\u{00FA}squeda de Google Shopping como antes.",
+        affiliateDisclosure: "Como Afiliado de Amazon, Kudao obtiene ingresos por las compras adscritas que cumplen los requisitos aplicables, sin coste adicional para ti"
     )
 }

@@ -100,7 +100,7 @@ struct ProfileDetailView: View {
                         contactCard
                         composeButton(proxy)
                         if occasion.wantsSuggestions {
-                            giftActionsRow
+                            giftSection
                         }
                         tabSelector
                             .id(Self.tabsAnchor)
@@ -876,11 +876,33 @@ struct ProfileDetailView: View {
         .buttonStyle(PressableCardStyle())
     }
 
+    /// The two gift actions plus, when the link earns a commission, the Amazon disclosure.
+    private var giftSection: some View {
+        VStack(spacing: 10) {
+            giftActionsRow
+
+            if isAffiliateLink {
+                Label(strings.affiliateDisclosure, systemImage: "info.circle")
+                    .font(.system(.caption2, design: .rounded))
+                    .foregroundStyle(.tertiary)
+                    .multilineTextAlignment(.leading)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, 4)
+            }
+        }
+    }
+
+    /// True when the shopping button carries an Associates tag for the active storefront.
+    private var isAffiliateLink: Bool {
+        settings.earnsAmazonCommission
+    }
+
     /// Both actions read the gift straight from the generated plan, never from a manual field.
     private var giftActionsRow: some View {
         HStack(spacing: 12) {
             giftActionTile(
-                title: strings.buyOnlineAction,
+                title: isAffiliateLink ? strings.buyOnAmazonAction : strings.buyOnlineAction,
                 systemImage: "cart.fill",
                 tint: Palette.berry
             ) {
@@ -949,13 +971,21 @@ struct ProfileDetailView: View {
         return plan.giftIdea
     }
 
+    /// Opens the gift search in the system browser: Amazon when tagged, Google otherwise.
+    ///
+    /// The query is always the AI-generated `giftIdea`, and the link always leaves
+    /// the app — an in-app web view would break the Associates attribution.
     private func openShopping() {
         guard let idea = giftIdea,
-              let url = GiftShopping.searchURL(for: idea, language: settings.language) else {
+              let destination = GiftShopping.destination(
+                  for: idea,
+                  language: settings.language,
+                  affiliateTags: settings.amazonTags
+              ) else {
             noGiftIdeaAlert = true
             return
         }
-        openURL(url)
+        ExternalLink.open(destination.url)
     }
 
     private func openNearbyStores() {

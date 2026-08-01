@@ -100,6 +100,12 @@ final class AppSettings {
     /// Lead time of the separate gift nudge, one value per category of occasion.
     private var giftDaysByOccasion: [String: Int]
 
+    /// Amazon Associates tags, keyed by `AmazonMarketplace.rawValue`.
+    ///
+    /// One dictionary rather than five properties, so typing a tag redraws every
+    /// dependent label at once: the shopping button and its disclosure.
+    private var amazonTagsByMarket: [String: String]
+
     /// Time of day every reminder fires at, local time.
     var reminderTime: Date {
         didSet {
@@ -149,6 +155,14 @@ final class AppSettings {
             of: Date()
         ) ?? Date()
 
+        amazonTagsByMarket = Dictionary(
+            uniqueKeysWithValues: AmazonMarketplace.allCases.map { market in
+                let stored = defaults.string(forKey: market.defaultsKey)?
+                    .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+                return (market.rawValue, stored.isEmpty ? market.shippedTag : stored)
+            }
+        )
+
         protectsSurpriseProfiles = defaults.bool(forKey: Self.biometricLockKey)
         // Surprises stay private by default.
         hidesSurpriseNotificationPreviews = defaults.object(forKey: Self.hidePreviewsKey) as? Bool ?? true
@@ -194,6 +208,39 @@ final class AppSettings {
         reminderDays(for: occasion) != ReminderDefaults.shippedDaysBefore(occasion)
             || (occasion.wantsSuggestions
                 && giftReminderDays(for: occasion) != ReminderDefaults.shippedGiftDaysBefore(occasion))
+    }
+
+    // MARK: - Amazon affiliation
+
+    /// Associates tag entered for one storefront, empty when none is configured.
+    func amazonTag(for market: AmazonMarketplace) -> String {
+        amazonTagsByMarket[market.rawValue] ?? ""
+    }
+
+    func setAmazonTag(_ value: String, for market: AmazonMarketplace) {
+        let clean = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard amazonTagsByMarket[market.rawValue] != clean else { return }
+        amazonTagsByMarket[market.rawValue] = clean
+        if clean.isEmpty {
+            UserDefaults.standard.removeObject(forKey: market.defaultsKey)
+        } else {
+            UserDefaults.standard.set(clean, forKey: market.defaultsKey)
+        }
+    }
+
+    /// Only the storefronts that actually have a tag, ready for the link builder.
+    var amazonTags: [String: String] {
+        amazonTagsByMarket.filter { !$0.value.isEmpty }
+    }
+
+    /// Storefront the shopping button currently points at.
+    var amazonMarketplace: AmazonMarketplace {
+        AmazonMarketplace.resolve(language: language)
+    }
+
+    /// True when the active storefront earns a commission, so the disclosure must show.
+    var earnsAmazonCommission: Bool {
+        !amazonTag(for: amazonMarketplace).isEmpty
     }
 
     /// True when a profile's details must be unlocked before being shown.
