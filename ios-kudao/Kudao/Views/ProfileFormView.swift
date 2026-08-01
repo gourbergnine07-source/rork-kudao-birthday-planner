@@ -111,6 +111,7 @@ struct ProfileFormView: View {
             .environment(\.locale, settings.locale)
         }
         .tint(accent)
+        .pausesInterstitials()
         .onAppear(perform: loadInitialState)
     }
 

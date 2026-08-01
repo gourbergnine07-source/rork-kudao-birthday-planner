@@ -191,12 +191,16 @@ struct HomeView: View {
                 }
             }
             .safeAreaInset(edge: .bottom) {
-                if !profiles.isEmpty {
-                    addButton
-                        .padding(.trailing, 20)
-                        .padding(.bottom, 8)
-                        .frame(maxWidth: .infinity, alignment: .trailing)
+                VStack(spacing: 10) {
+                    if !profiles.isEmpty {
+                        addButton
+                            .padding(.trailing, 20)
+                            .frame(maxWidth: .infinity, alignment: .trailing)
+                    }
+                    // The banner sits under the action button, never over it.
+                    AdBannerView { isShowingPaywall = true }
                 }
+                .padding(.bottom, 8)
             }
             .navigationDestination(for: HomeRoute.self) { route in
                 switch route {

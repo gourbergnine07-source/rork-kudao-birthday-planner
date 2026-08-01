@@ -15,7 +15,10 @@ struct AppSettingsView: View {
     @Environment(\.dismiss) private var dismiss
 
     @Environment(CloudBackupService.self) private var backup
+    @Environment(SubscriptionService.self) private var subscriptions
+    @Environment(AdsService.self) private var ads
 
+    @State private var isShowingPaywall: Bool = false
     @State private var isJoining: Bool = false
     @State private var isManagingBackup: Bool = false
     @State private var isShowingMyProfile: Bool = false
@@ -30,6 +33,7 @@ struct AppSettingsView: View {
 
                 ScrollView {
                     VStack(spacing: 18) {
+                        premiumCard
                         notificationsCard
                         collaborationCard
                         backupCard
@@ -54,6 +58,9 @@ struct AppSettingsView: View {
             .sheet(isPresented: $isJoining) {
                 JoinShareView()
             }
+            .sheet(isPresented: $isShowingPaywall) {
+                PaywallView()
+            }
             .sheet(isPresented: $isManagingBackup) {
                 CloudBackupView()
             }
@@ -65,6 +72,71 @@ struct AppSettingsView: View {
             }
         }
         .tint(Palette.coral)
+    }
+
+    // MARK: - Premium
+
+    /// Subscription status, the way into the paywall, and — only where European
+    /// rules require it — the switch that reopens the ad consent choices.
+    private var premiumCard: some View {
+        AppSettingsCard(
+            title: strings.premiumSettingsTitle,
+            systemImage: subscriptions.isPremium ? "checkmark.seal.fill" : "sparkles",
+            tint: Palette.berry
+        ) {
+            Text(subscriptions.isPremium ? strings.premiumActiveCaption : strings.premiumInactiveCaption)
+                .font(.system(.footnote, design: .rounded))
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+
+            Button {
+                isShowingPaywall = true
+            } label: {
+                HStack(spacing: 8) {
+                    Text(subscriptions.isPremium ? strings.premiumManageAction : strings.paywallSubscribeAction)
+                        .font(.system(.subheadline, design: .rounded, weight: .heavy))
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 11, weight: .heavy))
+                }
+                .foregroundStyle(.white)
+                .padding(.horizontal, 18)
+                .padding(.vertical, 11)
+                .background(Capsule().fill(Palette.vowGradient))
+            }
+            .buttonStyle(PressableCardStyle())
+
+            if ads.isPrivacyOptionsRequired && !subscriptions.isPremium {
+                Divider().overlay(Palette.hairline)
+
+                Button {
+                    Task { await ads.presentPrivacyOptions() }
+                } label: {
+                    HStack(spacing: 10) {
+                        Image(systemName: "hand.raised.fill")
+                            .font(.system(size: 15, weight: .semibold))
+                            .foregroundStyle(Palette.clay)
+
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(strings.adsPrivacyOptionsTitle)
+                                .font(.system(.body, design: .rounded, weight: .semibold))
+                                .foregroundStyle(.primary)
+                            Text(strings.adsPrivacyOptionsCaption)
+                                .font(.system(.caption2, design: .rounded))
+                                .foregroundStyle(.tertiary)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+
+                        Spacer(minLength: 0)
+
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 11, weight: .heavy))
+                            .foregroundStyle(.tertiary)
+                    }
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+            }
+        }
     }
 
     // MARK: - Notifications

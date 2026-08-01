@@ -91,6 +91,7 @@ struct DiaryQuickNoteView: View {
             .environment(\.locale, settings.locale)
         }
         .tint(Palette.coral)
+        .pausesInterstitials()
         .onAppear {
             selectedID = suggestedProfileID ?? candidates.first?.id
             guard !candidates.isEmpty else { return }

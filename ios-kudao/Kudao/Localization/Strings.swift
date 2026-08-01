@@ -733,6 +733,14 @@ nonisolated struct Strings: Sendable {
     let lockedProfileTitle: String
     let lockedProfileMessage: String
     let lockedProfileAction: String
+    let premiumSettingsTitle: String
+    let premiumActiveCaption: String
+    let premiumInactiveCaption: String
+    let premiumManageAction: String
+    let adsSponsoredLabel: String
+    let adsRemoveAction: String
+    let adsPrivacyOptionsTitle: String
+    let adsPrivacyOptionsCaption: String
 }
 
 extension Strings {
@@ -1414,7 +1422,15 @@ extension Strings {
         premiumBadgeLabel: "Premium",
         lockedProfileTitle: "Riattiva Premium per accedere a questo profilo",
         lockedProfileMessage: "Non hai perso nulla: note, foto e dettagli restano al loro posto e tornano visibili appena riattivi Premium.",
-        lockedProfileAction: "Riattiva Premium"
+        lockedProfileAction: "Riattiva Premium",
+        premiumSettingsTitle: "Kudao Premium",
+        premiumActiveCaption: "Abbonamento attivo. Grazie di sostenere Kudao.",
+        premiumInactiveCaption: "Sblocca matrimoni ed eventi speciali, senza pubblicit\u{00E0}.",
+        premiumManageAction: "Vedi i piani",
+        adsSponsoredLabel: "Sponsorizzato",
+        adsRemoveAction: "Togli",
+        adsPrivacyOptionsTitle: "Privacy degli annunci",
+        adsPrivacyOptionsCaption: "Rivedi il consenso all\u{2019}uso dei dati per la pubblicit\u{00E0}."
     )
 
     static let english = Strings(
@@ -2095,7 +2111,15 @@ extension Strings {
         premiumBadgeLabel: "Premium",
         lockedProfileTitle: "Restart Premium to open this profile",
         lockedProfileMessage: "Nothing is lost: notes, photos and details are all still here, and come back the moment Premium is active again.",
-        lockedProfileAction: "Restart Premium"
+        lockedProfileAction: "Restart Premium",
+        premiumSettingsTitle: "Kudao Premium",
+        premiumActiveCaption: "Subscription active. Thank you for supporting Kudao.",
+        premiumInactiveCaption: "Unlock weddings and special events, with no ads.",
+        premiumManageAction: "See the plans",
+        adsSponsoredLabel: "Sponsored",
+        adsRemoveAction: "Remove",
+        adsPrivacyOptionsTitle: "Ad privacy",
+        adsPrivacyOptionsCaption: "Review your consent for how ads use your data."
     )
 
     static let french = Strings(
@@ -2776,7 +2800,15 @@ extension Strings {
         premiumBadgeLabel: "Premium",
         lockedProfileTitle: "R\u{00E9}activez Premium pour ouvrir ce profil",
         lockedProfileMessage: "Rien n\u{2019}est perdu : les notes, les photos et les d\u{00E9}tails sont toujours l\u{00E0} et reviennent d\u{00E8}s que Premium est r\u{00E9}activ\u{00E9}.",
-        lockedProfileAction: "R\u{00E9}activer Premium"
+        lockedProfileAction: "R\u{00E9}activer Premium",
+        premiumSettingsTitle: "Kudao Premium",
+        premiumActiveCaption: "Abonnement actif. Merci de soutenir Kudao.",
+        premiumInactiveCaption: "D\u{00E9}bloquez les mariages et les \u{00E9}v\u{00E9}nements sp\u{00E9}ciaux, sans publicit\u{00E9}.",
+        premiumManageAction: "Voir les formules",
+        adsSponsoredLabel: "Sponsoris\u{00E9}",
+        adsRemoveAction: "Retirer",
+        adsPrivacyOptionsTitle: "Confidentialit\u{00E9} des annonces",
+        adsPrivacyOptionsCaption: "Revoyez votre consentement \u{00E0} l\u{2019}utilisation des donn\u{00E9}es publicitaires."
     )
 
     static let spanish = Strings(
@@ -3457,6 +3489,14 @@ extension Strings {
         premiumBadgeLabel: "Premium",
         lockedProfileTitle: "Reactiva Premium para abrir este perfil",
         lockedProfileMessage: "No has perdido nada: las notas, las fotos y los detalles siguen aqu\u{00ED} y vuelven en cuanto Premium est\u{00E9} activo.",
-        lockedProfileAction: "Reactivar Premium"
+        lockedProfileAction: "Reactivar Premium",
+        premiumSettingsTitle: "Kudao Premium",
+        premiumActiveCaption: "Suscripci\u{00F3}n activa. Gracias por apoyar Kudao.",
+        premiumInactiveCaption: "Desbloquea bodas y eventos especiales, sin publicidad.",
+        premiumManageAction: "Ver los planes",
+        adsSponsoredLabel: "Patrocinado",
+        adsRemoveAction: "Quitar",
+        adsPrivacyOptionsTitle: "Privacidad de los anuncios",
+        adsPrivacyOptionsCaption: "Revisa tu consentimiento sobre el uso de datos publicitarios."
     )
 }

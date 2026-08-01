@@ -16,6 +16,7 @@ struct KudaoApp: App {
     @State private var backup = CloudBackupService()
     @State private var auth = AuthService()
     @State private var subscriptions: SubscriptionService
+    @State private var ads = AdsService()
     private let container: ModelContainer = KudaoModelContainer.make()
 
     @Environment(\.scenePhase) private var scenePhase
@@ -39,14 +40,30 @@ struct KudaoApp: App {
                 .environment(backup)
                 .environment(auth)
                 .environment(subscriptions)
+                .environment(ads)
                 .environment(\.locale, settings.locale)
+                .task {
+                    // Consent first, then the SDK. Subscribers never get here.
+                    guard !subscriptions.isPremium else { return }
+                    await ads.start()
+                }
         }
         .modelContainer(container)
         .onChange(of: scenePhase) { _, phase in
             // An expiry or a renewal can happen while Kudao is in the
             // background, including from the App Store's own subscription page.
-            if phase == .active {
-                Task { await subscriptions.refresh() }
+            switch phase {
+            case .active:
+                Task {
+                    await subscriptions.refresh()
+                    // At most one full-screen ad per session, and only on a
+                    // real return — never mid-task, never for subscribers.
+                    ads.noteBecameActive(isPremium: subscriptions.isPremium)
+                }
+            case .background:
+                ads.noteEnteredBackground()
+            default:
+                break
             }
         }
     }
