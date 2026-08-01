@@ -22,11 +22,20 @@ struct KudaoApp: App {
     @Environment(\.scenePhase) private var scenePhase
 
     init() {
+        Self.logAdMobIdentifier()
         NotificationService.shared.bootstrap()
         // The service reads its state from a configured SDK, so the SDK has to
         // come first: a stored-property initializer would run too early.
         SubscriptionService.configure()
         _subscriptions = State(initialValue: SubscriptionService())
+    }
+
+    /// The Google Mobile Ads SDK checks `GADApplicationIdentifier` as soon as its
+    /// framework loads and terminates the process when the key is absent, so a
+    /// bundle that lost it must be obvious in the very first log line.
+    private static func logAdMobIdentifier() {
+        let identifier = Bundle.main.object(forInfoDictionaryKey: "GADApplicationIdentifier") as? String
+        print("[Kudao] GADApplicationIdentifier: \(identifier ?? "MISSING")")
     }
 
     var body: some Scene {

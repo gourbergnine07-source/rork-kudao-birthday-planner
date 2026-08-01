@@ -59,6 +59,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		AA01C0E02E9EAD3100EA8BCF /* Exceptions for "Kudao" folder in "Kudao" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 105FC5792E9EAD3100EA8BCF /* Kudao */;
+		};
 		XX7AB968D974D84898A95EXX /* Exceptions for "KudaoWidget" folder in "KudaoWidget" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -74,6 +81,9 @@
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = Kudao;
 			sourceTree = "<group>";
+			exceptions = (
+				AA01C0E02E9EAD3100EA8BCF /* Exceptions for "Kudao" folder in "Kudao" target */,
+			);
 		};
 		105FC58C2E9EAD3200EA8BCF /* KudaoTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
@@ -163,7 +173,6 @@
 				105FC5762E9EAD3100EA8BCF /* Sources */,
 				105FC5772E9EAD3100EA8BCF /* Frameworks */,
 				105FC5782E9EAD3100EA8BCF /* Resources */,
-				AA01C0DF2E9EAD3100EA8BCF /* Inject AdMob application id */,
 				XX8618DA762832199DA68BXX /* Embed Foundation Extensions */,
 			);
 			buildRules = (
@@ -351,25 +360,6 @@
 			shellPath = /bin/sh;
 			shellScript = "sh \"$SRCROOT/Scripts/generate-env-config.sh\"\n";
 		};
-		AA01C0DF2E9EAD3100EA8BCF /* Inject AdMob application id */ = {
-			isa = PBXShellScriptBuildPhase;
-			alwaysOutOfDate = 1;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			name = "Inject AdMob application id";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "sh \"$SRCROOT/Scripts/inject-admob-appid.sh\"\n";
-		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -556,7 +546,7 @@
 				EXCLUDED_SOURCE_FILE_NAMES = "Config.swift */Config.swift";
 				CODE_SIGN_ENTITLEMENTS = Kudao/Kudao.entitlements;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_GADApplicationIdentifier = "ca-app-pub-7245682186872516~8858650298";
+				INFOPLIST_FILE = Kudao/Info.plist;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "Kudao usa Face ID per proteggere i profili in modalità sorpresa.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Kudao usa la tua posizione solo per trovare negozi vicini dove comprare il regalo.";
@@ -599,7 +589,7 @@
 				EXCLUDED_SOURCE_FILE_NAMES = "Config.swift */Config.swift";
 				CODE_SIGN_ENTITLEMENTS = Kudao/Kudao.entitlements;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_GADApplicationIdentifier = "ca-app-pub-7245682186872516~8858650298";
+				INFOPLIST_FILE = Kudao/Info.plist;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "Kudao usa Face ID per proteggere i profili in modalità sorpresa.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Kudao usa la tua posizione solo per trovare negozi vicini dove comprare il regalo.";

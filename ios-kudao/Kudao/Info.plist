@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!--
+	  Base Info.plist. Xcode still generates the usual keys (usage descriptions,
+	  orientations, scene manifest) from the INFOPLIST_KEY_* build settings and
+	  merges them on top of this file.
+
+	  Only keys Xcode has no INFOPLIST_KEY_ equivalent for live here. The Google
+	  Mobile Ads SDK reads GADApplicationIdentifier from the bundle and throws an
+	  uncaught exception - a crash before the first screen - when it is missing,
+	  so it cannot be left to a build setting Xcode silently ignores.
+	-->
+	<key>GADApplicationIdentifier</key>
+	<string>ca-app-pub-7245682186872516~8858650298</string>
+	<key>SKAdNetworkItems</key>
+	<array>
+		<dict>
+			<key>SKAdNetworkIdentifier</key>
+			<string>cstr6suwn9.skadnetwork</string>
+		</dict>
+	</array>
+</dict>
+</plist>
