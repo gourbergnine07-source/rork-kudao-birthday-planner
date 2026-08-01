@@ -6,11 +6,43 @@
 import Foundation
 
 /// A person the diary invitation may talk about.
+///
+/// The three signals below are what the rotation ranks on: they are snapshotted
+/// here so the picking logic stays free of SwiftData and can be reasoned about
+/// (and tested) on its own.
 nonisolated struct DiaryNudgePerson: Sendable, Equatable, Identifiable {
     let id: UUID
     let name: String
     /// Surprise profiles whose name must never appear on the lock screen.
     let isDiscreet: Bool
+    /// Keywords already extracted from this diary: the less there is, the more a note is worth.
+    let tagCount: Int
+    /// Days until the occasion, straight from the countdown.
+    let daysUntilEvent: Int
+    /// Days since the last note was written here; `neverWritten` when there is none.
+    let daysSinceLastNote: Int
+
+    /// Stand-in age for a diary that has never been written in.
+    static let neverWritten: Int = 400
+
+    /// How much Kudao has to gain from a note about this person right now.
+    ///
+    /// The three criteria are weighted rather than applied in strict order: a
+    /// pure lexicographic sort would let a profile with 3 keywords outrank one
+    /// with 4 even if the second person's birthday is tomorrow. The weights keep
+    /// scarcity dominant while still letting urgency decide between profiles
+    /// Kudao knows about equally well.
+    var priorityScore: Double {
+        // Criterion 1 - how little is known. The gap between 0 and 1 keywords is
+        // huge and narrows as the diary fills, so an empty profile always wins.
+        let scarcity = 100.0 / Double(1 + max(0, tagCount))
+        // Criterion 2 - how close the date is, over a one-year horizon.
+        let urgency = 10.0 * max(0, 1 - Double(max(0, daysUntilEvent)) / 365.0)
+        // Criterion 3 - how long this diary has been silent, capped at three
+        // months so neglect alone can never outrank an imminent date.
+        let staleness = min(Double(max(0, daysSinceLastNote)), 90.0) / 90.0
+        return scarcity + urgency + staleness
+    }
 }
 
 /// Everything needed to schedule the diary invitations, snapshotted off the models.
@@ -42,16 +74,46 @@ nonisolated struct DiaryNudgePlan: Sendable, Equatable {
         people.filter { !$0.isDiscreet }
     }
 
+    /// Age of the most recent note, used to surface diaries that went quiet.
+    @MainActor
+    private static func daysSinceLastNote(
+        in profile: BirthdayProfile,
+        reference: Date,
+        calendar: Calendar
+    ) -> Int {
+        guard let latest = profile.diaryEntries.map(\.createdAt).max() else {
+            return DiaryNudgePerson.neverWritten
+        }
+        let days = calendar.dateComponents(
+            [.day],
+            from: calendar.startOfDay(for: latest),
+            to: calendar.startOfDay(for: reference)
+        ).day ?? 0
+        return max(0, days)
+    }
+
     /// Builds the plan from the live settings and profiles.
     @MainActor
-    static func make(settings: AppSettings, profiles: [BirthdayProfile]) -> DiaryNudgePlan {
+    static func make(
+        settings: AppSettings,
+        profiles: [BirthdayProfile],
+        reference: Date = Date()
+    ) -> DiaryNudgePlan {
+        let calendar = Calendar.current
         let people = profiles
             .filter(\.wantsDiaryNudges)
-            .map {
+            .map { profile in
                 DiaryNudgePerson(
-                    id: $0.id,
-                    name: $0.name.trimmingCharacters(in: .whitespacesAndNewlines),
-                    isDiscreet: settings.masksIdentity(of: $0)
+                    id: profile.id,
+                    name: profile.name.trimmingCharacters(in: .whitespacesAndNewlines),
+                    isDiscreet: settings.masksIdentity(of: profile),
+                    tagCount: profile.diaryTags.count,
+                    daysUntilEvent: profile.countdown.daysRemaining,
+                    daysSinceLastNote: Self.daysSinceLastNote(
+                        in: profile,
+                        reference: reference,
+                        calendar: calendar
+                    )
                 )
             }
             .filter { !$0.name.isEmpty }

@@ -637,6 +637,7 @@ nonisolated struct Strings: Sendable {
     let diaryNudgeVariantThree: String
     let diaryNudgePersonFormatOne: String
     let diaryNudgePersonFormatTwo: String
+    let diaryNudgePairFormat: String
     let quickNoteTitle: String
     let quickNoteCaption: String
     let quickNoteEmptyMessage: String
@@ -1294,6 +1295,7 @@ extension Strings {
         diaryNudgeVariantThree: "Tieni aggiornati i profili delle persone che contano.",
         diaryNudgePersonFormatOne: "Hai scoperto qualcosa su %@ di recente?",
         diaryNudgePersonFormatTwo: "Due righe su %@: il te del futuro ringrazier\u{00E0}.",
+        diaryNudgePairFormat: "Hai novit\u{00E0} su %@ o %@? Un dettaglio in pi\u{00F9} li rende speciali.",
         quickNoteTitle: "Nota al volo",
         quickNoteCaption: "Scegli la persona e scrivi: bastano poche parole.",
         quickNoteEmptyMessage: "Nessun profilo disponibile per una nota. Creane uno e torna qui.",
@@ -1941,6 +1943,7 @@ extension Strings {
         diaryNudgeVariantThree: "Keep the profiles of the people who matter up to date.",
         diaryNudgePersonFormatOne: "Have you learned anything about %@ lately?",
         diaryNudgePersonFormatTwo: "Two lines about %@: future you will be grateful.",
+        diaryNudgePairFormat: "Any news about %@ or %@? One more detail makes them special.",
         quickNoteTitle: "Quick note",
         quickNoteCaption: "Pick the person and write: a few words are enough.",
         quickNoteEmptyMessage: "No profile available for a note yet. Create one and come back.",
@@ -2588,6 +2591,7 @@ extension Strings {
         diaryNudgeVariantThree: "Gardez \u{00E0} jour les profils des personnes qui comptent.",
         diaryNudgePersonFormatOne: "Vous avez appris quelque chose sur %@ derni\u{00E8}rement ?",
         diaryNudgePersonFormatTwo: "Deux lignes sur %@ : votre futur vous dira merci.",
+        diaryNudgePairFormat: "Du nouveau sur %@ ou %@ ? Un d\u{00E9}tail de plus les rend uniques.",
         quickNoteTitle: "Note rapide",
         quickNoteCaption: "Choisissez la personne et \u{00E9}crivez : quelques mots suffisent.",
         quickNoteEmptyMessage: "Aucun profil disponible pour une note. Cr\u{00E9}ez-en un et revenez.",
@@ -3235,6 +3239,7 @@ extension Strings {
         diaryNudgeVariantThree: "Mant\u{00E9}n al d\u{00ED}a los perfiles de las personas que importan.",
         diaryNudgePersonFormatOne: "\u{00BF}Has descubierto algo sobre %@ \u{00FA}ltimamente?",
         diaryNudgePersonFormatTwo: "Dos l\u{00ED}neas sobre %@: tu yo del futuro lo agradecer\u{00E1}.",
+        diaryNudgePairFormat: "\u{00BF}Alguna novedad sobre %@ o %@? Un detalle m\u{00E1}s los hace especiales.",
         quickNoteTitle: "Nota r\u{00E1}pida",
         quickNoteCaption: "Elige a la persona y escribe: bastan unas pocas palabras.",
         quickNoteEmptyMessage: "Todav\u{00ED}a no hay perfiles para una nota. Crea uno y vuelve.",

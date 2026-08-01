@@ -250,54 +250,76 @@ final class NotificationService {
 
     /// The next few invitations to write something down.
     ///
-    /// Each slot picks its own wording so the notification never reads like a
-    /// loop, and roughly every other one names a profile — unless the only
-    /// candidates are surprises, whose names stay off the lock screen.
+    /// Each slot asks about one or two people rather than the whole roster, so
+    /// the diary never feels like a list of chores. `DiaryNudgeRotation` decides
+    /// who: whoever Kudao knows the least about, weighted by how close their
+    /// date is and how long their diary has been quiet.
     static func diaryReminders(plan: DiaryNudgePlan, strings: Strings) -> [ScheduledReminder] {
         let dates = plan.upcomingDates()
         guard !dates.isEmpty else { return [] }
 
-        let generic = [
-            strings.diaryNudgeVariantOne,
-            strings.diaryNudgeVariantTwo,
-            strings.diaryNudgeVariantThree,
-        ]
-        let personal = [
-            strings.diaryNudgePersonFormatOne,
-            strings.diaryNudgePersonFormatTwo,
-        ]
-        let namable = plan.namablePeople
-        var lastBody = ""
+        let selections = DiaryNudgeRotation.selections(
+            for: dates,
+            among: plan.people,
+            cadence: plan.cadence
+        )
+        guard !selections.isEmpty else { return [] }
+
         var result: [ScheduledReminder] = []
 
         for (index, date) in dates.enumerated() {
-            // A named line every other slot keeps the nudge personal without
-            // turning into a nag about the same person.
-            let wantsName = !namable.isEmpty && (index % 2 == 1 || namable.count == 1)
-            let person = wantsName ? namable.randomElement() : nil
-
-            var body = person.map { String(format: personal.randomElement() ?? personal[0], $0.name) }
-                ?? (generic.randomElement() ?? generic[0])
-            if body == lastBody, let alternative = generic.first(where: { $0 != lastBody }) {
-                body = alternative
-            }
-            lastBody = body
-
-            guard let target = person?.id ?? plan.people.first?.id else { continue }
+            guard index < selections.count else { break }
+            let chosen = selections[index]
+            // The tap opens the quick note on the person the line is about.
+            guard let target = chosen.first(where: { !$0.isDiscreet }) ?? chosen.first else { continue }
 
             result.append(
                 ScheduledReminder(
                     id: "\(diaryPrefix)\(index)",
                     title: strings.diaryNudgeTitle,
-                    body: body,
+                    body: body(for: chosen, slot: index, strings: strings),
                     fireDate: date,
-                    profileID: target,
+                    profileID: target.id,
                     kind: .diary
                 )
             )
         }
 
         return result
+    }
+
+    /// Wording for one invitation, given the people the rotation picked.
+    ///
+    /// Surprise profiles are dropped from the wording rather than the rotation:
+    /// they still get their turn, the line just stays anonymous so a lock screen
+    /// never gives the surprise away.
+    private static func body(
+        for chosen: [DiaryNudgePerson],
+        slot: Int,
+        strings: Strings
+    ) -> String {
+        let namable = chosen.filter { !$0.isDiscreet }
+
+        if namable.count >= 2 {
+            return String(format: strings.diaryNudgePairFormat, namable[0].name, namable[1].name)
+        }
+
+        if let person = namable.first {
+            let personal = [
+                strings.diaryNudgePersonFormatOne,
+                strings.diaryNudgePersonFormatTwo,
+            ]
+            // Indexed, not random: the reminders are rebuilt on every launch and
+            // a random pick would rewrite the same slot over and over.
+            return String(format: personal[slot % personal.count], person.name)
+        }
+
+        let generic = [
+            strings.diaryNudgeVariantOne,
+            strings.diaryNudgeVariantTwo,
+            strings.diaryNudgeVariantThree,
+        ]
+        return generic[slot % generic.count]
     }
 
     /// Builds the reminders a profile currently deserves.
