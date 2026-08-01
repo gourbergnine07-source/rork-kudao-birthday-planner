@@ -13,11 +13,14 @@ import SwiftData
 /// occasion — "the year we booked the boat", not "record #12".
 struct LibraryView: View {
     @Environment(AppSettings.self) private var settings
+    @Environment(\.modelContext) private var context
     @Query private var records: [EventRecord]
     @Query private var profiles: [BirthdayProfile]
 
     @State private var occasionFilter: OccasionFilter = .all
     @State private var profileFilter: UUID?
+    /// Archived cycle waiting for the owner to confirm they really mean it.
+    @State private var pendingDeletion: EventRecord?
 
     private var strings: Strings { settings.strings }
 
@@ -65,6 +68,29 @@ struct LibraryView: View {
         }
         .navigationTitle(strings.libraryTitle)
         .navigationBarTitleDisplayMode(.inline)
+        .confirmationDialog(
+            strings.libraryDeleteEventTitle,
+            isPresented: Binding(
+                get: { pendingDeletion != nil },
+                set: { if !$0 { pendingDeletion = nil } }
+            ),
+            titleVisibility: .visible,
+            presenting: pendingDeletion
+        ) { record in
+            Button(strings.libraryDeleteEventAction, role: .destructive) {
+                EventArchivist.delete(record, context: context)
+                pendingDeletion = nil
+            }
+            Button(strings.cancelAction, role: .cancel) { pendingDeletion = nil }
+        } message: { record in
+            Text(
+                String(
+                    format: strings.libraryDeleteEventMessageFormat,
+                    String(record.year),
+                    record.profileName
+                )
+            )
+        }
         .environment(\.locale, settings.locale)
     }
 
@@ -110,6 +136,13 @@ struct LibraryView: View {
                     EventRecordCard(record: record, strings: strings, showsProfileName: true)
                 }
                 .buttonStyle(PressableCardStyle())
+                .contextMenu {
+                    Button(role: .destructive) {
+                        pendingDeletion = record
+                    } label: {
+                        Label(strings.libraryDeleteEventAction, systemImage: "trash")
+                    }
+                }
             }
         }
     }

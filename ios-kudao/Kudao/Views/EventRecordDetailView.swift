@@ -11,8 +11,14 @@ struct EventRecordDetailView: View {
     let record: EventRecord
 
     @Environment(AppSettings.self) private var settings
+    @Environment(\.modelContext) private var context
+    @Environment(\.dismiss) private var dismiss
     @State private var gallery = GalleryService()
     @State private var viewerID: String?
+    @State private var isConfirmingRecordDeletion: Bool = false
+    /// Position of the memory awaiting confirmation, kept as an index because
+    /// the highlights are plain strings and two years can read alike.
+    @State private var pendingMemoryIndex: Int?
 
     private var strings: Strings { settings.strings }
     private var occasion: OccasionKind { record.occasion }
@@ -72,6 +78,57 @@ struct EventRecordDetailView: View {
         }
         .navigationTitle(String(record.year))
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Menu {
+                    Button(role: .destructive) {
+                        isConfirmingRecordDeletion = true
+                    } label: {
+                        Label(strings.libraryDeleteEventAction, systemImage: "trash")
+                    }
+                } label: {
+                    Image(systemName: "ellipsis.circle")
+                }
+            }
+        }
+        .confirmationDialog(
+            strings.libraryDeleteEventTitle,
+            isPresented: $isConfirmingRecordDeletion,
+            titleVisibility: .visible
+        ) {
+            Button(strings.libraryDeleteEventAction, role: .destructive) {
+                // Leave the screen first: the record it renders is about to go.
+                dismiss()
+                EventArchivist.delete(record, context: context)
+            }
+            Button(strings.cancelAction, role: .cancel) {}
+        } message: {
+            Text(
+                String(
+                    format: strings.libraryDeleteEventMessageFormat,
+                    String(record.year),
+                    record.profileName
+                )
+            )
+        }
+        .confirmationDialog(
+            strings.libraryDeleteMemoryTitle,
+            isPresented: Binding(
+                get: { pendingMemoryIndex != nil },
+                set: { if !$0 { pendingMemoryIndex = nil } }
+            ),
+            titleVisibility: .visible
+        ) {
+            Button(strings.libraryDeleteMemoryAction, role: .destructive) {
+                if let index = pendingMemoryIndex {
+                    EventArchivist.removeMemory(at: index, from: record, context: context)
+                }
+                pendingMemoryIndex = nil
+            }
+            Button(strings.cancelAction, role: .cancel) { pendingMemoryIndex = nil }
+        } message: {
+            Text(strings.libraryDeleteMemoryMessage)
+        }
         .fullScreenCover(item: Binding(
             get: { viewerID.map(ViewerSelection.init) },
             set: { viewerID = $0?.id }
@@ -232,7 +289,7 @@ struct EventRecordDetailView: View {
             tint: Palette.sage
         ) {
             VStack(alignment: .leading, spacing: 10) {
-                ForEach(Array(record.memoryHighlights.enumerated()), id: \.offset) { _, memory in
+                ForEach(Array(record.memoryHighlights.enumerated()), id: \.offset) { index, memory in
                     HStack(alignment: .top, spacing: 8) {
                         Circle()
                             .fill(Palette.sage)
@@ -243,6 +300,14 @@ struct EventRecordDetailView: View {
                             .fixedSize(horizontal: false, vertical: true)
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
+                    .contentShape(Rectangle())
+                    .contextMenu {
+                        Button(role: .destructive) {
+                            pendingMemoryIndex = index
+                        } label: {
+                            Label(strings.libraryDeleteMemoryAction, systemImage: "trash")
+                        }
+                    }
                 }
 
                 if record.noteCount > record.memoryHighlights.count {

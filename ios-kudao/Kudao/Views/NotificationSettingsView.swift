@@ -298,7 +298,64 @@ struct NotificationSettingsView: View {
             )
             .font(.system(.caption, design: .rounded, weight: .semibold))
             .foregroundStyle(.tertiary)
+
+            rotationPreview(plan)
         }
+    }
+
+    /// The people the next few invitations will actually name.
+    ///
+    /// Without this the rotation is invisible: the user reads "5 profiles
+    /// included" and reasonably expects all five in every notification. Showing
+    /// the real queue is what makes the one-or-two-at-a-time rule legible.
+    @ViewBuilder
+    private func rotationPreview(_ plan: DiaryNudgePlan) -> some View {
+        let dates = plan.upcomingDates(limit: 3)
+        let selections = DiaryNudgeRotation.selections(
+            for: dates,
+            among: plan.people,
+            cadence: plan.cadence
+        )
+
+        if !selections.isEmpty {
+            VStack(alignment: .leading, spacing: 8) {
+                Divider().overlay(Palette.hairline)
+
+                Text(strings.diaryNudgePreviewTitle)
+                    .font(.system(.caption, design: .rounded, weight: .bold))
+                    .foregroundStyle(.secondary)
+
+                ForEach(Array(selections.enumerated()), id: \.offset) { index, people in
+                    HStack(alignment: .firstTextBaseline, spacing: 8) {
+                        Text(settings.dayMonth(dates[index]))
+                            .font(.system(.caption2, design: .rounded, weight: .semibold))
+                            .foregroundStyle(.tertiary)
+                            .frame(width: 76, alignment: .leading)
+
+                        Text(previewNames(people))
+                            .font(.system(.caption, design: .rounded, weight: .semibold))
+                            .foregroundStyle(Palette.clay)
+                            .fixedSize(horizontal: false, vertical: true)
+
+                        Spacer(minLength: 0)
+                    }
+                }
+
+                Text(strings.diaryNudgePreviewCaption)
+                    .font(.system(.caption2, design: .rounded))
+                    .foregroundStyle(.tertiary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .padding(.top, 2)
+        }
+    }
+
+    /// Names for one slot, with surprise profiles kept anonymous exactly as the
+    /// notification itself keeps them.
+    private func previewNames(_ people: [DiaryNudgePerson]) -> String {
+        people
+            .map { $0.isDiscreet ? strings.maskedProfileName : $0.name }
+            .formatted(.list(type: .or).locale(settings.locale))
     }
 
     // MARK: - One category of occasion

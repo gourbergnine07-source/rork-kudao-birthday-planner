@@ -41,6 +41,10 @@ enum EventArchivist {
                 continue
             }
 
+            // The owner deleted this year from the library on purpose; rebuilding
+            // it would quietly undo that.
+            guard !profile.removedArchiveYears.contains(cycle.year) else { continue }
+
             if let existing = records.first(where: { $0.profileID == profile.id && $0.year == cycle.year }) {
                 // The party is over but the memories are not in yet: keep the media fresh.
                 guard existing.isMediaWindowOpen(reference: reference) else { continue }
@@ -173,6 +177,43 @@ enum EventArchivist {
             ?? items.first(where: { $0.thumbnailData != nil })?.thumbnailData
             ?? profile.photoData
         record.updatedAt = Date()
+    }
+
+    // MARK: - Deletion
+
+    /// Removes an archived cycle for good, leaving the live profile untouched.
+    ///
+    /// Only the snapshot goes: the diary notes it summarised, the gallery items it
+    /// pointed at and the profile itself all stay. A tombstone is recorded so the
+    /// next `sync` does not archive that year all over again.
+    static func delete(_ record: EventRecord, context: ModelContext) {
+        if let profile = record.profile, !profile.removedArchiveYears.contains(record.year) {
+            profile.removedArchiveYears.append(record.year)
+        }
+        context.delete(record)
+
+        do {
+            try context.save()
+        } catch {
+            logger.error("Deleting an archived cycle failed: \(error.localizedDescription, privacy: .public)")
+        }
+    }
+
+    /// Drops a single memory from an archived cycle.
+    ///
+    /// `noteCount` is decremented alongside so the "12 notes written that year"
+    /// line cannot end up claiming more than the record can show.
+    static func removeMemory(at index: Int, from record: EventRecord, context: ModelContext) {
+        guard record.memoryHighlights.indices.contains(index) else { return }
+        record.memoryHighlights.remove(at: index)
+        record.noteCount = max(0, record.noteCount - 1)
+        record.updatedAt = Date()
+
+        do {
+            try context.save()
+        } catch {
+            logger.error("Deleting an archived memory failed: \(error.localizedDescription, privacy: .public)")
+        }
     }
 
     // MARK: - Restart

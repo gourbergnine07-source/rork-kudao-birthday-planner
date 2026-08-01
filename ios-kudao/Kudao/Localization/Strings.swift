@@ -627,6 +627,8 @@ nonisolated struct Strings: Sendable {
     let diaryReminderTimeLabel: String
     let diaryReminderNextFormat: String
     let diaryReminderPeopleFormat: String
+    let diaryNudgePreviewTitle: String
+    let diaryNudgePreviewCaption: String
     let diaryReminderRemembranceNote: String
     let diaryReminderExcludeTitle: String
     let diaryReminderExcludeCaption: String
@@ -700,6 +702,12 @@ nonisolated struct Strings: Sendable {
     let libraryNotesCountFormat: String
     let libraryKeywordsSection: String
     let libraryArchivedOnFormat: String
+    let libraryDeleteEventAction: String
+    let libraryDeleteEventTitle: String
+    let libraryDeleteEventMessageFormat: String
+    let libraryDeleteMemoryAction: String
+    let libraryDeleteMemoryTitle: String
+    let libraryDeleteMemoryMessage: String
 }
 
 extension Strings {
@@ -1285,6 +1293,8 @@ extension Strings {
         diaryReminderTimeLabel: "Orario dell\u{2019}invito",
         diaryReminderNextFormat: "Prossimo invito: %@",
         diaryReminderPeopleFormat: "%d profili coinvolti",
+        diaryNudgePreviewTitle: "Di chi ti parler\u{00E0}",
+        diaryNudgePreviewCaption: "Kudao alterna i profili: nomina prima quelli che conosce meno e quelli con la data pi\u{00F9} vicina.",
         diaryReminderRemembranceNote: "Le commemorazioni restano sempre fuori da questi inviti.",
         diaryReminderExcludeTitle: "Escludi dai promemoria diario",
         diaryReminderExcludeCaption: "Questo profilo non verr\u{00E0} pi\u{00F9} nominato negli inviti a scrivere.",
@@ -1348,7 +1358,13 @@ extension Strings {
         libraryMediaCountFormat: "%d ricordi raccolti",
         libraryNotesCountFormat: "%d note scritte in quell\u{2019}anno",
         libraryKeywordsSection: "Cosa sapevamo allora",
-        libraryArchivedOnFormat: "Archiviato il %@"
+        libraryArchivedOnFormat: "Archiviato il %@",
+        libraryDeleteEventAction: "Elimina evento",
+        libraryDeleteEventTitle: "Eliminare questo evento?",
+        libraryDeleteEventMessageFormat: "L\u{2019}archivio %@ di %@ verr\u{00E0} eliminato definitivamente. Il profilo, le note del diario e le foto in galleria restano.",
+        libraryDeleteMemoryAction: "Elimina ricordo",
+        libraryDeleteMemoryTitle: "Eliminare questo ricordo?",
+        libraryDeleteMemoryMessage: "Questo ricordo sparir\u{00E0} definitivamente dall\u{2019}archivio. La nota originale nel diario resta al suo posto."
     )
 
     static let english = Strings(
@@ -1933,6 +1949,8 @@ extension Strings {
         diaryReminderTimeLabel: "Reminder time",
         diaryReminderNextFormat: "Next nudge: %@",
         diaryReminderPeopleFormat: "%d profiles included",
+        diaryNudgePreviewTitle: "Who it will ask about",
+        diaryNudgePreviewCaption: "Kudao rotates through your profiles: it names the ones it knows least about and those whose date is closest first.",
         diaryReminderRemembranceNote: "Remembrances are always left out of these nudges.",
         diaryReminderExcludeTitle: "Exclude from diary reminders",
         diaryReminderExcludeCaption: "This profile will no longer be mentioned in the nudges.",
@@ -1996,7 +2014,13 @@ extension Strings {
         libraryMediaCountFormat: "%d memories collected",
         libraryNotesCountFormat: "%d notes written that year",
         libraryKeywordsSection: "What we knew back then",
-        libraryArchivedOnFormat: "Archived on %@"
+        libraryArchivedOnFormat: "Archived on %@",
+        libraryDeleteEventAction: "Delete event",
+        libraryDeleteEventTitle: "Delete this event?",
+        libraryDeleteEventMessageFormat: "The %@ archive for %@ will be deleted for good. The profile, the diary notes and the gallery photos all stay.",
+        libraryDeleteMemoryAction: "Delete memory",
+        libraryDeleteMemoryTitle: "Delete this memory?",
+        libraryDeleteMemoryMessage: "This memory will disappear from the archive for good. The original diary note stays where it is."
     )
 
     static let french = Strings(
@@ -2581,6 +2605,8 @@ extension Strings {
         diaryReminderTimeLabel: "Heure du rappel",
         diaryReminderNextFormat: "Prochain rappel : %@",
         diaryReminderPeopleFormat: "%d profils concern\u{00E9}s",
+        diaryNudgePreviewTitle: "De qui il va parler",
+        diaryNudgePreviewCaption: "Kudao alterne les profils : il nomme d\u{2019}abord ceux qu\u{2019}il conna\u{00EE}t le moins et ceux dont la date approche.",
         diaryReminderRemembranceNote: "Les comm\u{00E9}morations restent toujours en dehors de ces rappels.",
         diaryReminderExcludeTitle: "Exclure des rappels du journal",
         diaryReminderExcludeCaption: "Ce profil ne sera plus mentionn\u{00E9} dans les rappels.",
@@ -2644,7 +2670,13 @@ extension Strings {
         libraryMediaCountFormat: "%d souvenirs collect\u{00E9}s",
         libraryNotesCountFormat: "%d notes \u{00E9}crites cette ann\u{00E9}e-l\u{00E0}",
         libraryKeywordsSection: "Ce que l\u{2019}on savait alors",
-        libraryArchivedOnFormat: "Archiv\u{00E9} le %@"
+        libraryArchivedOnFormat: "Archiv\u{00E9} le %@",
+        libraryDeleteEventAction: "Supprimer l\u{2019}\u{00E9}v\u{00E9}nement",
+        libraryDeleteEventTitle: "Supprimer cet \u{00E9}v\u{00E9}nement ?",
+        libraryDeleteEventMessageFormat: "L\u{2019}archive %@ de %@ sera supprim\u{00E9}e d\u{00E9}finitivement. Le profil, les notes du journal et les photos de la galerie restent.",
+        libraryDeleteMemoryAction: "Supprimer le souvenir",
+        libraryDeleteMemoryTitle: "Supprimer ce souvenir ?",
+        libraryDeleteMemoryMessage: "Ce souvenir dispara\u{00EE}tra d\u{00E9}finitivement de l\u{2019}archive. La note d\u{2019}origine reste dans le journal."
     )
 
     static let spanish = Strings(
@@ -3229,6 +3261,8 @@ extension Strings {
         diaryReminderTimeLabel: "Hora del recordatorio",
         diaryReminderNextFormat: "Pr\u{00F3}ximo aviso: %@",
         diaryReminderPeopleFormat: "%d perfiles incluidos",
+        diaryNudgePreviewTitle: "De qui\u{00E9}n te hablar\u{00E1}",
+        diaryNudgePreviewCaption: "Kudao va alternando los perfiles: nombra primero los que menos conoce y los que tienen la fecha m\u{00E1}s cerca.",
         diaryReminderRemembranceNote: "Las conmemoraciones siempre quedan fuera de estos avisos.",
         diaryReminderExcludeTitle: "Excluir de los recordatorios del diario",
         diaryReminderExcludeCaption: "Este perfil ya no se mencionar\u{00E1} en los avisos.",
@@ -3292,6 +3326,12 @@ extension Strings {
         libraryMediaCountFormat: "%d recuerdos recogidos",
         libraryNotesCountFormat: "%d notas escritas ese a\u{00F1}o",
         libraryKeywordsSection: "Lo que sab\u{00ED}amos entonces",
-        libraryArchivedOnFormat: "Archivado el %@"
+        libraryArchivedOnFormat: "Archivado el %@",
+        libraryDeleteEventAction: "Eliminar evento",
+        libraryDeleteEventTitle: "\u{00BF}Eliminar este evento?",
+        libraryDeleteEventMessageFormat: "El archivo %@ de %@ se eliminar\u{00E1} definitivamente. El perfil, las notas del diario y las fotos de la galer\u{00ED}a se mantienen.",
+        libraryDeleteMemoryAction: "Eliminar recuerdo",
+        libraryDeleteMemoryTitle: "\u{00BF}Eliminar este recuerdo?",
+        libraryDeleteMemoryMessage: "Este recuerdo desaparecer\u{00E1} definitivamente del archivo. La nota original del diario se mantiene."
     )
 }

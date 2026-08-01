@@ -78,6 +78,13 @@ final class BirthdayProfile {
     @Relationship(deleteRule: .cascade, inverse: \EventRecord.profile)
     var eventHistory: [EventRecord] = []
 
+    /// Years the owner deleted from the library and never wants to see again.
+    ///
+    /// The archivist rebuilds any missing cycle on every launch, so a plain
+    /// delete would come straight back. These tombstones are what makes
+    /// "elimina definitivamente" actually definitive.
+    var removedArchiveYears: [Int] = []
+
     // MARK: Collaboration
 
     /// Kudao id of the person who owns the profile; empty until it is shared.
