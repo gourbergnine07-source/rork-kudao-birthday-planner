@@ -708,6 +708,31 @@ nonisolated struct Strings: Sendable {
     let libraryDeleteMemoryAction: String
     let libraryDeleteMemoryTitle: String
     let libraryDeleteMemoryMessage: String
+    let paywallTitle: String
+    let paywallSubtitle: String
+    let paywallBenefitEventsTitle: String
+    let paywallBenefitEventsCaption: String
+    let paywallBenefitAdsTitle: String
+    let paywallBenefitAdsCaption: String
+    let paywallBenefitToolsTitle: String
+    let paywallBenefitToolsCaption: String
+    let paywallFreeNote: String
+    let paywallMonthlyTitle: String
+    let paywallYearlyTitle: String
+    let paywallSavingsFormat: String
+    let paywallSubscribeAction: String
+    let paywallRestoreAction: String
+    let paywallRestoreEmptyTitle: String
+    let paywallRestoreEmptyMessage: String
+    let paywallTermsNote: String
+    let paywallUnavailableTitle: String
+    let paywallUnavailableMessage: String
+    let paywallErrorTitle: String
+    let paywallRetryAction: String
+    let premiumBadgeLabel: String
+    let lockedProfileTitle: String
+    let lockedProfileMessage: String
+    let lockedProfileAction: String
 }
 
 extension Strings {
@@ -1364,7 +1389,32 @@ extension Strings {
         libraryDeleteEventMessageFormat: "L\u{2019}archivio %@ di %@ verr\u{00E0} eliminato definitivamente. Il profilo, le note del diario e le foto in galleria restano.",
         libraryDeleteMemoryAction: "Elimina ricordo",
         libraryDeleteMemoryTitle: "Eliminare questo ricordo?",
-        libraryDeleteMemoryMessage: "Questo ricordo sparir\u{00E0} definitivamente dall\u{2019}archivio. La nota originale nel diario resta al suo posto."
+        libraryDeleteMemoryMessage: "Questo ricordo sparir\u{00E0} definitivamente dall\u{2019}archivio. La nota originale nel diario resta al suo posto.",
+        paywallTitle: "Sblocca Matrimoni e altri eventi speciali con Kudao Premium",
+        paywallSubtitle: "Compleanni e commemorazioni restano gratuiti per sempre. Premium aggiunge le occasioni che richiedono pi\u{00F9} preparazione.",
+        paywallBenefitEventsTitle: "Matrimoni ed eventi senza limiti",
+        paywallBenefitEventsCaption: "Crea tutti i profili matrimonio e altri eventi che vuoi, con diario, suggerimenti e archivio.",
+        paywallBenefitAdsTitle: "Nessuna pubblicit\u{00E0}",
+        paywallBenefitAdsCaption: "L\u{2019}app resta pulita in ogni schermata, su ogni profilo.",
+        paywallBenefitToolsTitle: "Ricordi al sicuro",
+        paywallBenefitToolsCaption: "Galleria condivisa, backup e archivio degli anni passati sempre a portata di mano.",
+        paywallFreeNote: "Compleanni e commemorazioni restano sempre gratuiti e senza pubblicit\u{00E0}.",
+        paywallMonthlyTitle: "Mensile",
+        paywallYearlyTitle: "Annuale",
+        paywallSavingsFormat: "Risparmi il %d%%",
+        paywallSubscribeAction: "Attiva Premium",
+        paywallRestoreAction: "Ripristina acquisti",
+        paywallRestoreEmptyTitle: "Nessun acquisto da ripristinare",
+        paywallRestoreEmptyMessage: "Su questo ID Apple non risulta un abbonamento Kudao Premium attivo.",
+        paywallTermsNote: "L\u{2019}abbonamento si rinnova automaticamente finch\u{00E9} non lo annulli dalle impostazioni dell\u{2019}App Store.",
+        paywallUnavailableTitle: "Piani non disponibili",
+        paywallUnavailableMessage: "Non riusciamo a caricare gli abbonamenti in questo momento. Riprova tra poco.",
+        paywallErrorTitle: "Qualcosa non ha funzionato",
+        paywallRetryAction: "Riprova",
+        premiumBadgeLabel: "Premium",
+        lockedProfileTitle: "Riattiva Premium per accedere a questo profilo",
+        lockedProfileMessage: "Non hai perso nulla: note, foto e dettagli restano al loro posto e tornano visibili appena riattivi Premium.",
+        lockedProfileAction: "Riattiva Premium"
     )
 
     static let english = Strings(
@@ -2020,7 +2070,32 @@ extension Strings {
         libraryDeleteEventMessageFormat: "The %@ archive for %@ will be deleted for good. The profile, the diary notes and the gallery photos all stay.",
         libraryDeleteMemoryAction: "Delete memory",
         libraryDeleteMemoryTitle: "Delete this memory?",
-        libraryDeleteMemoryMessage: "This memory will disappear from the archive for good. The original diary note stays where it is."
+        libraryDeleteMemoryMessage: "This memory will disappear from the archive for good. The original diary note stays where it is.",
+        paywallTitle: "Unlock weddings and other special events with Kudao Premium",
+        paywallSubtitle: "Birthdays and remembrances stay free forever. Premium adds the occasions that take more preparation.",
+        paywallBenefitEventsTitle: "Unlimited weddings and events",
+        paywallBenefitEventsCaption: "Create as many wedding and other-event profiles as you like, diary and suggestions included.",
+        paywallBenefitAdsTitle: "No ads",
+        paywallBenefitAdsCaption: "The app stays clean on every screen, in every profile.",
+        paywallBenefitToolsTitle: "Memories kept safe",
+        paywallBenefitToolsCaption: "Shared gallery, backup and the archive of past years, always within reach.",
+        paywallFreeNote: "Birthdays and remembrances always stay free and ad-free.",
+        paywallMonthlyTitle: "Monthly",
+        paywallYearlyTitle: "Yearly",
+        paywallSavingsFormat: "Save %d%%",
+        paywallSubscribeAction: "Start Premium",
+        paywallRestoreAction: "Restore purchases",
+        paywallRestoreEmptyTitle: "Nothing to restore",
+        paywallRestoreEmptyMessage: "This Apple ID has no active Kudao Premium subscription.",
+        paywallTermsNote: "The subscription renews automatically until you cancel it in your App Store settings.",
+        paywallUnavailableTitle: "Plans unavailable",
+        paywallUnavailableMessage: "We can\u{2019}t load the subscriptions right now. Please try again shortly.",
+        paywallErrorTitle: "Something went wrong",
+        paywallRetryAction: "Try again",
+        premiumBadgeLabel: "Premium",
+        lockedProfileTitle: "Restart Premium to open this profile",
+        lockedProfileMessage: "Nothing is lost: notes, photos and details are all still here, and come back the moment Premium is active again.",
+        lockedProfileAction: "Restart Premium"
     )
 
     static let french = Strings(
@@ -2676,7 +2751,32 @@ extension Strings {
         libraryDeleteEventMessageFormat: "L\u{2019}archive %@ de %@ sera supprim\u{00E9}e d\u{00E9}finitivement. Le profil, les notes du journal et les photos de la galerie restent.",
         libraryDeleteMemoryAction: "Supprimer le souvenir",
         libraryDeleteMemoryTitle: "Supprimer ce souvenir ?",
-        libraryDeleteMemoryMessage: "Ce souvenir dispara\u{00EE}tra d\u{00E9}finitivement de l\u{2019}archive. La note d\u{2019}origine reste dans le journal."
+        libraryDeleteMemoryMessage: "Ce souvenir dispara\u{00EE}tra d\u{00E9}finitivement de l\u{2019}archive. La note d\u{2019}origine reste dans le journal.",
+        paywallTitle: "D\u{00E9}bloquez les mariages et les autres \u{00E9}v\u{00E9}nements avec Kudao Premium",
+        paywallSubtitle: "Les anniversaires et les comm\u{00E9}morations restent gratuits pour toujours. Premium ajoute les occasions qui demandent plus de pr\u{00E9}paration.",
+        paywallBenefitEventsTitle: "Mariages et \u{00E9}v\u{00E9}nements sans limite",
+        paywallBenefitEventsCaption: "Cr\u{00E9}ez autant de profils mariage et autres \u{00E9}v\u{00E9}nements que vous voulez, journal et suggestions compris.",
+        paywallBenefitAdsTitle: "Aucune publicit\u{00E9}",
+        paywallBenefitAdsCaption: "L\u{2019}application reste nette sur chaque \u{00E9}cran, dans chaque profil.",
+        paywallBenefitToolsTitle: "Des souvenirs \u{00E0} l\u{2019}abri",
+        paywallBenefitToolsCaption: "Galerie partag\u{00E9}e, sauvegarde et archive des ann\u{00E9}es pass\u{00E9}es, toujours \u{00E0} port\u{00E9}e de main.",
+        paywallFreeNote: "Les anniversaires et les comm\u{00E9}morations restent toujours gratuits et sans publicit\u{00E9}.",
+        paywallMonthlyTitle: "Mensuel",
+        paywallYearlyTitle: "Annuel",
+        paywallSavingsFormat: "\u{00C9}conomisez %d%%",
+        paywallSubscribeAction: "Activer Premium",
+        paywallRestoreAction: "Restaurer les achats",
+        paywallRestoreEmptyTitle: "Rien \u{00E0} restaurer",
+        paywallRestoreEmptyMessage: "Aucun abonnement Kudao Premium actif sur cet identifiant Apple.",
+        paywallTermsNote: "L\u{2019}abonnement se renouvelle automatiquement jusqu\u{2019}\u{00E0} son annulation dans les r\u{00E9}glages de l\u{2019}App Store.",
+        paywallUnavailableTitle: "Formules indisponibles",
+        paywallUnavailableMessage: "Impossible de charger les abonnements pour le moment. R\u{00E9}essayez dans un instant.",
+        paywallErrorTitle: "Un probl\u{00E8}me est survenu",
+        paywallRetryAction: "R\u{00E9}essayer",
+        premiumBadgeLabel: "Premium",
+        lockedProfileTitle: "R\u{00E9}activez Premium pour ouvrir ce profil",
+        lockedProfileMessage: "Rien n\u{2019}est perdu : les notes, les photos et les d\u{00E9}tails sont toujours l\u{00E0} et reviennent d\u{00E8}s que Premium est r\u{00E9}activ\u{00E9}.",
+        lockedProfileAction: "R\u{00E9}activer Premium"
     )
 
     static let spanish = Strings(
@@ -3332,6 +3432,31 @@ extension Strings {
         libraryDeleteEventMessageFormat: "El archivo %@ de %@ se eliminar\u{00E1} definitivamente. El perfil, las notas del diario y las fotos de la galer\u{00ED}a se mantienen.",
         libraryDeleteMemoryAction: "Eliminar recuerdo",
         libraryDeleteMemoryTitle: "\u{00BF}Eliminar este recuerdo?",
-        libraryDeleteMemoryMessage: "Este recuerdo desaparecer\u{00E1} definitivamente del archivo. La nota original del diario se mantiene."
+        libraryDeleteMemoryMessage: "Este recuerdo desaparecer\u{00E1} definitivamente del archivo. La nota original del diario se mantiene.",
+        paywallTitle: "Desbloquea bodas y otros eventos especiales con Kudao Premium",
+        paywallSubtitle: "Los cumplea\u{00F1}os y las conmemoraciones siguen siendo gratis para siempre. Premium a\u{00F1}ade las ocasiones que piden m\u{00E1}s preparaci\u{00F3}n.",
+        paywallBenefitEventsTitle: "Bodas y eventos sin l\u{00ED}mite",
+        paywallBenefitEventsCaption: "Crea todos los perfiles de boda y otros eventos que quieras, con diario y sugerencias.",
+        paywallBenefitAdsTitle: "Sin publicidad",
+        paywallBenefitAdsCaption: "La app se mantiene limpia en cada pantalla y en cada perfil.",
+        paywallBenefitToolsTitle: "Recuerdos a salvo",
+        paywallBenefitToolsCaption: "Galer\u{00ED}a compartida, copia de seguridad y archivo de los a\u{00F1}os pasados, siempre a mano.",
+        paywallFreeNote: "Los cumplea\u{00F1}os y las conmemoraciones siempre son gratis y sin publicidad.",
+        paywallMonthlyTitle: "Mensual",
+        paywallYearlyTitle: "Anual",
+        paywallSavingsFormat: "Ahorras un %d%%",
+        paywallSubscribeAction: "Activar Premium",
+        paywallRestoreAction: "Restaurar compras",
+        paywallRestoreEmptyTitle: "No hay nada que restaurar",
+        paywallRestoreEmptyMessage: "Este ID de Apple no tiene ninguna suscripci\u{00F3}n Kudao Premium activa.",
+        paywallTermsNote: "La suscripci\u{00F3}n se renueva autom\u{00E1}ticamente hasta que la canceles en los ajustes de la App Store.",
+        paywallUnavailableTitle: "Planes no disponibles",
+        paywallUnavailableMessage: "No podemos cargar las suscripciones ahora mismo. Int\u{00E9}ntalo de nuevo en un momento.",
+        paywallErrorTitle: "Algo no ha funcionado",
+        paywallRetryAction: "Reintentar",
+        premiumBadgeLabel: "Premium",
+        lockedProfileTitle: "Reactiva Premium para abrir este perfil",
+        lockedProfileMessage: "No has perdido nada: las notas, las fotos y los detalles siguen aqu\u{00ED} y vuelven en cuanto Premium est\u{00E9} activo.",
+        lockedProfileAction: "Reactivar Premium"
     )
 }

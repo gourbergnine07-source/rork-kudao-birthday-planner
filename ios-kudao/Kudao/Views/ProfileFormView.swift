@@ -18,6 +18,7 @@ struct ProfileFormView: View {
     @Environment(AppSettings.self) private var settings
     @Environment(NotificationService.self) private var notifications
     @Environment(KudaoIdentity.self) private var identity
+    @Environment(SubscriptionService.self) private var subscriptions
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -38,6 +39,7 @@ struct ProfileFormView: View {
     @State private var isSurpriseMode: Bool = false
     @State private var photoData: Data?
     @State private var didSave: Bool = false
+    @State private var isShowingPaywall: Bool = false
 
     private var strings: Strings { settings.strings }
     private var isEditing: Bool { profile != nil }
@@ -103,6 +105,9 @@ struct ProfileFormView: View {
                 }
             }
             .sensoryFeedback(.success, trigger: didSave)
+            .sheet(isPresented: $isShowingPaywall) {
+                PaywallView()
+            }
             .environment(\.locale, settings.locale)
         }
         .tint(accent)
@@ -177,6 +182,15 @@ struct ProfileFormView: View {
                 }
 
                 Spacer(minLength: 0)
+
+                if subscriptions.isLocked(kind) {
+                    Label(strings.premiumBadgeLabel, systemImage: "lock.fill")
+                        .font(.system(size: 11, weight: .heavy, design: .rounded))
+                        .foregroundStyle(kind.accent)
+                        .padding(.horizontal, 9)
+                        .padding(.vertical, 5)
+                        .background(Capsule().fill(kind.accent.opacity(0.13)))
+                }
             }
             .frame(maxWidth: .infinity, minHeight: 176, alignment: .topLeading)
             .padding(16)
@@ -195,6 +209,11 @@ struct ProfileFormView: View {
     }
 
     private func select(_ kind: OccasionKind) {
+        // Locked occasions never reach the form: the paywall answers first.
+        guard !subscriptions.isLocked(kind) else {
+            isShowingPaywall = true
+            return
+        }
         occasion = kind
         if !kind.allowsSelfProfile { isSelfProfile = false }
         if !kind.wantsSurpriseMode { isSurpriseMode = false }

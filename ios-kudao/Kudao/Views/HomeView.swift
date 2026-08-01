@@ -114,6 +114,7 @@ struct HomeView: View {
     @Environment(NotificationService.self) private var notifications
     @Environment(BiometricGate.self) private var gate
     @Environment(KudaoIdentity.self) private var identity
+    @Environment(SubscriptionService.self) private var subscriptions
     @Query private var profiles: [BirthdayProfile]
     @Query private var shares: [ProfileShare]
     @Query private var archive: [EventRecord]
@@ -136,6 +137,7 @@ struct HomeView: View {
     @State private var isShowingMyProfile: Bool = false
     @State private var isJoiningShare: Bool = false
     @State private var unlockFailed: Bool = false
+    @State private var isShowingPaywall: Bool = false
 
     @Environment(\.scenePhase) private var scenePhase
 
@@ -164,8 +166,7 @@ struct HomeView: View {
                             path.append(.list(scope))
                         },
                         onCreateProfile: { occasion in
-                            newProfileOccasion = occasion
-                            isCreatingProfile = true
+                            startCreating(occasion)
                         },
                         onJoinShare: { isJoiningShare = true }
                     )
@@ -228,6 +229,9 @@ struct HomeView: View {
             }
             .sheet(isPresented: $isJoiningShare) {
                 JoinShareView()
+            }
+            .sheet(isPresented: $isShowingPaywall) {
+                PaywallView()
             }
             .sheet(item: $quickNoteTarget) { target in
                 DiaryQuickNoteView(suggestedProfileID: target.id)
@@ -441,8 +445,7 @@ struct HomeView: View {
             }
 
             Button {
-                newProfileOccasion = nil
-                isCreatingProfile = true
+                startCreating(nil)
             } label: {
                 Label(strings.emptyAction, systemImage: "plus")
                     .font(.system(.headline, design: .rounded, weight: .semibold))
@@ -457,10 +460,25 @@ struct HomeView: View {
         .padding(.horizontal, 36)
     }
 
+    /// Opens the form, unless the occasion is one Premium pays for.
+    ///
+    /// The paywall has to come before the form: asking someone to fill in a
+    /// wedding and only then telling them it is locked would be a small
+    /// betrayal. A `nil` occasion means the picker inside the form decides,
+    /// and that step does its own checking.
+    private func startCreating(_ occasion: OccasionKind?) {
+        if let occasion, subscriptions.isLocked(occasion) {
+            newProfileOccasion = nil
+            isShowingPaywall = true
+            return
+        }
+        newProfileOccasion = occasion
+        isCreatingProfile = true
+    }
+
     private var addButton: some View {
         Button {
-            newProfileOccasion = nil
-            isCreatingProfile = true
+            startCreating(nil)
         } label: {
             Image(systemName: "plus")
                 .font(.system(size: 22, weight: .bold))

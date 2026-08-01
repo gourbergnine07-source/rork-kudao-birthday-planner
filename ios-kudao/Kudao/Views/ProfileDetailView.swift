@@ -16,6 +16,7 @@ struct ProfileDetailView: View {
     @Environment(NotificationService.self) private var notifications
     @Environment(KudaoIdentity.self) private var identity
     @Environment(CollaborationService.self) private var collaboration
+    @Environment(SubscriptionService.self) private var subscriptions
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
@@ -39,7 +40,15 @@ struct ProfileDetailView: View {
     @State private var isSharingProfile: Bool = false
     @State private var isShowingParticipants: Bool = false
     @State private var shareBlockedAlert: Bool = false
+    @State private var isShowingPaywall: Bool = false
     @Namespace private var tabNamespace
+
+    /// A wedding or a generic event whose subscription lapsed stays in the list
+    /// but stops opening. The check waits for the first entitlement answer so a
+    /// subscriber never sees the lock flash on launch.
+    private var isLocked: Bool {
+        subscriptions.hasResolvedStatus && !subscriptions.canAccess(profile.occasion)
+    }
 
     /// The requested tab, snapped back to one this occasion actually offers.
     private var activeTab: ProfileTab {
@@ -102,31 +111,86 @@ struct ProfileDetailView: View {
         }
     }
 
+    /// The profile itself: header, countdown, gift block and the tab stack.
+    private var profileScroll: some View {
+        ScrollViewReader { proxy in
+            ScrollView {
+                VStack(spacing: 18) {
+                    header
+                    statsRow
+                    contactCard
+                    composeButton(proxy)
+                    if occasion.wantsSuggestions {
+                        giftSection
+                    }
+                    tabSelector
+                        .id(Self.tabsAnchor)
+                    tabContent
+                        .padding(.bottom, 32)
+                }
+                .padding(.horizontal, 20)
+            }
+            .scrollIndicators(.hidden)
+            .scrollDismissesKeyboard(.interactively)
+        }
+    }
+
+    /// Shown in place of the profile once Premium lapses. This is a pause, not
+    /// a loss, and the wording exists to make that unmistakable.
+    private var lockedState: some View {
+        VStack(spacing: 20) {
+            ZStack {
+                Circle()
+                    .fill(occasion.gradient)
+                    .frame(width: 88, height: 88)
+                    .shadow(color: occasion.accent.opacity(0.32), radius: 16, y: 8)
+
+                Image(systemName: "lock.fill")
+                    .font(.system(size: 32, weight: .semibold))
+                    .foregroundStyle(.white)
+            }
+
+            VStack(spacing: 10) {
+                Text(strings.lockedProfileTitle)
+                    .font(.system(size: 23, weight: .heavy, design: .rounded))
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                Text(strings.lockedProfileMessage)
+                    .font(.system(.subheadline, design: .rounded))
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+            Button {
+                isShowingPaywall = true
+            } label: {
+                Text(strings.lockedProfileAction)
+                    .font(.system(.headline, design: .rounded, weight: .heavy))
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 26)
+                    .padding(.vertical, 15)
+                    .background(Capsule().fill(Palette.vowGradient))
+                    .shadow(color: Palette.berry.opacity(0.34), radius: 14, y: 7)
+            }
+            .buttonStyle(PressableCardStyle())
+        }
+        .padding(.horizontal, 32)
+    }
+
     var body: some View {
         ZStack {
             WarmBackdrop()
 
-            ScrollViewReader { proxy in
-                ScrollView {
-                    VStack(spacing: 18) {
-                        header
-                        statsRow
-                        contactCard
-                        composeButton(proxy)
-                        if occasion.wantsSuggestions {
-                            giftSection
-                        }
-                        tabSelector
-                            .id(Self.tabsAnchor)
-                        tabContent
-                            .padding(.bottom, 32)
-                    }
-                    .padding(.horizontal, 20)
-                }
-                .scrollIndicators(.hidden)
-                .scrollDismissesKeyboard(.interactively)
+            if isLocked {
+                lockedState
+                    .transition(.opacity)
+            } else {
+                profileScroll
             }
         }
+        .animation(.smooth(duration: 0.3), value: isLocked)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .principal) {
@@ -156,6 +220,9 @@ struct ProfileDetailView: View {
         }
         .sheet(isPresented: $isShowingParticipants) {
             ParticipantsView(profile: profile)
+        }
+        .sheet(isPresented: $isShowingPaywall) {
+            PaywallView()
         }
         .sheet(item: $linkPreview) { preview in
             GiftLinkPreviewView(preview: preview)
