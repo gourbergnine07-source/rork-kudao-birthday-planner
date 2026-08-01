@@ -545,6 +545,11 @@ nonisolated struct Strings: Sendable {
     let selfProfileFallbackName: String
     let backAction: String
     let filterAllOccasions: String
+    let timeFilterAll: String
+    let timeFilterThisMonth: String
+    let timeFilterNextWeek: String
+    let timeFilterEmptyTitle: String
+    let timeFilterEmptyMessageFormat: String
     let filterEmptyTitle: String
     let filterEmptyMessageFormat: String
     let anniversaryGiftCardTitle: String
@@ -1252,6 +1257,11 @@ extension Strings {
         selfProfileFallbackName: "Io",
         backAction: "Indietro",
         filterAllOccasions: "Tutti",
+        timeFilterAll: "Tutte",
+        timeFilterThisMonth: "Questo mese",
+        timeFilterNextWeek: "Prossimi 7 giorni",
+        timeFilterEmptyTitle: "Niente in questo periodo",
+        timeFilterEmptyMessageFormat: "Nessuna ricorrenza in \u{201C}%@\u{201D}. Prova un altro periodo.",
         filterEmptyTitle: "Niente qui",
         filterEmptyMessageFormat: "Non hai ancora occasioni nella categoria \u{201C}%@\u{201D}.",
         anniversaryGiftCardTitle: "Regalo anniversario",
@@ -1941,6 +1951,11 @@ extension Strings {
         selfProfileFallbackName: "Me",
         backAction: "Back",
         filterAllOccasions: "All",
+        timeFilterAll: "All",
+        timeFilterThisMonth: "This month",
+        timeFilterNextWeek: "Next 7 days",
+        timeFilterEmptyTitle: "Nothing in this period",
+        timeFilterEmptyMessageFormat: "No occasions under \u{201C}%@\u{201D}. Try another period.",
         filterEmptyTitle: "Nothing here",
         filterEmptyMessageFormat: "You have no occasions under \u{201C}%@\u{201D} yet.",
         anniversaryGiftCardTitle: "Anniversary gift",
@@ -2630,6 +2645,11 @@ extension Strings {
         selfProfileFallbackName: "Moi",
         backAction: "Retour",
         filterAllOccasions: "Tout",
+        timeFilterAll: "Toutes",
+        timeFilterThisMonth: "Ce mois-ci",
+        timeFilterNextWeek: "7 prochains jours",
+        timeFilterEmptyTitle: "Rien sur cette p\u{00E9}riode",
+        timeFilterEmptyMessageFormat: "Aucune occasion dans \u{00AB} %@ \u{00BB}. Essaie une autre p\u{00E9}riode.",
         filterEmptyTitle: "Rien ici",
         filterEmptyMessageFormat: "Tu n\u{2019}as encore aucune occasion dans \u{00AB} %@ \u{00BB}.",
         anniversaryGiftCardTitle: "Cadeau d\u{2019}anniversaire",
@@ -3319,6 +3339,11 @@ extension Strings {
         selfProfileFallbackName: "Yo",
         backAction: "Atr\u{00E1}s",
         filterAllOccasions: "Todo",
+        timeFilterAll: "Todas",
+        timeFilterThisMonth: "Este mes",
+        timeFilterNextWeek: "Pr\u{00F3}ximos 7 d\u{00ED}as",
+        timeFilterEmptyTitle: "Nada en este periodo",
+        timeFilterEmptyMessageFormat: "Ninguna ocasi\u{00F3}n en \u{201C}%@\u{201D}. Prueba otro periodo.",
         filterEmptyTitle: "Nada por aqu\u{00ED}",
         filterEmptyMessageFormat: "A\u{00FA}n no tienes ocasiones en \u{201C}%@\u{201D}.",
         anniversaryGiftCardTitle: "Regalo de aniversario",

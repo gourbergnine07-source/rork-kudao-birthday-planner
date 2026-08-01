@@ -63,6 +63,51 @@ enum ProfileListScope: Hashable {
     }
 }
 
+/// Quick time windows layered on top of a list scope.
+///
+/// These read the *next* occurrence rather than the original date, so a
+/// birthday in March counts as "this month" during any March — which is what
+/// somebody scanning the list is actually asking about.
+enum OccasionWindow: String, CaseIterable, Identifiable {
+    case all
+    case thisMonth
+    case nextWeek
+
+    var id: String { rawValue }
+
+    var symbolName: String {
+        switch self {
+        case .all: "square.stack.3d.up.fill"
+        case .thisMonth: "calendar"
+        case .nextWeek: "clock.badge.fill"
+        }
+    }
+
+    func title(_ strings: Strings) -> String {
+        switch self {
+        case .all: strings.timeFilterAll
+        case .thisMonth: strings.timeFilterThisMonth
+        case .nextWeek: strings.timeFilterNextWeek
+        }
+    }
+
+    func matches(
+        _ profile: BirthdayProfile,
+        reference: Date = Date(),
+        calendar: Calendar = .current
+    ) -> Bool {
+        switch self {
+        case .all:
+            return true
+        case .thisMonth:
+            // Year and month together, so next January never passes for this one.
+            return calendar.isDate(profile.countdown.nextDate, equalTo: reference, toGranularity: .month)
+        case .nextWeek:
+            return profile.countdown.isThisWeek
+        }
+    }
+}
+
 /// Everything the home navigation stack can push.
 enum HomeRoute: Hashable {
     case list(ProfileListScope)
@@ -90,6 +135,7 @@ struct ProfileListView: View {
 
     @State private var searchText: String = ""
     @State private var sortOrder: ProfileSortOrder = .nearestBirthday
+    @State private var window: OccasionWindow = .all
     @State private var reviewProfile: BirthdayProfile?
     @State private var appeared: Bool = false
     @State private var unlockFailed: Bool = false
@@ -102,23 +148,31 @@ struct ProfileListView: View {
 
     private var isSearching: Bool { !query.isEmpty }
 
-    /// Everything this screen is allowed to show, before search and sorting.
+    /// Everything this screen is allowed to show, before window, search and sorting.
     private var scopedProfiles: [BirthdayProfile] {
         allProfiles.filter { scope.matches($0) }
     }
 
-    private var ordered: [BirthdayProfile] {
-        sortOrder.sorted(scopedProfiles)
+    /// The scope narrowed to the selected time window.
+    private var windowed: [BirthdayProfile] {
+        guard window != .all else { return scopedProfiles }
+        return scopedProfiles.filter { window.matches($0) }
     }
 
+    private var ordered: [BirthdayProfile] {
+        sortOrder.sorted(windowed)
+    }
+
+    /// Search deliberately ignores the time window: hiding a name somebody just
+    /// typed, because of a filter they forgot about, would read as a bug.
     private var results: [BirthdayProfile] {
         guard isSearching else { return ordered }
-        return ordered.filter { $0.name.localizedStandardContains(query) }
+        return sortOrder.sorted(scopedProfiles).filter { $0.name.localizedStandardContains(query) }
     }
 
     /// The closest date always leads, whatever the list order is.
     private var nextUp: BirthdayProfile? {
-        ProfileSortOrder.nearestBirthday.sorted(scopedProfiles).first
+        ProfileSortOrder.nearestBirthday.sorted(windowed).first
     }
 
     /// Profiles in this scope whose party plan still needs a yes.
@@ -174,6 +228,7 @@ struct ProfileListView: View {
                 if isSearching {
                     searchResults
                 } else {
+                    windowFilter
                     reviewBanner
                     upcomingSections
                 }
@@ -247,8 +302,133 @@ struct ProfileListView: View {
         }
     }
 
+    // MARK: - Time window
+
+    /// Three chips: everything, this calendar month, the next seven days. Each
+    /// carries its own count, so "who is coming up?" is already answered before
+    /// anything is tapped.
+    private var windowFilter: some View {
+        HStack(spacing: 8) {
+            ForEach(OccasionWindow.allCases) { option in
+                windowChip(option)
+            }
+            Spacer(minLength: 0)
+        }
+        .animation(reduceMotion ? nil : .smooth(duration: 0.25), value: window)
+        .sensoryFeedback(.selection, trigger: window)
+    }
+
+    private func windowChip(_ option: OccasionWindow) -> some View {
+        let isSelected = window == option
+        let total = count(for: option)
+        let isEmpty = total == 0 && option != .all
+
+        return Button {
+            // Tapping the active chip goes back to the full list.
+            window = isSelected ? .all : option
+        } label: {
+            HStack(spacing: 6) {
+                Image(systemName: option.symbolName)
+                    .font(.system(size: 10, weight: .black))
+
+                Text(option.title(strings))
+                    .font(.system(size: 13, weight: .bold, design: .rounded))
+                    .lineLimit(1)
+
+                if option != .all {
+                    Text(total.formatted())
+                        .font(.system(size: 11, weight: .heavy, design: .rounded))
+                        .foregroundStyle(isSelected ? Color.white : scope.accent)
+                        .padding(.horizontal, 5)
+                        .padding(.vertical, 1)
+                        .background(
+                            Capsule().fill(
+                                isSelected ? Color.white.opacity(0.24) : scope.accent.opacity(0.14)
+                            )
+                        )
+                }
+            }
+            .foregroundStyle(isSelected ? Color.white : (isEmpty ? Color.secondary : Color.primary))
+            .padding(.horizontal, 12)
+            .padding(.vertical, 9)
+            .background(Capsule().fill(isSelected ? scope.accent : Palette.surface))
+            .overlay(
+                Capsule().strokeBorder(isSelected ? Color.clear : Palette.hairline, lineWidth: 1)
+            )
+            .shadow(color: scope.accent.opacity(isSelected ? 0.28 : 0), radius: 8, y: 4)
+            .opacity(isEmpty && !isSelected ? 0.55 : 1)
+        }
+        .buttonStyle(PressableCardStyle())
+        .disabled(isEmpty && !isSelected)
+        .accessibilityLabel(option == .all ? option.title(strings) : "\(option.title(strings)), \(total)")
+        .accessibilityAddTraits(isSelected ? [.isSelected] : [])
+    }
+
+    private func count(for option: OccasionWindow) -> Int {
+        guard option != .all else { return scopedProfiles.count }
+        return scopedProfiles.reduce(into: 0) { total, profile in
+            if option.matches(profile) { total += 1 }
+        }
+    }
+
+    // MARK: - Results
+
     @ViewBuilder
     private var upcomingSections: some View {
+        if window == .all {
+            heroAndRest
+        } else {
+            filteredResults
+        }
+    }
+
+    /// A narrowed window is a question with a short answer, so it drops the hero
+    /// card and simply lists what falls inside.
+    @ViewBuilder
+    private var filteredResults: some View {
+        if ordered.isEmpty {
+            PlaceholderPanel(
+                icon: window.symbolName,
+                title: strings.timeFilterEmptyTitle,
+                message: String(
+                    format: strings.timeFilterEmptyMessageFormat,
+                    window.title(strings).lowercased()
+                )
+            )
+            .padding(.top, 4)
+        } else {
+            HStack(spacing: 6) {
+                Text(window.title(strings).uppercased())
+                    .font(.system(.caption, design: .rounded, weight: .bold))
+                    .tracking(1.1)
+                Text("·")
+                    .font(.system(.caption, design: .rounded, weight: .bold))
+                Text(
+                    ordered.count == 1
+                        ? strings.gridProfileCountOne
+                        : String(format: strings.gridProfileCountFormat, ordered.count)
+                )
+                .font(.system(.caption, design: .rounded, weight: .medium))
+            }
+            .foregroundStyle(.secondary)
+
+            VStack(spacing: 12) {
+                ForEach(ordered) { profile in
+                    profileLink(profile) {
+                        ProfileRowCard(
+                            profile: profile,
+                            settings: settings,
+                            isLocked: isLocked(profile),
+                            collaboration: summary(for: profile)
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var heroAndRest: some View {
         if let hero = nextUp {
             Text(strings.upNext.uppercased())
                 .font(.system(.caption, design: .rounded, weight: .bold))
