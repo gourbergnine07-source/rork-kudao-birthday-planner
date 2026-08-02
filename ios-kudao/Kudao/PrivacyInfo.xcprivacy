@@ -9,13 +9,20 @@
 
 	  Third-party SDKs (RevenueCat, Supabase, Google Mobile Ads) ship their own
 	  manifests inside their bundles, so only Kudao's own behaviour is declared
-	  here. Tracking is declared because the free tier can serve personalised
-	  ads once the user allows it through the App Tracking Transparency prompt.
+	  here.
+
+	  Tracking is false because Kudao itself never links data to other companies'
+	  data for advertising: it does not call App Tracking Transparency, so no
+	  IDFA is ever requested, and it contacts no tracking domain of its own.
+	  Advertising is served by Google Mobile Ads under the consent gathered by
+	  the User Messaging Platform, and that SDK declares its own tracking and
+	  tracking domains in the manifest inside its bundle. Declaring true here
+	  with an empty NSPrivacyTrackingDomains is rejected by App Store validation
+	  (ITMS-91064), and listing Google's domains here would make iOS block them
+	  whenever tracking is not authorised — which, with no prompt, is always.
 	-->
 	<key>NSPrivacyTracking</key>
-	<true/>
-	<key>NSPrivacyTrackingDomains</key>
-	<array/>
+	<false/>
 	<key>NSPrivacyCollectedDataTypes</key>
 	<array>
 		<dict>
