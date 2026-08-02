@@ -34,6 +34,7 @@ struct PaywallView: View {
                     VStack(spacing: 26) {
                         hero
                         benefits
+                        extras
 
                         if subscriptions.packages.isEmpty {
                             unavailable
@@ -150,6 +151,63 @@ struct PaywallView: View {
             RoundedRectangle(cornerRadius: 26, style: .continuous)
                 .strokeBorder(Palette.hairline, lineWidth: 1)
         )
+    }
+
+    // MARK: - Concrete actions
+
+    /// The three things people actually do inside a profile, spelled out.
+    ///
+    /// The block above sells the idea; this one names the buttons, so the screen
+    /// never asks for money against a promise the user cannot picture.
+    private var extras: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text(strings.paywallExtrasTitle.uppercased())
+                .font(.system(.caption2, design: .rounded, weight: .heavy))
+                .tracking(1)
+                .foregroundStyle(.secondary)
+
+            extraRow(
+                symbol: "person.2.badge.plus.fill",
+                tint: Palette.violet,
+                title: strings.inviteSomeoneAction,
+                caption: strings.paywallExtraInviteCaption
+            )
+            extraRow(
+                symbol: "cart.fill",
+                tint: Palette.berry,
+                title: strings.buyOnAmazonAction,
+                caption: strings.paywallExtraShopCaption
+            )
+            extraRow(
+                symbol: "map.fill",
+                tint: Palette.teal,
+                title: strings.findStoreAction,
+                caption: strings.paywallExtraStoreCaption
+            )
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private func extraRow(symbol: String, tint: Color, title: String, caption: String) -> some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: symbol)
+                .font(.system(size: 13, weight: .bold))
+                .foregroundStyle(tint)
+                .frame(width: 26, height: 26)
+                .background(Circle().fill(tint.opacity(0.13)))
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.system(.footnote, design: .rounded, weight: .bold))
+                Text(caption)
+                    .font(.system(.caption2, design: .rounded))
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+            Spacer(minLength: 0)
+        }
+        .accessibilityElement(children: .combine)
     }
 
     private func benefitRow(symbol: String, tint: Color, title: String, caption: String) -> some View {

@@ -349,6 +349,7 @@ nonisolated struct Strings: Sendable {
     let collaborationInviteTitle: String
     let collaborationInviteMessage: String
     let inviteSomeoneAction: String
+    let inviteTileCaption: String
     let pendingInvitesCountFormat: String
     let collaborationOnlyYou: String
 
@@ -755,6 +756,10 @@ nonisolated struct Strings: Sendable {
     let paywallBenefitAdsCaption: String
     let paywallBenefitToolsTitle: String
     let paywallBenefitToolsCaption: String
+    let paywallExtrasTitle: String
+    let paywallExtraInviteCaption: String
+    let paywallExtraShopCaption: String
+    let paywallExtraStoreCaption: String
     let paywallFreeNote: String
     let paywallMonthlyTitle: String
     let paywallYearlyTitle: String
@@ -1100,6 +1105,7 @@ extension Strings {
         collaborationInviteTitle: "Organizza in gruppo",
         collaborationInviteMessage: "Invita chi vuoi in un profilo, o unisciti con un codice.",
         inviteSomeoneAction: "Invita qualcuno",
+        inviteTileCaption: "Organizzate insieme",
         pendingInvitesCountFormat: "%d inviti in attesa",
         collaborationOnlyYou: "Solo tu, per ora",
         ageBracketLabel: "Fascia d\u{2019}et\u{00E0}",
@@ -1481,6 +1487,10 @@ extension Strings {
         paywallBenefitAdsCaption: "L\u{2019}app resta pulita in ogni schermata, su ogni profilo.",
         paywallBenefitToolsTitle: "Ricordi al sicuro",
         paywallBenefitToolsCaption: "Galleria condivisa, backup e archivio degli anni passati sempre a portata di mano.",
+        paywallExtrasTitle: "In ogni profilo trovi anche",
+        paywallExtraInviteCaption: "Organizzate la festa in più persone, con diario e galleria condivisi.",
+        paywallExtraShopCaption: "Dall'idea regalo suggerita alla ricerca, in un tocco.",
+        paywallExtraStoreCaption: "I negozi vicini che vendono quello che stai cercando.",
         paywallFreeNote: "Compleanni e commemorazioni restano sempre gratuiti e senza pubblicit\u{00E0}.",
         paywallMonthlyTitle: "Mensile",
         paywallYearlyTitle: "Annuale",
@@ -1825,6 +1835,7 @@ extension Strings {
         collaborationInviteTitle: "Plan it together",
         collaborationInviteMessage: "Invite anyone into a profile, or join with a code.",
         inviteSomeoneAction: "Invite someone",
+        inviteTileCaption: "Plan together",
         pendingInvitesCountFormat: "%d invites pending",
         collaborationOnlyYou: "Just you, for now",
         ageBracketLabel: "Age group",
@@ -2206,6 +2217,10 @@ extension Strings {
         paywallBenefitAdsCaption: "The app stays clean on every screen, in every profile.",
         paywallBenefitToolsTitle: "Memories kept safe",
         paywallBenefitToolsCaption: "Shared gallery, backup and the archive of past years, always within reach.",
+        paywallExtrasTitle: "Every profile also gives you",
+        paywallExtraInviteCaption: "Plan the celebration together, with a shared diary and gallery.",
+        paywallExtraShopCaption: "From the suggested gift idea straight to the search, in one tap.",
+        paywallExtraStoreCaption: "The shops near you that sell what you are looking for.",
         paywallFreeNote: "Birthdays and remembrances always stay free and ad-free.",
         paywallMonthlyTitle: "Monthly",
         paywallYearlyTitle: "Yearly",
@@ -2550,6 +2565,7 @@ extension Strings {
         collaborationInviteTitle: "Organisez \u{00E0} plusieurs",
         collaborationInviteMessage: "Invitez qui vous voulez dans un profil, ou rejoignez avec un code.",
         inviteSomeoneAction: "Inviter quelqu\u{2019}un",
+        inviteTileCaption: "Organisez ensemble",
         pendingInvitesCountFormat: "%d invitations en attente",
         collaborationOnlyYou: "Vous seul, pour l\u{2019}instant",
         ageBracketLabel: "Tranche d\u{2019}\u{00E2}ge",
@@ -2931,6 +2947,10 @@ extension Strings {
         paywallBenefitAdsCaption: "L\u{2019}application reste nette sur chaque \u{00E9}cran, dans chaque profil.",
         paywallBenefitToolsTitle: "Des souvenirs \u{00E0} l\u{2019}abri",
         paywallBenefitToolsCaption: "Galerie partag\u{00E9}e, sauvegarde et archive des ann\u{00E9}es pass\u{00E9}es, toujours \u{00E0} port\u{00E9}e de main.",
+        paywallExtrasTitle: "Dans chaque profil, vous trouvez aussi",
+        paywallExtraInviteCaption: "Organisez la fête à plusieurs, journal et galerie partagés.",
+        paywallExtraShopCaption: "De l'idée cadeau suggérée à la recherche, en un geste.",
+        paywallExtraStoreCaption: "Les boutiques près de vous qui vendent ce que vous cherchez.",
         paywallFreeNote: "Les anniversaires et les comm\u{00E9}morations restent toujours gratuits et sans publicit\u{00E9}.",
         paywallMonthlyTitle: "Mensuel",
         paywallYearlyTitle: "Annuel",
@@ -3275,6 +3295,7 @@ extension Strings {
         collaborationInviteTitle: "Organiza en grupo",
         collaborationInviteMessage: "Invita a quien quieras a un perfil, o \u{00FA}nete con un c\u{00F3}digo.",
         inviteSomeoneAction: "Invitar a alguien",
+        inviteTileCaption: "Organizad juntos",
         pendingInvitesCountFormat: "%d invitaciones pendientes",
         collaborationOnlyYou: "Solo t\u{00FA}, por ahora",
         ageBracketLabel: "Franja de edad",
@@ -3656,6 +3677,10 @@ extension Strings {
         paywallBenefitAdsCaption: "La app se mantiene limpia en cada pantalla y en cada perfil.",
         paywallBenefitToolsTitle: "Recuerdos a salvo",
         paywallBenefitToolsCaption: "Galer\u{00ED}a compartida, copia de seguridad y archivo de los a\u{00F1}os pasados, siempre a mano.",
+        paywallExtrasTitle: "En cada perfil también tienes",
+        paywallExtraInviteCaption: "Organizad la fiesta entre varios, con diario y galería compartidos.",
+        paywallExtraShopCaption: "De la idea de regalo sugerida a la búsqueda, en un toque.",
+        paywallExtraStoreCaption: "Las tiendas cercanas que venden lo que buscas.",
         paywallFreeNote: "Los cumplea\u{00F1}os y las conmemoraciones siempre son gratis y sin publicidad.",
         paywallMonthlyTitle: "Mensual",
         paywallYearlyTitle: "Anual",

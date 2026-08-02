@@ -505,7 +505,8 @@ struct ProfileDetailView: View {
                 if profile.isCollaborative {
                     participantsStrip
                         .padding(.top, 6)
-                } else if profile.isOwnedByMe {
+                } else if profile.isOwnedByMe && !showsInviteTile {
+                    // Occasions without a gift row keep the invitation here.
                     inviteStrip
                         .padding(.top, 6)
                 }
@@ -1062,13 +1063,36 @@ struct ProfileDetailView: View {
         )
     }
 
-    /// Both actions read the gift straight from the generated plan, never from a manual field.
+    /// True while the invitation belongs to the action row rather than the header.
+    private var showsInviteTile: Bool {
+        occasion.wantsSuggestions && profile.isOwnedByMe && !profile.isCollaborative
+    }
+
+    /// The three things to do about this celebration, side by side.
+    ///
+    /// The two gift actions read the idea straight from the generated plan, never
+    /// from a manual field; the invitation sits next to them because deciding to
+    /// organise together happens in the same breath as deciding what to buy.
     private var giftActionsRow: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: 10) {
+            if showsInviteTile {
+                giftActionTile(
+                    title: strings.inviteSomeoneAction,
+                    systemImage: "person.2.badge.plus.fill",
+                    tint: Palette.violet,
+                    caption: strings.inviteTileCaption,
+                    isReady: true
+                ) {
+                    startSharing()
+                }
+            }
+
             giftActionTile(
                 title: isAffiliateLink ? strings.buyOnAmazonAction : strings.buyOnlineAction,
                 systemImage: "cart.fill",
-                tint: Palette.berry
+                tint: Palette.berry,
+                caption: giftIdea ?? strings.suggestionsTab,
+                isReady: giftIdea != nil
             ) {
                 openShopping()
             }
@@ -1076,7 +1100,9 @@ struct ProfileDetailView: View {
             giftActionTile(
                 title: strings.findStoreAction,
                 systemImage: "map.fill",
-                tint: Palette.violet
+                tint: Palette.teal,
+                caption: giftIdea ?? strings.suggestionsTab,
+                isReady: giftIdea != nil
             ) {
                 openNearbyStores()
             }
@@ -1087,6 +1113,8 @@ struct ProfileDetailView: View {
         title: String,
         systemImage: String,
         tint: Color,
+        caption: String,
+        isReady: Bool,
         action: @escaping () -> Void
     ) -> some View {
         Button(action: action) {
@@ -1099,30 +1127,24 @@ struct ProfileDetailView: View {
                     .foregroundStyle(.primary)
                     .multilineTextAlignment(.center)
                     .lineLimit(2)
-                    .minimumScaleFactor(0.85)
+                    .minimumScaleFactor(0.7)
 
-                if let idea = giftIdea {
-                    Text(idea)
-                        .font(.system(.caption2, design: .rounded, weight: .medium))
-                        .foregroundStyle(.secondary)
-                        .lineLimit(1)
-                } else {
-                    Text(strings.suggestionsTab)
-                        .font(.system(.caption2, design: .rounded, weight: .medium))
-                        .foregroundStyle(.tertiary)
-                        .lineLimit(1)
-                }
+                Text(caption)
+                    .font(.system(.caption2, design: .rounded, weight: .medium))
+                    .foregroundStyle(isReady ? .secondary : .tertiary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 16)
-            .padding(.horizontal, 10)
+            .padding(.horizontal, 8)
             .background(
                 RoundedRectangle(cornerRadius: 22, style: .continuous)
                     .fill(Palette.surface)
             )
             .overlay(
                 RoundedRectangle(cornerRadius: 22, style: .continuous)
-                    .strokeBorder(giftIdea == nil ? Palette.hairline : tint.opacity(0.3), lineWidth: 1)
+                    .strokeBorder(isReady ? tint.opacity(0.3) : Palette.hairline, lineWidth: 1)
             )
             .shadow(color: .black.opacity(0.04), radius: 8, y: 4)
         }

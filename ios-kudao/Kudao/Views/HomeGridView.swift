@@ -155,7 +155,6 @@ struct HomeGridView: View {
         ) {
             onOpenList(.pendingPlans)
         }
-        .disabled(count == 0)
     }
 
     private func quickCard(
