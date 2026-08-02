@@ -26,6 +26,7 @@ struct AppSettingsView: View {
     @State private var isManagingBackup: Bool = false
     @State private var isShowingMyProfile: Bool = false
     @State private var isEditingNotifications: Bool = false
+    @State private var isShowingPrivacyInfo: Bool = false
 
     private var strings: Strings { settings.strings }
 
@@ -41,6 +42,7 @@ struct AppSettingsView: View {
                         collaborationCard
                         backupCard
                         surpriseCard
+                        privacyInfoCard
                         widgetCard
                     }
                     .padding(.horizontal, 20)
@@ -72,6 +74,9 @@ struct AppSettingsView: View {
             }
             .sheet(isPresented: $isEditingNotifications) {
                 NotificationSettingsView()
+            }
+            .sheet(isPresented: $isShowingPrivacyInfo) {
+                PrivacyInfoView()
             }
             #if DEBUG
             .sheet(isPresented: $isShowingPurchaseDebug) {
@@ -437,6 +442,45 @@ struct AppSettingsView: View {
             RoundedRectangle(cornerRadius: 16, style: .continuous)
                 .fill(Palette.surfaceRaised)
         )
+    }
+
+    // MARK: - Privacy information
+
+    /// Where everything written in Kudao actually ends up, in plain language.
+    private var privacyInfoCard: some View {
+        AppSettingsCard(
+            title: strings.privacyInfoTitle,
+            systemImage: "lock.shield.fill",
+            tint: Palette.clay
+        ) {
+            Button {
+                isShowingPrivacyInfo = true
+            } label: {
+                HStack(spacing: 10) {
+                    Image(systemName: "doc.text.magnifyingglass")
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(Palette.clay)
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(strings.privacyInfoTitle)
+                            .font(.system(.body, design: .rounded, weight: .semibold))
+                            .foregroundStyle(.primary)
+                        Text(strings.privacyInfoCaption)
+                            .font(.system(.caption2, design: .rounded))
+                            .foregroundStyle(.tertiary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+
+                    Spacer(minLength: 0)
+
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 11, weight: .heavy))
+                        .foregroundStyle(.tertiary)
+                }
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+        }
     }
 
     // MARK: - Widget

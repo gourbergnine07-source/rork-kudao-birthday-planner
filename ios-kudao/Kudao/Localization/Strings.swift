@@ -211,6 +211,24 @@ nonisolated struct Strings: Sendable {
     let maskedProfileName: String
     let settingsWidgetSection: String
     let settingsWidgetHint: String
+    let privacyInfoTitle: String
+    let privacyInfoCaption: String
+    let privacyInfoIntro: String
+    let privacyInfoOnDeviceTitle: String
+    let privacyInfoOnDeviceBody: String
+    let privacyInfoSharedTitle: String
+    let privacyInfoSharedBody: String
+    let privacyInfoContactsTitle: String
+    let privacyInfoContactsBody: String
+    let privacyInfoPurchasesTitle: String
+    let privacyInfoPurchasesBody: String
+    let privacyInfoAdsTitle: String
+    let privacyInfoAdsBody: String
+    let privacyInfoAmazonTitle: String
+    let privacyInfoAmazonBody: String
+    let privacyInfoControlTitle: String
+    let privacyInfoControlBody: String
+    let privacyInfoFooter: String
     let settingsSharingNote: String
 
     let lastNameLabel: String
@@ -976,6 +994,24 @@ extension Strings {
         maskedProfileName: "Sorpresa",
         settingsWidgetSection: "Widget",
         settingsWidgetHint: "Tieni premuto sulla schermata Home, tocca Modifica, poi Aggiungi widget e scegli Kudao per il conto alla rovescia.",
+        privacyInfoTitle: "Informazioni sulla privacy",
+        privacyInfoCaption: "Cosa resta sul telefono e cosa esce solo se lo decidi tu.",
+        privacyInfoIntro: "Kudao custodisce ricordi e sorprese: per questo funziona prima di tutto sul tuo telefono. Qui trovi, in chiaro, dove finisce ogni cosa che scrivi.",
+        privacyInfoOnDeviceTitle: "Resta sul tuo telefono",
+        privacyInfoOnDeviceBody: "Profili, date, note del diario, idee regalo, foto scelte dalla libreria e impostazioni sono salvati solo sul dispositivo. Non serve nessun account Kudao e niente di tutto questo viene inviato per essere analizzato.",
+        privacyInfoSharedTitle: "Esce solo se lo scegli tu",
+        privacyInfoSharedBody: "Quando inviti qualcuno o attivi il backup, quel profilo viaggia cifrato verso i nostri server per raggiungere le persone che hai invitato. Le foto della galleria condivisa le vede solo chi ha il codice. Chiudi la condivisione e la stanza smette di esistere.",
+        privacyInfoContactsTitle: "Rubrica",
+        privacyInfoContactsBody: "Se compili un profilo da un contatto, nome, data e foto vengono letti in quel momento e copiati nel profilo. Kudao non carica la tua rubrica da nessuna parte e non la conserva.",
+        privacyInfoPurchasesTitle: "Abbonamento",
+        privacyInfoPurchasesBody: "L'acquisto lo gestisce Apple. Kudao sa soltanto se l'abbonamento e' attivo, tramite RevenueCat. Nessun dato della tua carta passa dall'app.",
+        privacyInfoAdsTitle: "Pubblicita'",
+        privacyInfoAdsBody: "La versione gratuita mostra qualche annuncio discreto fornito da Google AdMob. Non compare mai mentre scrivi il diario, mentre crei un profilo, ne' dentro un profilo di commemorazione. In Europa puoi rivedere il tuo consenso quando vuoi.",
+        privacyInfoAmazonTitle: "Link ad Amazon",
+        privacyInfoAmazonBody: "I pulsanti per comprare aprono Amazon nel browser con un codice affiliato. Kudao non sa cosa compri: puo' solo ricevere una piccola commissione, senza costi in piu' per te.",
+        privacyInfoControlTitle: "Sempre nelle tue mani",
+        privacyInfoControlBody: "Elimini un profilo e spariscono con lui note, foto e cronologia. Disattivi il backup e la copia sul server viene rimossa. Disinstalli Kudao e sul telefono non resta nulla.",
+        privacyInfoFooter: "Nessun messaggio parte da solo: l'ultimo tocco e' sempre tuo.",
         settingsSharingNote: "I profili sorpresa resteranno esclusi da qualsiasi condivisione con il festeggiato.",
         lastNameLabel: "Cognome",
         lastNamePlaceholder: "Cognome (opzionale)",
@@ -1706,6 +1742,24 @@ extension Strings {
         maskedProfileName: "Surprise",
         settingsWidgetSection: "Widget",
         settingsWidgetHint: "Touch and hold the Home Screen, tap Edit, then Add Widget and pick Kudao for the countdown.",
+        privacyInfoTitle: "Privacy information",
+        privacyInfoCaption: "What stays on your phone, and what leaves only if you decide so.",
+        privacyInfoIntro: "Kudao looks after memories and surprises, so it works on your phone first. Here is exactly where everything you write ends up.",
+        privacyInfoOnDeviceTitle: "Stays on your phone",
+        privacyInfoOnDeviceBody: "Profiles, dates, diary notes, gift ideas, photos you pick and settings are saved on the device only. No Kudao account is needed, and none of this is sent anywhere to be analysed.",
+        privacyInfoSharedTitle: "Leaves only if you choose",
+        privacyInfoSharedBody: "When you invite someone or turn on backup, that profile travels encrypted to our servers so it can reach the people you invited. Shared gallery photos are visible only to whoever has the code. Close the share and the room stops existing.",
+        privacyInfoContactsTitle: "Contacts",
+        privacyInfoContactsBody: "If you fill a profile from a contact, the name, date and photo are read there and then and copied into the profile. Kudao never uploads your address book and never keeps it.",
+        privacyInfoPurchasesTitle: "Subscription",
+        privacyInfoPurchasesBody: "Purchases are handled by Apple. Kudao only learns whether the subscription is active, through RevenueCat. No card details ever pass through the app.",
+        privacyInfoAdsTitle: "Advertising",
+        privacyInfoAdsBody: "The free version shows a few discreet ads served by Google AdMob. They never appear while you write the diary, while you create a profile, or inside a remembrance profile. In Europe you can review your consent whenever you like.",
+        privacyInfoAmazonTitle: "Amazon links",
+        privacyInfoAmazonBody: "Shopping buttons open Amazon in the browser with an affiliate tag. Kudao does not know what you buy: it may only receive a small commission, at no extra cost to you.",
+        privacyInfoControlTitle: "Always in your hands",
+        privacyInfoControlBody: "Delete a profile and its notes, photos and history go with it. Turn off backup and the server copy is removed. Uninstall Kudao and nothing is left behind.",
+        privacyInfoFooter: "Nothing is ever sent on its own: the last tap is always yours.",
         settingsSharingNote: "Surprise profiles will stay out of any sharing with the birthday person.",
         lastNameLabel: "Last name",
         lastNamePlaceholder: "Last name (optional)",
@@ -2436,6 +2490,24 @@ extension Strings {
         maskedProfileName: "Surprise",
         settingsWidgetSection: "Widget",
         settingsWidgetHint: "Appuyez longuement sur l’écran d’accueil, touchez Modifier, puis Ajouter un widget et choisissez Kudao.",
+        privacyInfoTitle: "Informations sur la confidentialité",
+        privacyInfoCaption: "Ce qui reste sur votre téléphone et ce qui en sort seulement si vous le décidez.",
+        privacyInfoIntro: "Kudao garde des souvenirs et des surprises : il fonctionne donc d’abord sur votre téléphone. Voici, en clair, où va tout ce que vous écrivez.",
+        privacyInfoOnDeviceTitle: "Reste sur votre téléphone",
+        privacyInfoOnDeviceBody: "Profils, dates, notes du journal, idées cadeaux, photos choisies et réglages sont enregistrés uniquement sur l’appareil. Aucun compte Kudao n’est nécessaire et rien de tout cela n’est envoyé pour être analysé.",
+        privacyInfoSharedTitle: "Ne sort que si vous le choisissez",
+        privacyInfoSharedBody: "Quand vous invitez quelqu’un ou activez la sauvegarde, ce profil voyage chiffré vers nos serveurs pour atteindre les personnes invitées. Les photos de la galerie partagée ne sont visibles que par ceux qui ont le code. Fermez le partage et le salon cesse d’exister.",
+        privacyInfoContactsTitle: "Contacts",
+        privacyInfoContactsBody: "Si vous remplissez un profil depuis un contact, le nom, la date et la photo sont lus sur le moment et copiés dans le profil. Kudao n’envoie jamais votre carnet d’adresses et ne le conserve pas.",
+        privacyInfoPurchasesTitle: "Abonnement",
+        privacyInfoPurchasesBody: "L’achat est géré par Apple. Kudao apprend seulement si l’abonnement est actif, via RevenueCat. Aucune donnée bancaire ne passe par l’application.",
+        privacyInfoAdsTitle: "Publicité",
+        privacyInfoAdsBody: "La version gratuite affiche quelques annonces discrètes fournies par Google AdMob. Elles n’apparaissent jamais pendant l’écriture du journal, pendant la création d’un profil, ni dans un profil de commémoration. En Europe, vous pouvez revoir votre consentement quand vous voulez.",
+        privacyInfoAmazonTitle: "Liens Amazon",
+        privacyInfoAmazonBody: "Les boutons d’achat ouvrent Amazon dans le navigateur avec un code d’affiliation. Kudao ne sait pas ce que vous achetez : il peut seulement recevoir une petite commission, sans surcoût pour vous.",
+        privacyInfoControlTitle: "Toujours entre vos mains",
+        privacyInfoControlBody: "Supprimez un profil et ses notes, photos et historique partent avec lui. Désactivez la sauvegarde et la copie sur le serveur est effacée. Désinstallez Kudao et il ne reste rien.",
+        privacyInfoFooter: "Rien ne part tout seul : le dernier geste est toujours le vôtre.",
         settingsSharingNote: "Les profils surprise resteront exclus de tout partage avec la personne fêtée.",
         lastNameLabel: "Nom",
         lastNamePlaceholder: "Nom (facultatif)",
@@ -3166,6 +3238,24 @@ extension Strings {
         maskedProfileName: "Sorpresa",
         settingsWidgetSection: "Widget",
         settingsWidgetHint: "Mantén pulsada la pantalla de inicio, toca Editar, luego Añadir widget y elige Kudao.",
+        privacyInfoTitle: "Información sobre privacidad",
+        privacyInfoCaption: "Qué se queda en tu teléfono y qué sale solo si tú lo decides.",
+        privacyInfoIntro: "Kudao guarda recuerdos y sorpresas, por eso funciona primero en tu teléfono. Aquí está, en claro, dónde acaba todo lo que escribes.",
+        privacyInfoOnDeviceTitle: "Se queda en tu teléfono",
+        privacyInfoOnDeviceBody: "Perfiles, fechas, notas del diario, ideas de regalo, fotos elegidas y ajustes se guardan solo en el dispositivo. No hace falta ninguna cuenta de Kudao y nada de esto se envía para ser analizado.",
+        privacyInfoSharedTitle: "Sale solo si tú quieres",
+        privacyInfoSharedBody: "Cuando invitas a alguien o activas la copia de seguridad, ese perfil viaja cifrado a nuestros servidores para llegar a quienes has invitado. Las fotos de la galería compartida solo las ve quien tiene el código. Cierras el perfil compartido y la sala deja de existir.",
+        privacyInfoContactsTitle: "Contactos",
+        privacyInfoContactsBody: "Si rellenas un perfil desde un contacto, el nombre, la fecha y la foto se leen en ese momento y se copian en el perfil. Kudao nunca sube tu agenda ni la conserva.",
+        privacyInfoPurchasesTitle: "Suscripción",
+        privacyInfoPurchasesBody: "La compra la gestiona Apple. Kudao solo sabe si la suscripción está activa, a través de RevenueCat. Ningún dato de tu tarjeta pasa por la app.",
+        privacyInfoAdsTitle: "Publicidad",
+        privacyInfoAdsBody: "La versión gratuita muestra algunos anuncios discretos de Google AdMob. Nunca aparecen mientras escribes el diario, mientras creas un perfil, ni dentro de un perfil de conmemoración. En Europa puedes revisar tu consentimiento cuando quieras.",
+        privacyInfoAmazonTitle: "Enlaces de Amazon",
+        privacyInfoAmazonBody: "Los botones de compra abren Amazon en el navegador con un código de afiliado. Kudao no sabe qué compras: solo puede recibir una pequeña comisión, sin coste adicional para ti.",
+        privacyInfoControlTitle: "Siempre en tus manos",
+        privacyInfoControlBody: "Borras un perfil y se van con él sus notas, fotos e historial. Desactivas la copia de seguridad y se elimina la copia del servidor. Desinstalas Kudao y no queda nada.",
+        privacyInfoFooter: "Nada se envía solo: el último toque siempre es tuyo.",
         settingsSharingNote: "Los perfiles sorpresa quedarán fuera de cualquier compartición con la persona homenajeada.",
         lastNameLabel: "Apellido",
         lastNamePlaceholder: "Apellido (opcional)",
