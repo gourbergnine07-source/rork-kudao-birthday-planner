@@ -1,0 +1,30 @@
+{
+  "versionLocalizationId": "82de5964-ea78-4734-9758-abfc69d5d06f",
+  "path": ".asc/reports/screenshots-upload/failures-1785659568318439861.json",
+  "deviceType": "IPHONE_65",
+  "displayType": "APP_IPHONE_65",
+  "setId": "d08b15be-cbba-4dc7-ba5e-167b2d984e06",
+  "files": [
+    "/home/user/rork-app/screenshots/iphone/en-US/01_home.png",
+    "/home/user/rork-app/screenshots/iphone/en-US/02_countdown.png",
+    "/home/user/rork-app/screenshots/iphone/en-US/03_gift_ideas.png",
+    "/home/user/rork-app/screenshots/iphone/en-US/04_shared_diary.png",
+    "/home/user/rork-app/screenshots/iphone/en-US/05_together.png"
+  ],
+  "pendingFiles": [
+    "/home/user/rork-app/screenshots/iphone/en-US/01_home.png",
+    "/home/user/rork-app/screenshots/iphone/en-US/02_countdown.png",
+    "/home/user/rork-app/screenshots/iphone/en-US/03_gift_ideas.png",
+    "/home/user/rork-app/screenshots/iphone/en-US/04_shared_diary.png",
+    "/home/user/rork-app/screenshots/iphone/en-US/05_together.png"
+  ],
+  "failures": [
+    {
+      "fileName": "01_home.png",
+      "filePath": "/home/user/rork-app/screenshots/iphone/en-US/01_home.png",
+      "error": "asset cf2e9b7e-107d-43c1-a05b-afd99d9940df delivery failed: IMAGE_ALPHA_NOT_ALLOWED"
+    }
+  ],
+  "error": "asset cf2e9b7e-107d-43c1-a05b-afd99d9940df delivery failed: IMAGE_ALPHA_NOT_ALLOWED",
+  "generatedAt": "2026-08-02T08:32:48Z"
+}

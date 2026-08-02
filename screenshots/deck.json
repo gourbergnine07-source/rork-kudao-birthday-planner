@@ -1,0 +1,52 @@
+{
+  "theme": {
+    "style": "A warm, celebratory world built from late-afternoon light: creamy sand, warm coral, and deep plum tones that feel like a hand-written card and a birthday candle glow rather than a cold utility app. Soft paper-grain textures, gentle radiating light rings, and hand-drawn ribbon motifs give it an intimate, personal warmth. Lighting is always soft and golden or dusky, never harsh or clinical, evoking gatherings, gifts, and remembered moments.",
+    "headlineFont": "'Plus Jakarta Sans', sans-serif — import via @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&display=swap')",
+    "headlineFontSize": 128,
+    "mockupIds": {
+      "iphone": "cosmic-orange",
+      "ipad": "silver"
+    },
+    "palette": {
+      "primary": "#F4E4D4",
+      "secondary": "#E8674A",
+      "accent": "#5B2A4A"
+    }
+  },
+  "slides": [
+    {
+      "label": "Home",
+      "backgroundPrompt": "Abstract digital art with a soft warm glow radiating from the lower center, blending creamy ivory into gentle coral and peach tones across a smooth gradient field, evoking late afternoon light on a kitchen table. Subtle floating soft-edged circular light shapes drift across the frame like warm sunspots, with fine grain texture adding organic warmth. The upper 30% fades into a calmer muted cream for text clarity, soft volumetric light rays entering from the right, 8K quality, ultra smooth gradients, premium feel, no text, no letters, no UI elements, no device mockups",
+      "backgroundUrl": "https://r2-pub.rork.com/app-store-screenshots/477b395f-effc-44c5-902e-3b320a2ee977.png"
+    },
+    {
+      "label": "Countdown",
+      "backgroundPrompt": "Abstract digital art featuring concentric radiating rings expanding outward from the right side of frame, rendered in deep saturated coral and burnt orange tones fading into a rich terracotta base. Rings pulse with warm amber light at their edges, creating a sense of building energy and anticipation, with soft lens glow at the ring centers. The upper 30% darkens into a muted plum-coral blend for calm text space, fine atmospheric haze adds depth, 8K quality, ultra smooth gradients, premium feel, no text, no letters, no UI elements, no device mockups",
+      "backgroundUrl": "https://r2-pub.rork.com/app-store-screenshots/7a9bc750-6543-43de-aeb8-00324f4a5b39.png"
+    },
+    {
+      "label": "Gift ideas",
+      "backgroundPrompt": "Abstract digital art on a soft airy cream background with faint pale terracotta ribbon-like curved shapes flowing gently across the lower half, light and weightless like drifting silk. Delicate soft shadows and warm off-white highlights create gentle dimensionality, with a touch of golden light glinting along the ribbon edges. The upper 30% stays clean and pale cream for text overlay, subtle paper-like grain texture throughout, 8K quality, ultra smooth gradients, premium feel, no text, no letters, no UI elements, no device mockups",
+      "backgroundUrl": "https://r2-pub.rork.com/app-store-screenshots/a2a08819-4e19-45d9-a129-83e5974cae73.png"
+    },
+    {
+      "label": "Shared diary",
+      "backgroundPrompt": "Abstract digital art with a warm sand-toned background featuring a soft visible paper-grain texture across the entire surface, a single gentle soft-edged shadow falling diagonally from the upper left. Muted warm beige and dusty coral tones blend quietly in the lower portion, intimate and understated in mood, with a faint warm spotlight glow pooling in the lower center. The upper 30% remains calm and evenly lit sand tone for text clarity, 8K quality, ultra smooth gradients, premium feel, no text, no letters, no UI elements, no device mockups",
+      "backgroundUrl": "https://r2-pub.rork.com/app-store-screenshots/81a84dfc-d5d4-4021-8e4e-929441ba8fc3.png"
+    },
+    {
+      "label": "Together",
+      "backgroundPrompt": "Abstract digital art with a dramatic dusk-toned gradient, deep plum and aubergine tones at the top blending smoothly into warm coral and amber near the horizon line at the lower third. Soft silhouette-like layered shapes suggest distant rolling hills or dunes catching the last warm light, with a glowing warm horizon line creating dramatic rim lighting. The upper 30% stays deep plum and calm for text overlay, fine atmospheric haze and subtle grain add cinematic depth, 8K quality, ultra smooth gradients, premium feel, no text, no letters, no UI elements, no device mockups",
+      "backgroundUrl": "https://r2-pub.rork.com/app-store-screenshots/6117e5d2-3214-43e2-b1f6-2243b8ececcb.png"
+    }
+  ],
+  "headlines": {
+    "en": {
+      "Home": "Never Forget<br>Who Matters",
+      "Countdown": "Every Moment<br>Counts Down",
+      "Gift ideas": "Perfect Gifts<br>Made Easy",
+      "Shared diary": "Notice The<br>Little Things",
+      "Together": "Plan It<br>Together"
+    }
+  }
+}
