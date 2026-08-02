@@ -24,9 +24,11 @@ struct HomeGridView: View {
     let onJoinShare: () -> Void
 
     @Environment(AppSettings.self) private var settings
+    @Environment(BiometricGate.self) private var gate
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     @State private var appeared: Bool = false
+    @State private var searchText: String = ""
 
     private var strings: Strings { settings.strings }
 
@@ -34,6 +36,24 @@ struct HomeGridView: View {
         GridItem(.flexible(), spacing: 12),
         GridItem(.flexible(), spacing: 12),
     ]
+
+    private var query: String {
+        searchText.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    private var isSearching: Bool { !query.isEmpty }
+
+    /// Everyone matching the typed name or date, closest celebration first.
+    ///
+    /// Search cuts straight across the categories: somebody looking for a name
+    /// does not want to remember which card it was filed under.
+    private var results: [BirthdayProfile] {
+        let search = ProfileSearch(settings: settings)
+        let tokens = ProfileSearch.tokens(query, locale: settings.locale)
+        return ProfileSortOrder.nearestBirthday.sorted(
+            profiles.filter { search.matches($0, tokens: tokens) }
+        )
+    }
 
     /// Closest date across the whole library.
     private var nextUp: BirthdayProfile? {
@@ -70,33 +90,104 @@ struct HomeGridView: View {
             VStack(alignment: .leading, spacing: 14) {
                 header
 
-                HStack(spacing: 12) {
-                    nextEventCard
-                    pendingCard
+                SearchField(
+                    placeholder: strings.homeSearchPlaceholder,
+                    clearLabel: strings.searchClear,
+                    text: $searchText
+                )
+
+                if isSearching {
+                    searchResults
+                } else {
+                    grid
                 }
-
-                sectionLabel(strings.gridCategoriesTitle)
-
-                LazyVGrid(columns: columns, spacing: 12) {
-                    ForEach(Array(OccasionKind.allCases.enumerated()), id: \.element) { index, kind in
-                        categoryCard(kind)
-                            .opacity(appeared ? 1 : 0)
-                            .offset(y: appeared ? 0 : 22)
-                            .animation(
-                                reduceMotion ? nil : .smooth(duration: 0.45).delay(Double(index) * 0.06),
-                                value: appeared
-                            )
-                    }
-                }
-
-                collaborationCard
-                    .padding(.top, 4)
             }
             .padding(.horizontal, 20)
             .padding(.bottom, 100)
+            .animation(reduceMotion ? nil : .smooth(duration: 0.28), value: isSearching)
         }
         .scrollIndicators(.hidden)
+        .scrollDismissesKeyboard(.immediately)
         .onAppear { appeared = true }
+    }
+
+    /// The grid proper: quick actions, one card per occasion, the shared row.
+    @ViewBuilder
+    private var grid: some View {
+        HStack(spacing: 12) {
+            nextEventCard
+            pendingCard
+        }
+
+        sectionLabel(strings.gridCategoriesTitle)
+
+        LazyVGrid(columns: columns, spacing: 12) {
+            ForEach(Array(OccasionKind.allCases.enumerated()), id: \.element) { index, kind in
+                categoryCard(kind)
+                    .opacity(appeared ? 1 : 0)
+                    .offset(y: appeared ? 0 : 22)
+                    .animation(
+                        reduceMotion ? nil : .smooth(duration: 0.45).delay(Double(index) * 0.06),
+                        value: appeared
+                    )
+            }
+        }
+
+        collaborationCard
+            .padding(.top, 4)
+    }
+
+    // MARK: - Search
+
+    @ViewBuilder
+    private var searchResults: some View {
+        let matches = results
+
+        if matches.isEmpty {
+            PlaceholderPanel(
+                icon: "magnifyingglass",
+                title: strings.noResultsTitle,
+                message: String(format: strings.noResultsMessageFormat, query)
+            )
+            .padding(.top, 4)
+        } else {
+            HStack(spacing: 6) {
+                Text(strings.resultsSection.uppercased())
+                    .font(.system(.caption, design: .rounded, weight: .bold))
+                    .tracking(1.1)
+                Text("\u{00B7}")
+                    .font(.system(.caption, design: .rounded, weight: .bold))
+                Text(
+                    matches.count == 1
+                        ? strings.gridProfileCountOne
+                        : String(format: strings.gridProfileCountFormat, matches.count)
+                )
+                .font(.system(.caption, design: .rounded, weight: .medium))
+            }
+            .foregroundStyle(.secondary)
+            .padding(.top, 2)
+
+            VStack(spacing: 12) {
+                ForEach(matches) { profile in
+                    Button {
+                        onOpenProfile(profile)
+                    } label: {
+                        ProfileRowCard(
+                            profile: profile,
+                            settings: settings,
+                            isLocked: isLocked(profile),
+                            collaboration: collaboration[profile.id] ?? .none
+                        )
+                    }
+                    .buttonStyle(PressableCardStyle())
+                    .accessibilityHint(isLocked(profile) ? strings.lockedBadgeLabel : "")
+                }
+            }
+        }
+    }
+
+    private func isLocked(_ profile: BirthdayProfile) -> Bool {
+        settings.requiresUnlock(profile) && !gate.isUnlocked(profile.id)
     }
 
     // MARK: - Header

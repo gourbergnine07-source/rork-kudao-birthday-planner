@@ -17,6 +17,8 @@ nonisolated struct Strings: Sendable {
     let emptyAction: String
 
     let searchPlaceholder: String
+    /// Home field: the same search also understands dates.
+    let homeSearchPlaceholder: String
     let searchClear: String
     let resultsSection: String
     let noResultsTitle: String
@@ -494,6 +496,7 @@ nonisolated struct Strings: Sendable {
     let gallerySortOldest: String
     let myProfileTitle: String
     let myProfileSubtitle: String
+    let myProfileFillFromContactCaption: String
     let notificationDefaultsTitle: String
     let notificationDefaultsCaption: String
     let defaultReminderDaysLabel: String
@@ -839,6 +842,7 @@ extension Strings {
         emptyMessage: "Aggiungi le persone a cui tieni e inizia a raccogliere idee per il loro compleanno.",
         emptyAction: "Crea il primo profilo",
         searchPlaceholder: "Cerca un nome",
+        homeSearchPlaceholder: "Cerca per nome o data",
         searchClear: "Cancella la ricerca",
         resultsSection: "Risultati",
         noResultsTitle: "Nessun risultato",
@@ -1288,6 +1292,7 @@ extension Strings {
         gallerySortOldest: "Dai pi\u{00F9} vecchi",
         myProfileTitle: "Il mio profilo",
         myProfileSubtitle: "Foto e nome che vedono le persone con cui condividi un festeggiato.",
+        myProfileFillFromContactCaption: "Prendi nome e foto dalla tua scheda in rubrica.",
         notificationDefaultsTitle: "Impostazioni notifiche",
         notificationDefaultsCaption: "Valori usati per ogni nuovo festeggiato. Puoi sempre cambiarli sul singolo profilo.",
         defaultReminderDaysLabel: "Promemoria compleanno",
@@ -1611,6 +1616,7 @@ extension Strings {
         emptyMessage: "Add the people you care about and start collecting ideas for their birthday.",
         emptyAction: "Create first profile",
         searchPlaceholder: "Search a name",
+        homeSearchPlaceholder: "Search by name or date",
         searchClear: "Clear search",
         resultsSection: "Results",
         noResultsTitle: "No results",
@@ -2060,6 +2066,7 @@ extension Strings {
         gallerySortOldest: "Oldest first",
         myProfileTitle: "My profile",
         myProfileSubtitle: "The photo and name people see when you share a celebration.",
+        myProfileFillFromContactCaption: "Take your name and photo from your own card in Contacts.",
         notificationDefaultsTitle: "Notification settings",
         notificationDefaultsCaption: "Used for every new celebration. You can still change them profile by profile.",
         defaultReminderDaysLabel: "Birthday reminder",
@@ -2383,6 +2390,7 @@ extension Strings {
         emptyMessage: "Ajoutez les personnes qui comptent et commencez à réunir des idées pour leur anniversaire.",
         emptyAction: "Créer le premier profil",
         searchPlaceholder: "Rechercher un nom",
+        homeSearchPlaceholder: "Rechercher par nom ou date",
         searchClear: "Effacer la recherche",
         resultsSection: "Résultats",
         noResultsTitle: "Aucun résultat",
@@ -2832,6 +2840,7 @@ extension Strings {
         gallerySortOldest: "Les plus anciens d\u{2019}abord",
         myProfileTitle: "Mon profil",
         myProfileSubtitle: "La photo et le nom que voient les personnes avec qui tu partages un anniversaire.",
+        myProfileFillFromContactCaption: "Reprends ton nom et ta photo depuis ta fiche dans les contacts.",
         notificationDefaultsTitle: "R\u{00E9}glages des notifications",
         notificationDefaultsCaption: "Utilis\u{00E9}s pour chaque nouvel anniversaire. Tu peux toujours les changer profil par profil.",
         defaultReminderDaysLabel: "Rappel anniversaire",
@@ -3155,6 +3164,7 @@ extension Strings {
         emptyMessage: "Añade a las personas que te importan y empieza a reunir ideas para su cumpleaños.",
         emptyAction: "Crear el primer perfil",
         searchPlaceholder: "Buscar un nombre",
+        homeSearchPlaceholder: "Buscar por nombre o fecha",
         searchClear: "Borrar la búsqueda",
         resultsSection: "Resultados",
         noResultsTitle: "Sin resultados",
@@ -3604,6 +3614,7 @@ extension Strings {
         gallerySortOldest: "M\u{00E1}s antiguos primero",
         myProfileTitle: "Mi perfil",
         myProfileSubtitle: "La foto y el nombre que ven las personas con quienes compartes un cumplea\u{00F1}os.",
+        myProfileFillFromContactCaption: "Toma tu nombre y tu foto de tu ficha en contactos.",
         notificationDefaultsTitle: "Ajustes de notificaciones",
         notificationDefaultsCaption: "Se usan en cada nuevo cumplea\u{00F1}os. Siempre puedes cambiarlos perfil por perfil.",
         defaultReminderDaysLabel: "Aviso de cumplea\u{00F1}os",

@@ -24,6 +24,9 @@ struct MyProfileView: View {
     @State private var isManagingAccount: Bool = false
     @State private var isEditingNotifications: Bool = false
     @State private var isConfirmingSignOut: Bool = false
+    @State private var isPickingContact: Bool = false
+    /// Flipped every time a contact fills the card, so the haptic fires again.
+    @State private var didFillFromContact: Bool = false
 
     private var strings: Strings { settings.strings }
 
@@ -74,6 +77,15 @@ struct MyProfileView: View {
             .sheet(isPresented: $isEditingNotifications) {
                 NotificationSettingsView()
             }
+            .sheet(isPresented: $isPickingContact) {
+                // The user's own card rarely carries a birthday, and none is
+                // needed here: only the name and the photo are taken.
+                ContactPicker(requiresBirthday: false) { candidate in
+                    fill(from: candidate)
+                }
+                .ignoresSafeArea()
+            }
+            .sensoryFeedback(.success, trigger: didFillFromContact)
             .alert(strings.accountSignOutTitle, isPresented: $isConfirmingSignOut) {
                 Button(strings.cancelAction, role: .cancel) {}
                 Button(strings.accountSignOutAction, role: .destructive) {
@@ -131,6 +143,8 @@ struct MyProfileView: View {
                     .multilineTextAlignment(.center)
                     .fixedSize(horizontal: false, vertical: true)
             }
+
+            fillFromContactButton
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 22)
@@ -144,6 +158,49 @@ struct MyProfileView: View {
                 .strokeBorder(Palette.hairline, lineWidth: 1)
         )
         .shadow(color: Palette.coral.opacity(0.1), radius: 14, y: 7)
+    }
+
+    /// Typing your own name is the most avoidable chore in the app.
+    ///
+    /// The system picker runs out of process, so tapping one card hands back
+    /// only that card — the address book itself is never read.
+    private var fillFromContactButton: some View {
+        VStack(spacing: 7) {
+            Button {
+                isPickingContact = true
+            } label: {
+                HStack(spacing: 7) {
+                    Image(systemName: "person.crop.circle.badge.plus")
+                        .font(.system(size: 13, weight: .bold))
+                    Text(strings.contactsFillFromContactAction)
+                        .font(.system(size: 14, weight: .bold, design: .rounded))
+                }
+                .foregroundStyle(Palette.coral)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 10)
+                .background(Capsule().fill(Palette.coral.opacity(0.12)))
+                .overlay(Capsule().strokeBorder(Palette.coral.opacity(0.28), lineWidth: 1))
+            }
+            .buttonStyle(PressableCardStyle())
+
+            Text(strings.myProfileFillFromContactCaption)
+                .font(.system(.caption2, design: .rounded))
+                .foregroundStyle(.tertiary)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+
+    /// Copies name and photo across, leaving anything the contact lacks untouched.
+    private func fill(from candidate: ContactCandidate) {
+        let name = candidate.fullName.isEmpty ? candidate.givenName : candidate.fullName
+
+        withAnimation(.smooth(duration: 0.25)) {
+            if !name.isEmpty { identity.displayName = name }
+            if let photo = candidate.photoData { identity.photoData = photo }
+        }
+
+        didFillFromContact.toggle()
     }
 
     // MARK: - Reminder defaults
