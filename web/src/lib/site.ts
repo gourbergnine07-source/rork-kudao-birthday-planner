@@ -11,7 +11,7 @@ export const SITE = {
   platform: "iPhone, iOS 18 or later",
   supportEmail: "gourbergnine07@gmail.com",
   effectiveDate: "2 August 2026",
-  copyright: "@2026 Kudao",
+  copyright: "© 2026 Kudao",
   responseWindow: "within 3 working days",
 } as const;
 
