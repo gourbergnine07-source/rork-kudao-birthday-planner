@@ -124,7 +124,10 @@ final class ContactsImportService {
                     birthday: birthday ?? DateComponents(),
                     photoData: contact.thumbnailImageData,
                     phone: contact.phoneNumbers.first?.value.stringValue ?? "",
-                    email: contact.emailAddresses.first?.value as String? ?? ""
+                    email: contact.emailAddresses.first?.value as String? ?? "",
+                    // The bulk import never asks for addresses: it only needs
+                    // enough to create a profile, so that key is not fetched.
+                    postalAddress: ""
                 )
 
                 // Unified contacts can still repeat across accounts.

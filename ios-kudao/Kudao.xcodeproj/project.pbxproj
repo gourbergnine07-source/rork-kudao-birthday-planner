@@ -548,7 +548,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Kudao/Info.plist;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
-				INFOPLIST_KEY_NSContactsUsageDescription = "Kudao legge i compleanni salvati nei tuoi contatti solo per aiutarti a creare i profili. Nulla viene inviato online.";
+				INFOPLIST_KEY_NSContactsUsageDescription = "Kudao vuole accedere ai tuoi contatti per compilare più velocemente il profilo del festeggiato. Nulla viene inviato online.";
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "Kudao usa Face ID per proteggere i profili in modalità sorpresa.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Kudao usa la tua posizione solo per trovare negozi vicini dove comprare il regalo.";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Kudao usa la fotocamera per scattare foto e registrare video della festa da aggiungere alla galleria condivisa.";
@@ -591,7 +591,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Kudao/Info.plist;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
-				INFOPLIST_KEY_NSContactsUsageDescription = "Kudao legge i compleanni salvati nei tuoi contatti solo per aiutarti a creare i profili. Nulla viene inviato online.";
+				INFOPLIST_KEY_NSContactsUsageDescription = "Kudao vuole accedere ai tuoi contatti per compilare più velocemente il profilo del festeggiato. Nulla viene inviato online.";
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "Kudao usa Face ID per proteggere i profili in modalità sorpresa.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Kudao usa la tua posizione solo per trovare negozi vicini dove comprare il regalo.";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Kudao usa la fotocamera per scattare foto e registrare video della festa da aggiungere alla galleria condivisa.";

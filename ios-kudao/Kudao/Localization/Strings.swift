@@ -651,6 +651,8 @@ nonisolated struct Strings: Sendable {
     let contactsCompleteConfirmOne: String
     let contactsCompleteConfirmFormat: String
     let contactsFillFromContactAction: String
+    let contactsFillFromContactNote: String
+    let contactsFillFromContactDoneFormat: String
     let unknownYearShort: String
 
     // MARK: Email account
@@ -1454,6 +1456,8 @@ extension Strings {
         contactsCompleteConfirmOne: "Aggiungi 1 profilo",
         contactsCompleteConfirmFormat: "Aggiungi %d profili",
         contactsFillFromContactAction: "Compila da un contatto",
+        contactsFillFromContactNote: "Kudao legge solo la scheda che tocchi tu. Poi correggi quello che vuoi.",
+        contactsFillFromContactDoneFormat: "Compilato da %@ \u{00B7} modifica pure tutto",
         unknownYearShort: "\u{2014}",
 
         accountSignInTitle: "Accedi con email",
@@ -2239,6 +2243,8 @@ extension Strings {
         contactsCompleteConfirmOne: "Add 1 profile",
         contactsCompleteConfirmFormat: "Add %d profiles",
         contactsFillFromContactAction: "Fill from a contact",
+        contactsFillFromContactNote: "Kudao only reads the card you tap. You can edit every field afterwards.",
+        contactsFillFromContactDoneFormat: "Filled from %@ \u{00B7} edit anything you like",
         unknownYearShort: "\u{2014}",
 
         accountSignInTitle: "Sign in with email",
@@ -3024,6 +3030,8 @@ extension Strings {
         contactsCompleteConfirmOne: "Ajouter 1 profil",
         contactsCompleteConfirmFormat: "Ajouter %d profils",
         contactsFillFromContactAction: "Remplir depuis un contact",
+        contactsFillFromContactNote: "Kudao ne lit que la fiche que tu touches. Tu peux ensuite tout corriger.",
+        contactsFillFromContactDoneFormat: "Rempli depuis %@ \u{00B7} modifie ce que tu veux",
         unknownYearShort: "\u{2014}",
 
         accountSignInTitle: "Se connecter par e-mail",
@@ -3809,6 +3817,8 @@ extension Strings {
         contactsCompleteConfirmOne: "A\u{00F1}adir 1 perfil",
         contactsCompleteConfirmFormat: "A\u{00F1}adir %d perfiles",
         contactsFillFromContactAction: "Rellenar desde un contacto",
+        contactsFillFromContactNote: "Kudao solo lee la ficha que tocas. Despu\u{00E9}s puedes corregir cada campo.",
+        contactsFillFromContactDoneFormat: "Rellenado desde %@ \u{00B7} edita lo que quieras",
         unknownYearShort: "\u{2014}",
 
         accountSignInTitle: "Entrar con correo",

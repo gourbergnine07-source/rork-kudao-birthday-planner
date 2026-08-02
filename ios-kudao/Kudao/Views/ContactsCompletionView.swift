@@ -259,7 +259,8 @@ struct ContactsCompletionView: View {
                 birthday: DateComponents(),
                 photoData: nil,
                 phone: "",
-                email: ""
+                email: "",
+                postalAddress: ""
             ),
             ContactCandidate(
                 id: "2",
@@ -268,7 +269,8 @@ struct ContactsCompletionView: View {
                 birthday: DateComponents(),
                 photoData: nil,
                 phone: "",
-                email: ""
+                email: "",
+                postalAddress: ""
             ),
         ],
         readyCount: 2,

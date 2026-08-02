@@ -45,6 +45,8 @@ struct ProfileFormView: View {
     @State private var isShowingPaywall: Bool = false
     @State private var isPickingContact: Bool = false
     @State private var didFillFromContact: Bool = false
+    /// Name of the contact just imported, shown as a confirmation under the button.
+    @State private var filledFromContactName: String = ""
 
     private var strings: Strings { settings.strings }
     private var isEditing: Bool { profile != nil }
@@ -116,6 +118,7 @@ struct ProfileFormView: View {
             .sheet(isPresented: $isPickingContact) {
                 ContactPicker { candidate in
                     fill(from: candidate)
+                    isPickingContact = false
                 }
                 .ignoresSafeArea()
             }
@@ -373,30 +376,8 @@ struct ProfileFormView: View {
 
     private var nameCard: some View {
         FormCard(title: strings.nameLabel, systemImage: "person.text.rectangle") {
-            // A birthday almost always belongs to somebody already in the phone.
-            if occasion == .birthday && !isEditing {
-                Button {
-                    isPickingContact = true
-                } label: {
-                    HStack(spacing: 7) {
-                        Image(systemName: "person.crop.circle.badge.plus")
-                            .font(.system(size: 12, weight: .bold))
-                        Text(strings.contactsFillFromContactAction)
-                            .font(.system(size: 13, weight: .bold, design: .rounded))
-                        Spacer(minLength: 0)
-                        Image(systemName: "chevron.right")
-                            .font(.system(size: 10, weight: .heavy))
-                            .foregroundStyle(.tertiary)
-                    }
-                    .foregroundStyle(accent)
-                    .padding(.horizontal, 11)
-                    .padding(.vertical, 9)
-                    .background(
-                        RoundedRectangle(cornerRadius: 13, style: .continuous)
-                            .fill(accent.opacity(0.1))
-                    )
-                }
-                .buttonStyle(PressableCardStyle())
+            if canFillFromContact {
+                fillFromContactButton
 
                 Divider().overlay(Palette.hairline)
             }
@@ -419,6 +400,59 @@ struct ProfileFormView: View {
 
     private var namePlaceholder: String {
         occasion == .remembrance ? strings.rememberedNamePlaceholder : strings.namePlaceholder
+    }
+
+    // MARK: - Fill from a contact
+
+    /// The celebrated person is almost always somebody already in the phone.
+    ///
+    /// Not offered while editing, where the fields are already the user's own
+    /// answers, nor for an occasion of their own: there the name comes from
+    /// "My profile" and there is no contact card to borrow.
+    private var canFillFromContact: Bool { !isEditing && !isSelfProfile }
+
+    private var fillFromContactButton: some View {
+        VStack(alignment: .leading, spacing: 7) {
+            Button {
+                isPickingContact = true
+            } label: {
+                HStack(spacing: 7) {
+                    Image(systemName: "person.crop.circle.badge.plus")
+                        .font(.system(size: 12, weight: .bold))
+                    Text(strings.contactsFillFromContactAction)
+                        .font(.system(size: 13, weight: .bold, design: .rounded))
+                    Spacer(minLength: 0)
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 10, weight: .heavy))
+                        .foregroundStyle(.tertiary)
+                }
+                .foregroundStyle(accent)
+                .padding(.horizontal, 11)
+                .padding(.vertical, 9)
+                .background(
+                    RoundedRectangle(cornerRadius: 13, style: .continuous)
+                        .fill(accent.opacity(0.1))
+                )
+            }
+            .buttonStyle(PressableCardStyle())
+
+            if filledFromContactName.isEmpty {
+                Text(strings.contactsFillFromContactNote)
+                    .font(.system(.caption2, design: .rounded))
+                    .foregroundStyle(.tertiary)
+                    .fixedSize(horizontal: false, vertical: true)
+            } else {
+                Label(
+                    String(format: strings.contactsFillFromContactDoneFormat, filledFromContactName),
+                    systemImage: "checkmark.circle.fill"
+                )
+                .font(.system(.caption2, design: .rounded, weight: .semibold))
+                .foregroundStyle(Palette.sage)
+                .fixedSize(horizontal: false, vertical: true)
+                .transition(.opacity.combined(with: .offset(y: -4)))
+            }
+        }
+        .animation(.smooth(duration: 0.25), value: filledFromContactName)
     }
 
     /// When the occasion is the user's own, the name is simply theirs.
@@ -757,16 +791,30 @@ struct ProfileFormView: View {
 
     /// Copies a picked contact into the form without saving anything yet.
     ///
-    /// Every field stays editable afterwards: the address book is a starting
-    /// point, not the final word.
+    /// Nothing leaves the device here and nothing is written to the database:
+    /// the fields are simply pre-filled and stay editable, so the address book
+    /// is a starting point rather than the final word. Whatever the card does
+    /// not carry is left exactly as it was.
     private func fill(from candidate: ContactCandidate) {
-        name = candidate.givenName.isEmpty ? candidate.fullName : candidate.givenName
-        lastName = candidate.givenName.isEmpty ? "" : candidate.familyName
-        birthDate = candidate.resolvedDate()
-        hasUnknownBirthYear = !candidate.hasYear
-        if candidate.photoData != nil { photoData = candidate.photoData }
-        if !candidate.phone.isEmpty { phone = candidate.phone }
-        if !candidate.email.isEmpty { email = candidate.email }
+        withAnimation(.smooth(duration: 0.25)) {
+            name = candidate.givenName.isEmpty ? candidate.fullName : candidate.givenName
+            lastName = candidate.givenName.isEmpty ? "" : candidate.familyName
+
+            // Without a date in the card the picker keeps whatever is on screen:
+            // inventing one would be worse than leaving the field to the user.
+            if candidate.hasDate {
+                birthDate = candidate.resolvedDate()
+                hasUnknownBirthYear = !candidate.hasYear
+            }
+
+            if let photo = candidate.photoData { photoData = photo }
+            if !candidate.phone.isEmpty { phone = candidate.phone }
+            if !candidate.email.isEmpty { email = candidate.email }
+            if !candidate.postalAddress.isEmpty { address = candidate.postalAddress }
+
+            filledFromContactName = candidate.fullName
+        }
+
         didFillFromContact.toggle()
     }
 

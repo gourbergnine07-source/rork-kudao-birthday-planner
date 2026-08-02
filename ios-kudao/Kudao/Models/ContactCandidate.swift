@@ -19,10 +19,12 @@ nonisolated struct ContactCandidate: Identifiable, Sendable, Hashable {
     /// Empty when the address book holds no date at all: those contacts can
     /// still be imported, the date is asked for in a following step.
     let birthday: DateComponents
-    /// Thumbnail from the address book, already small enough to store as-is.
+    /// Picture from the address book, already downscaled to avatar size.
     let photoData: Data?
     let phone: String
     let email: String
+    /// Home address on a single line, empty when the card carries none.
+    let postalAddress: String
 
     /// Many address books only hold a day and a month.
     var hasYear: Bool { birthday.year != nil }
