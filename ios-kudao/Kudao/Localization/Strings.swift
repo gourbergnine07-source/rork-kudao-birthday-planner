@@ -496,7 +496,6 @@ nonisolated struct Strings: Sendable {
     let gallerySortOldest: String
     let myProfileTitle: String
     let myProfileSubtitle: String
-    let myProfileFillFromContactCaption: String
     let notificationDefaultsTitle: String
     let notificationDefaultsCaption: String
     let defaultReminderDaysLabel: String
@@ -1304,7 +1303,6 @@ extension Strings {
         gallerySortOldest: "Dai pi\u{00F9} vecchi",
         myProfileTitle: "Il mio profilo",
         myProfileSubtitle: "Foto e nome che vedono le persone con cui condividi un festeggiato.",
-        myProfileFillFromContactCaption: "Prendi nome e foto dalla tua scheda in rubrica.",
         notificationDefaultsTitle: "Impostazioni notifiche",
         notificationDefaultsCaption: "Valori usati per ogni nuovo festeggiato. Puoi sempre cambiarli sul singolo profilo.",
         defaultReminderDaysLabel: "Promemoria compleanno",
@@ -2090,7 +2088,6 @@ extension Strings {
         gallerySortOldest: "Oldest first",
         myProfileTitle: "My profile",
         myProfileSubtitle: "The photo and name people see when you share a celebration.",
-        myProfileFillFromContactCaption: "Take your name and photo from your own card in Contacts.",
         notificationDefaultsTitle: "Notification settings",
         notificationDefaultsCaption: "Used for every new celebration. You can still change them profile by profile.",
         defaultReminderDaysLabel: "Birthday reminder",
@@ -2876,7 +2873,6 @@ extension Strings {
         gallerySortOldest: "Les plus anciens d\u{2019}abord",
         myProfileTitle: "Mon profil",
         myProfileSubtitle: "La photo et le nom que voient les personnes avec qui tu partages un anniversaire.",
-        myProfileFillFromContactCaption: "Reprends ton nom et ta photo depuis ta fiche dans les contacts.",
         notificationDefaultsTitle: "R\u{00E9}glages des notifications",
         notificationDefaultsCaption: "Utilis\u{00E9}s pour chaque nouvel anniversaire. Tu peux toujours les changer profil par profil.",
         defaultReminderDaysLabel: "Rappel anniversaire",
@@ -3662,7 +3658,6 @@ extension Strings {
         gallerySortOldest: "M\u{00E1}s antiguos primero",
         myProfileTitle: "Mi perfil",
         myProfileSubtitle: "La foto y el nombre que ven las personas con quienes compartes un cumplea\u{00F1}os.",
-        myProfileFillFromContactCaption: "Toma tu nombre y tu foto de tu ficha en contactos.",
         notificationDefaultsTitle: "Ajustes de notificaciones",
         notificationDefaultsCaption: "Se usan en cada nuevo cumplea\u{00F1}os. Siempre puedes cambiarlos perfil por perfil.",
         defaultReminderDaysLabel: "Aviso de cumplea\u{00F1}os",
