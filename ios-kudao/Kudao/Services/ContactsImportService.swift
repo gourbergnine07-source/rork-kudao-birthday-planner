@@ -20,7 +20,11 @@ nonisolated enum ContactsAccessState: Equatable, Sendable {
     case failed
 }
 
-/// Reads birthdays out of the system address book.
+/// Reads the system address book so contacts can become profiles.
+///
+/// Contacts without a birthday are returned too: the import sheet lets the user
+/// add them and asks for the date afterwards, which is the only way to reach the
+/// many address books where dates were never filled in.
 ///
 /// Only the fields Kudao actually fills in are requested, and nothing is ever
 /// written back: the address book stays exactly as the user left it.
@@ -33,7 +37,7 @@ final class ContactsImportService {
     /// True once the user has refused access, so the UI can point at Settings.
     var isDenied: Bool { state == .denied }
 
-    /// Requests access if needed and loads every contact that has a birthday.
+    /// Requests access if needed and loads every usable contact.
     func load() async {
         state = .loading
 
@@ -81,7 +85,7 @@ final class ContactsImportService {
         }
     }
 
-    /// Walks the address book on a background thread and keeps only birthdays.
+    /// Walks the address book on a background thread and keeps everyone with a name.
     private static func fetchCandidates() async throws -> [ContactCandidate] {
         try await Task.detached(priority: .userInitiated) {
             let keys: [CNKeyDescriptor] = [
@@ -102,17 +106,14 @@ final class ContactsImportService {
             var seen: Set<String> = []
 
             try CNContactStore().enumerateContacts(with: request) { contact, _ in
-                guard
-                    let birthday = contact.birthday,
-                    birthday.month != nil,
-                    birthday.day != nil
-                else { return }
+                let stored = contact.birthday
+                let birthday = (stored?.month != nil && stored?.day != nil) ? stored : nil
 
                 let given = contact.givenName.trimmingCharacters(in: .whitespacesAndNewlines)
                 let family = contact.familyName.trimmingCharacters(in: .whitespacesAndNewlines)
                 let nickname = contact.nickname.trimmingCharacters(in: .whitespacesAndNewlines)
 
-                // A birthday with nobody attached to it is not worth importing.
+                // A card with nobody attached to it is not worth importing.
                 let resolvedGiven = given.isEmpty ? nickname : given
                 guard !resolvedGiven.isEmpty || !family.isEmpty else { return }
 
@@ -120,7 +121,7 @@ final class ContactsImportService {
                     id: contact.identifier,
                     givenName: resolvedGiven,
                     familyName: family,
-                    birthday: birthday,
+                    birthday: birthday ?? DateComponents(),
                     photoData: contact.thumbnailImageData,
                     phone: contact.phoneNumbers.first?.value.stringValue ?? "",
                     email: contact.emailAddresses.first?.value as String? ?? ""

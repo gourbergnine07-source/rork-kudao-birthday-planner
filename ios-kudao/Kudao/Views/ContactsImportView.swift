@@ -6,7 +6,11 @@
 import SwiftData
 import SwiftUI
 
-/// Picks birthdays out of the address book and turns them into profiles.
+/// Picks people out of the address book and turns them into profiles.
+///
+/// Contacts without a birthday are listed too, in their own section: picking
+/// them opens a second step that asks for the missing date, which is the only
+/// way to import from the many address books where dates were never filled in.
 ///
 /// Everything already in Kudao is shown too, greyed out and unselectable, so
 /// importing twice is impossible and the list still matches what the user sees
@@ -24,6 +28,14 @@ struct ContactsImportView: View {
     @State private var searchText: String = ""
     @State private var importedCount: Int = 0
     @State private var didImport: Bool = false
+    @State private var isCompleting: Bool = false
+    @State private var showsAllDateless: Bool = false
+
+    /// How many dateless contacts are shown before asking to see the rest.
+    ///
+    /// A whole address book under the birthdays would bury the section that
+    /// matters, so the tail stays behind one tap unless the user is searching.
+    private static let datelessPreviewLimit: Int = 20
 
     private var strings: Strings { settings.strings }
 
@@ -33,6 +45,15 @@ struct ContactsImportView: View {
             profiles
                 .filter { $0.occasion == .birthday }
                 .map { ContactCandidate.matchKey(name: $0.name, lastName: $0.lastName, date: $0.birthDate) }
+        )
+    }
+
+    /// Names already stored, the only way to spot a dateless contact twice.
+    private var existingNameKeys: Set<String> {
+        Set(
+            profiles
+                .filter { $0.occasion == .birthday }
+                .map { ContactCandidate.nameKey(name: $0.name, lastName: $0.lastName) }
         )
     }
 
@@ -63,6 +84,7 @@ struct ContactsImportView: View {
 
     /// Every written form of a contact's date that a search could plausibly use.
     private func dateTokens(for candidate: ContactCandidate) -> [String] {
+        guard candidate.hasDate else { return [] }
         let date = candidate.resolvedDate()
         var tokens: [String] = [settings.dayMonth(date)]
 
@@ -82,18 +104,49 @@ struct ContactsImportView: View {
         return tokens
     }
 
-    /// Contacts that would create something new, and the ones already covered.
+    /// True when Kudao already holds this person.
+    ///
+    /// A contact with a date is matched on name plus day and month; without a
+    /// date the name is all there is to go on.
+    private func isAlreadyStored(_ candidate: ContactCandidate) -> Bool {
+        candidate.hasDate
+            ? existingKeys.contains(candidate.matchKey)
+            : existingNameKeys.contains(candidate.nameKey)
+    }
+
+    /// Contacts that would create something new, split by whether a date exists.
     private var importable: [ContactCandidate] {
-        let existing = existingKeys
-        return filtered.filter { !existing.contains($0.matchKey) }
+        filtered.filter { $0.hasDate && !isAlreadyStored($0) }
+    }
+
+    /// New contacts whose date has to be asked for in the following step.
+    private var needsDate: [ContactCandidate] {
+        filtered.filter { !$0.hasDate && !isAlreadyStored($0) }
+    }
+
+    /// The slice of dateless contacts currently on screen.
+    private var visibleNeedsDate: [ContactCandidate] {
+        guard query.isEmpty, !showsAllDateless else { return needsDate }
+        return Array(needsDate.prefix(Self.datelessPreviewLimit))
     }
 
     private var alreadyThere: [ContactCandidate] {
-        let existing = existingKeys
-        return filtered.filter { existing.contains($0.matchKey) }
+        filtered.filter { isAlreadyStored($0) }
     }
 
     private var selectedCount: Int { selection.count }
+
+    private var selectedCandidates: [ContactCandidate] {
+        allCandidates.filter { selection.contains($0.id) }
+    }
+
+    private var selectedDated: [ContactCandidate] {
+        selectedCandidates.filter(\.hasDate)
+    }
+
+    private var selectedDateless: [ContactCandidate] {
+        selectedCandidates.filter { !$0.hasDate }
+    }
 
     private var areAllSelected: Bool {
         !importable.isEmpty && importable.allSatisfy { selection.contains($0.id) }
@@ -129,6 +182,15 @@ struct ContactsImportView: View {
             }
             .animation(.smooth(duration: 0.28), value: selectedCount)
             .sensoryFeedback(.success, trigger: didImport)
+            .sheet(isPresented: $isCompleting) {
+                ContactsCompletionView(
+                    candidates: selectedDateless,
+                    readyCount: selectedDated.count
+                ) { completions in
+                    isCompleting = false
+                    performImport(completions: completions)
+                }
+            }
             .environment(\.locale, settings.locale)
         }
         .tint(Palette.coral)
@@ -225,7 +287,7 @@ struct ContactsImportView: View {
 
     private var list: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
+            LazyVStack(alignment: .leading, spacing: 16) {
                 header
 
                 SearchField(
@@ -234,7 +296,7 @@ struct ContactsImportView: View {
                     text: $searchText
                 )
 
-                if importable.isEmpty && alreadyThere.isEmpty {
+                if importable.isEmpty && needsDate.isEmpty && alreadyThere.isEmpty {
                     PlaceholderPanel(
                         icon: "magnifyingglass",
                         title: strings.noResultsTitle,
@@ -250,6 +312,21 @@ struct ContactsImportView: View {
                         ForEach(importable) { candidate in
                             row(candidate, isExisting: false)
                         }
+                    }
+                }
+
+                if !needsDate.isEmpty {
+                    sectionTitle(String(format: strings.contactsImportNeedsDateSectionFormat, needsDate.count))
+                        .padding(.top, 4)
+
+                    VStack(spacing: 10) {
+                        ForEach(visibleNeedsDate) { candidate in
+                            row(candidate, isExisting: false)
+                        }
+                    }
+
+                    if visibleNeedsDate.count < needsDate.count {
+                        showAllButton
                     }
                 }
 
@@ -288,6 +365,23 @@ struct ContactsImportView: View {
             .fixedSize(horizontal: false, vertical: true)
     }
 
+    private var showAllButton: some View {
+        Button {
+            showsAllDateless = true
+        } label: {
+            Text(String(format: strings.contactsImportShowAllFormat, needsDate.count))
+                .font(.system(.subheadline, design: .rounded, weight: .semibold))
+                .foregroundStyle(Palette.coral)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 13)
+                .background(
+                    RoundedRectangle(cornerRadius: 18, style: .continuous)
+                        .fill(Palette.coral.opacity(0.1))
+                )
+        }
+        .buttonStyle(PressableCardStyle())
+    }
+
     private func sectionTitle(_ text: String) -> some View {
         Text(text.uppercased())
             .font(.system(.caption, design: .rounded, weight: .bold))
@@ -312,16 +406,20 @@ struct ContactsImportView: View {
                         .lineLimit(1)
 
                     HStack(spacing: 6) {
-                        Image(systemName: "birthday.cake.fill")
+                        Image(systemName: candidate.hasDate ? "birthday.cake.fill" : "calendar.badge.plus")
                             .font(.system(size: 10, weight: .bold))
-                            .foregroundStyle(isExisting ? Color.secondary : Palette.amber)
+                            .foregroundStyle(rowIconTint(for: candidate, isExisting: isExisting))
 
-                        Text(dateLabel(for: candidate))
-                            .font(.system(.caption, design: .rounded))
-                            .foregroundStyle(.secondary)
+                        if candidate.hasDate {
+                            Text(dateLabel(for: candidate))
+                                .font(.system(.caption, design: .rounded))
+                                .foregroundStyle(.secondary)
+                        }
 
                         if isExisting {
                             badge(strings.contactsImportAlreadyBadge, tint: Palette.sage)
+                        } else if !candidate.hasDate {
+                            badge(strings.contactsImportNoDateBadge, tint: Palette.clay)
                         } else if !candidate.hasYear {
                             badge(strings.contactsImportNoYearBadge, tint: Palette.clay)
                         }
@@ -373,6 +471,11 @@ struct ContactsImportView: View {
         return isSelected ? Palette.coral : Color.secondary.opacity(0.5)
     }
 
+    private func rowIconTint(for candidate: ContactCandidate, isExisting: Bool) -> Color {
+        if isExisting { return .secondary }
+        return candidate.hasDate ? Palette.amber : Palette.clay
+    }
+
     /// The full date when the contact has a year, day and month otherwise.
     private func dateLabel(for candidate: ContactCandidate) -> String {
         let date = candidate.resolvedDate()
@@ -380,7 +483,8 @@ struct ContactsImportView: View {
     }
 
     private func accessibilityLabel(for candidate: ContactCandidate, isExisting: Bool) -> String {
-        var parts = [candidate.fullName, dateLabel(for: candidate)]
+        var parts = [candidate.fullName]
+        parts.append(candidate.hasDate ? dateLabel(for: candidate) : strings.contactsImportNoDateBadge)
         if isExisting { parts.append(strings.contactsImportAlreadyBadge) }
         return parts.joined(separator: ", ")
     }
@@ -389,8 +493,8 @@ struct ContactsImportView: View {
 
     private var importBar: some View {
         VStack(spacing: 8) {
-            if selectedNeedsYearNote {
-                Text(strings.contactsImportNoYearNote)
+            if let note = selectionNote {
+                Text(note)
                     .font(.system(.caption2, design: .rounded))
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
@@ -398,7 +502,7 @@ struct ContactsImportView: View {
             }
 
             Button {
-                importSelected()
+                startImport()
             } label: {
                 Text(
                     selectedCount == 1
@@ -420,9 +524,14 @@ struct ContactsImportView: View {
         .background(.ultraThinMaterial)
     }
 
-    /// True when at least one picked contact has no birth year.
-    private var selectedNeedsYearNote: Bool {
-        allCandidates.contains { selection.contains($0.id) && !$0.hasYear }
+    /// What the picked contacts still need, if anything.
+    ///
+    /// A missing date is the more surprising of the two, so it wins the single
+    /// line of space above the button.
+    private var selectionNote: String? {
+        if !selectedDateless.isEmpty { return strings.contactsImportNoDateNote }
+        if selectedDated.contains(where: { !$0.hasYear }) { return strings.contactsImportNoYearNote }
+        return nil
     }
 
     // MARK: - Actions
@@ -443,29 +552,42 @@ struct ContactsImportView: View {
         }
     }
 
-    /// Creates one birthday profile per selected contact, then schedules their reminders.
-    private func importSelected() {
-        let picked = allCandidates.filter { selection.contains($0.id) }
-        guard !picked.isEmpty else { return }
+    /// Imports straight away, or asks for the missing dates first.
+    private func startImport() {
+        guard selectedCount > 0 else { return }
+        if selectedDateless.isEmpty {
+            performImport(completions: [])
+        } else {
+            isCompleting = true
+        }
+    }
 
+    /// Creates one birthday profile per selected contact, then schedules their reminders.
+    ///
+    /// Dateless contacts only appear here once the user has given them a date;
+    /// the ones they left blank are simply skipped.
+    private func performImport(completions: [ContactDateCompletion]) {
         var created: [BirthdayProfile] = []
 
-        for candidate in picked {
-            let profile = BirthdayProfile(
-                name: candidate.givenName.isEmpty ? candidate.fullName : candidate.givenName,
-                birthDate: candidate.resolvedDate(),
-                relationship: .friend,
-                lastName: candidate.givenName.isEmpty ? "" : candidate.familyName,
-                contactPhone: candidate.phone,
-                contactEmail: candidate.email,
-                photoData: candidate.photoData,
-                occasion: .birthday,
-                hasUnknownBirthYear: !candidate.hasYear
+        for candidate in selectedDated {
+            created.append(
+                makeProfile(from: candidate, date: candidate.resolvedDate(), hasUnknownYear: !candidate.hasYear)
             )
-            profile.reminderDaysBefore = settings.reminderDays(for: .birthday)
-            profile.giftReminderDaysBefore = settings.giftReminderDays(for: .birthday)
-            modelContext.insert(profile)
-            created.append(profile)
+        }
+
+        for completion in completions {
+            created.append(
+                makeProfile(
+                    from: completion.candidate,
+                    date: completion.date,
+                    hasUnknownYear: completion.hasUnknownYear
+                )
+            )
+        }
+
+        guard !created.isEmpty else {
+            dismiss()
+            return
         }
 
         do {
@@ -478,6 +600,29 @@ struct ContactsImportView: View {
         didImport = true
         scheduleReminders(for: created)
         dismiss()
+    }
+
+    /// Builds and inserts one profile, leaving the save to the caller.
+    private func makeProfile(
+        from candidate: ContactCandidate,
+        date: Date,
+        hasUnknownYear: Bool
+    ) -> BirthdayProfile {
+        let profile = BirthdayProfile(
+            name: candidate.givenName.isEmpty ? candidate.fullName : candidate.givenName,
+            birthDate: date,
+            relationship: .friend,
+            lastName: candidate.givenName.isEmpty ? "" : candidate.familyName,
+            contactPhone: candidate.phone,
+            contactEmail: candidate.email,
+            photoData: candidate.photoData,
+            occasion: .birthday,
+            hasUnknownBirthYear: hasUnknownYear
+        )
+        profile.reminderDaysBefore = settings.reminderDays(for: .birthday)
+        profile.giftReminderDaysBefore = settings.giftReminderDays(for: .birthday)
+        modelContext.insert(profile)
+        return profile
     }
 
     private func scheduleReminders(for created: [BirthdayProfile]) {

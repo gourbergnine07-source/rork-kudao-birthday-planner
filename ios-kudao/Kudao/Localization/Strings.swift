@@ -639,6 +639,18 @@ nonisolated struct Strings: Sendable {
     let contactsImportDoneFormat: String
     let contactsImportNewSectionFormat: String
     let contactsImportExistingSectionFormat: String
+    let contactsImportNoDateBadge: String
+    let contactsImportNeedsDateSectionFormat: String
+    let contactsImportShowAllFormat: String
+    let contactsImportNoDateNote: String
+    let contactsCompleteTitle: String
+    let contactsCompleteSubtitle: String
+    let contactsCompletePendingBadge: String
+    let contactsCompleteReadyBadge: String
+    let contactsCompleteUnknownYear: String
+    let contactsCompleteHint: String
+    let contactsCompleteConfirmOne: String
+    let contactsCompleteConfirmFormat: String
     let contactsFillFromContactAction: String
     let unknownYearShort: String
 
@@ -1410,16 +1422,16 @@ extension Strings {
         notificationEventBodyFormat: "Si avvicina la ricorrenza di %@.",
 
         contactsImportAction: "Importa dalla rubrica",
-        contactsImportTitle: "Compleanni in rubrica",
-        contactsImportSubtitle: "Scegli chi vuoi aggiungere. Kudao legge solo nome e data.",
+        contactsImportTitle: "Aggiungi dalla rubrica",
+        contactsImportSubtitle: "Scegli chi vuoi aggiungere. Per chi non ha una data in rubrica la scegli tu al passo dopo.",
         contactsImportPrivacyNote: "I contatti restano sul telefono: Kudao non li invia da nessuna parte.",
         contactsImportLoading: "Sto leggendo la rubrica\u{2026}",
         contactsImportSelectAll: "Seleziona tutti",
         contactsImportClearSelection: "Deseleziona",
         contactsImportConfirmOne: "Aggiungi 1 compleanno",
         contactsImportConfirmFormat: "Aggiungi %d compleanni",
-        contactsImportEmptyTitle: "Nessun compleanno salvato",
-        contactsImportEmptyMessage: "Nessuno dei tuoi contatti ha una data di nascita. Aggiungila in Contatti e torna qui.",
+        contactsImportEmptyTitle: "Rubrica vuota",
+        contactsImportEmptyMessage: "Non c\u{2019}\u{00E8} nessun contatto da leggere. Aggiungi qualcuno in Contatti e torna qui.",
         contactsImportDeniedTitle: "Rubrica non accessibile",
         contactsImportDeniedMessage: "Kudao non ha il permesso di leggere i contatti. Puoi darlo da Impostazioni.",
         contactsImportFailedTitle: "Lettura non riuscita",
@@ -1431,6 +1443,18 @@ extension Strings {
         contactsImportDoneFormat: "%d compleanni aggiunti",
         contactsImportNewSectionFormat: "Da aggiungere \u{00B7} %d",
         contactsImportExistingSectionFormat: "Gi\u{00E0} in Kudao \u{00B7} %d",
+        contactsImportNoDateBadge: "Senza data",
+        contactsImportNeedsDateSectionFormat: "Senza data \u{00B7} %d",
+        contactsImportShowAllFormat: "Mostra tutti (%d)",
+        contactsImportNoDateNote: "Le date mancanti te le chiediamo al passo dopo.",
+        contactsCompleteTitle: "Completa le date",
+        contactsCompleteSubtitle: "Questi contatti non hanno una data in rubrica. Scegli tu quella giusta.",
+        contactsCompletePendingBadge: "Da compilare",
+        contactsCompleteReadyBadge: "Pronto",
+        contactsCompleteUnknownYear: "Non conosco l\u{2019}anno",
+        contactsCompleteHint: "Tocca una data per includere il contatto. Chi resta da compilare non viene aggiunto.",
+        contactsCompleteConfirmOne: "Aggiungi 1 profilo",
+        contactsCompleteConfirmFormat: "Aggiungi %d profili",
         contactsFillFromContactAction: "Compila da un contatto",
         unknownYearShort: "\u{2014}",
 
@@ -2184,16 +2208,16 @@ extension Strings {
         notificationEventBodyFormat: "%@\u{2019}s occasion is getting close.",
 
         contactsImportAction: "Import from Contacts",
-        contactsImportTitle: "Birthdays in Contacts",
-        contactsImportSubtitle: "Pick who to add. Kudao only reads names and dates.",
+        contactsImportTitle: "Add from Contacts",
+        contactsImportSubtitle: "Pick who to add. If someone has no date in your address book, you choose it in the next step.",
         contactsImportPrivacyNote: "Your contacts stay on the phone: Kudao never sends them anywhere.",
         contactsImportLoading: "Reading your contacts\u{2026}",
         contactsImportSelectAll: "Select all",
         contactsImportClearSelection: "Clear",
         contactsImportConfirmOne: "Add 1 birthday",
         contactsImportConfirmFormat: "Add %d birthdays",
-        contactsImportEmptyTitle: "No birthdays saved",
-        contactsImportEmptyMessage: "None of your contacts has a date of birth. Add one in Contacts and come back.",
+        contactsImportEmptyTitle: "No contacts to read",
+        contactsImportEmptyMessage: "There is nothing in your address book yet. Add someone in Contacts and come back.",
         contactsImportDeniedTitle: "Contacts not available",
         contactsImportDeniedMessage: "Kudao doesn\u{2019}t have permission to read your contacts. You can grant it in Settings.",
         contactsImportFailedTitle: "Couldn\u{2019}t read Contacts",
@@ -2205,6 +2229,18 @@ extension Strings {
         contactsImportDoneFormat: "%d birthdays added",
         contactsImportNewSectionFormat: "To add \u{00B7} %d",
         contactsImportExistingSectionFormat: "Already in Kudao \u{00B7} %d",
+        contactsImportNoDateBadge: "No date",
+        contactsImportNeedsDateSectionFormat: "No date \u{00B7} %d",
+        contactsImportShowAllFormat: "Show all (%d)",
+        contactsImportNoDateNote: "We will ask you for the missing dates in the next step.",
+        contactsCompleteTitle: "Fill in the dates",
+        contactsCompleteSubtitle: "These contacts have no date in your address book. Pick the right one.",
+        contactsCompletePendingBadge: "To fill in",
+        contactsCompleteReadyBadge: "Ready",
+        contactsCompleteUnknownYear: "I don\u{2019}t know the year",
+        contactsCompleteHint: "Tap a date to include the contact. Anything left blank is skipped.",
+        contactsCompleteConfirmOne: "Add 1 profile",
+        contactsCompleteConfirmFormat: "Add %d profiles",
         contactsFillFromContactAction: "Fill from a contact",
         unknownYearShort: "\u{2014}",
 
@@ -2958,16 +2994,16 @@ extension Strings {
         notificationEventBodyFormat: "L\u{2019}occasion de %@ approche.",
 
         contactsImportAction: "Importer depuis les contacts",
-        contactsImportTitle: "Anniversaires dans les contacts",
-        contactsImportSubtitle: "Choisis qui ajouter. Kudao ne lit que le nom et la date.",
+        contactsImportTitle: "Ajouter depuis les contacts",
+        contactsImportSubtitle: "Choisis qui ajouter. Sans date dans le carnet, tu la choisiras \u{00E0} l\u{2019}\u{00E9}tape suivante.",
         contactsImportPrivacyNote: "Tes contacts restent sur le t\u{00E9}l\u{00E9}phone : Kudao ne les envoie nulle part.",
         contactsImportLoading: "Lecture des contacts\u{2026}",
         contactsImportSelectAll: "Tout s\u{00E9}lectionner",
         contactsImportClearSelection: "Effacer",
         contactsImportConfirmOne: "Ajouter 1 anniversaire",
         contactsImportConfirmFormat: "Ajouter %d anniversaires",
-        contactsImportEmptyTitle: "Aucun anniversaire enregistr\u{00E9}",
-        contactsImportEmptyMessage: "Aucun de tes contacts n\u{2019}a de date de naissance. Ajoute-la dans Contacts et reviens.",
+        contactsImportEmptyTitle: "Carnet vide",
+        contactsImportEmptyMessage: "Il n\u{2019}y a aucun contact \u{00E0} lire. Ajoute quelqu\u{2019}un dans Contacts et reviens.",
         contactsImportDeniedTitle: "Contacts inaccessibles",
         contactsImportDeniedMessage: "Kudao n\u{2019}a pas l\u{2019}autorisation de lire tes contacts. Tu peux la donner dans les R\u{00E9}glages.",
         contactsImportFailedTitle: "Lecture impossible",
@@ -2979,6 +3015,18 @@ extension Strings {
         contactsImportDoneFormat: "%d anniversaires ajout\u{00E9}s",
         contactsImportNewSectionFormat: "\u{00C0} ajouter \u{00B7} %d",
         contactsImportExistingSectionFormat: "D\u{00E9}j\u{00E0} dans Kudao \u{00B7} %d",
+        contactsImportNoDateBadge: "Sans date",
+        contactsImportNeedsDateSectionFormat: "Sans date \u{00B7} %d",
+        contactsImportShowAllFormat: "Tout afficher (%d)",
+        contactsImportNoDateNote: "Les dates manquantes te seront demand\u{00E9}es \u{00E0} l\u{2019}\u{00E9}tape suivante.",
+        contactsCompleteTitle: "Compl\u{00E8}te les dates",
+        contactsCompleteSubtitle: "Ces contacts n\u{2019}ont pas de date dans le carnet. Choisis la bonne.",
+        contactsCompletePendingBadge: "\u{00C0} compl\u{00E9}ter",
+        contactsCompleteReadyBadge: "Pr\u{00EA}t",
+        contactsCompleteUnknownYear: "Je ne connais pas l\u{2019}ann\u{00E9}e",
+        contactsCompleteHint: "Touche une date pour inclure le contact. Ceux laiss\u{00E9}s vides sont ignor\u{00E9}s.",
+        contactsCompleteConfirmOne: "Ajouter 1 profil",
+        contactsCompleteConfirmFormat: "Ajouter %d profils",
         contactsFillFromContactAction: "Remplir depuis un contact",
         unknownYearShort: "\u{2014}",
 
@@ -3732,16 +3780,16 @@ extension Strings {
         notificationEventBodyFormat: "Se acerca la ocasi\u{00F3}n de %@.",
 
         contactsImportAction: "Importar de contactos",
-        contactsImportTitle: "Cumplea\u{00F1}os en contactos",
-        contactsImportSubtitle: "Elige a qui\u{00E9}n a\u{00F1}adir. Kudao solo lee el nombre y la fecha.",
+        contactsImportTitle: "A\u{00F1}adir desde contactos",
+        contactsImportSubtitle: "Elige a qui\u{00E9}n a\u{00F1}adir. Si no tiene fecha en la agenda, la eliges en el paso siguiente.",
         contactsImportPrivacyNote: "Tus contactos se quedan en el tel\u{00E9}fono: Kudao no los env\u{00ED}a a ninguna parte.",
         contactsImportLoading: "Leyendo tus contactos\u{2026}",
         contactsImportSelectAll: "Seleccionar todos",
         contactsImportClearSelection: "Borrar",
         contactsImportConfirmOne: "A\u{00F1}adir 1 cumplea\u{00F1}os",
         contactsImportConfirmFormat: "A\u{00F1}adir %d cumplea\u{00F1}os",
-        contactsImportEmptyTitle: "Ning\u{00FA}n cumplea\u{00F1}os guardado",
-        contactsImportEmptyMessage: "Ninguno de tus contactos tiene fecha de nacimiento. A\u{00F1}\u{00E1}dela en Contactos y vuelve.",
+        contactsImportEmptyTitle: "Agenda vac\u{00ED}a",
+        contactsImportEmptyMessage: "No hay ning\u{00FA}n contacto que leer. A\u{00F1}ade a alguien en Contactos y vuelve.",
         contactsImportDeniedTitle: "Contactos no disponibles",
         contactsImportDeniedMessage: "Kudao no tiene permiso para leer tus contactos. Puedes darlo en Ajustes.",
         contactsImportFailedTitle: "No se pudo leer",
@@ -3753,6 +3801,18 @@ extension Strings {
         contactsImportDoneFormat: "%d cumplea\u{00F1}os a\u{00F1}adidos",
         contactsImportNewSectionFormat: "Para a\u{00F1}adir \u{00B7} %d",
         contactsImportExistingSectionFormat: "Ya en Kudao \u{00B7} %d",
+        contactsImportNoDateBadge: "Sin fecha",
+        contactsImportNeedsDateSectionFormat: "Sin fecha \u{00B7} %d",
+        contactsImportShowAllFormat: "Mostrar todos (%d)",
+        contactsImportNoDateNote: "Las fechas que faltan te las pedimos en el paso siguiente.",
+        contactsCompleteTitle: "Completa las fechas",
+        contactsCompleteSubtitle: "Estos contactos no tienen fecha en la agenda. Elige la correcta.",
+        contactsCompletePendingBadge: "Por completar",
+        contactsCompleteReadyBadge: "Listo",
+        contactsCompleteUnknownYear: "No s\u{00E9} el a\u{00F1}o",
+        contactsCompleteHint: "Toca una fecha para incluir el contacto. Los que queden vac\u{00ED}os se omiten.",
+        contactsCompleteConfirmOne: "A\u{00F1}adir 1 perfil",
+        contactsCompleteConfirmFormat: "A\u{00F1}adir %d perfiles",
         contactsFillFromContactAction: "Rellenar desde un contacto",
         unknownYearShort: "\u{2014}",
 
