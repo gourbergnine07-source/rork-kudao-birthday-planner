@@ -29,6 +29,8 @@ struct HomeGridView: View {
 
     @State private var appeared: Bool = false
     @State private var searchText: String = ""
+    /// True as soon as content slides under the pinned bar.
+    @State private var isScrolled: Bool = false
 
     private var strings: Strings { settings.strings }
 
@@ -90,12 +92,6 @@ struct HomeGridView: View {
             VStack(alignment: .leading, spacing: 14) {
                 header
 
-                SearchField(
-                    placeholder: strings.homeSearchPlaceholder,
-                    clearLabel: strings.searchClear,
-                    text: $searchText
-                )
-
                 if isSearching {
                     searchResults
                 } else {
@@ -108,7 +104,41 @@ struct HomeGridView: View {
         }
         .scrollIndicators(.hidden)
         .scrollDismissesKeyboard(.immediately)
+        .safeAreaInset(edge: .top, spacing: 0) { searchBar }
+        .onScrollGeometryChange(for: Bool.self) { geometry in
+            geometry.contentOffset.y + geometry.contentInsets.top > 6
+        } action: { _, scrolled in
+            isScrolled = scrolled
+        }
         .onAppear { appeared = true }
+    }
+
+    /// The search field, pinned above the scrolling content.
+    ///
+    /// It stays reachable however far down the list you are. The frosted panel
+    /// behind it only fades in once something actually scrolls underneath, so
+    /// at rest the bar floats on the warm backdrop with no seam.
+    private var searchBar: some View {
+        SearchField(
+            placeholder: strings.homeSearchPlaceholder,
+            clearLabel: strings.searchClear,
+            text: $searchText
+        )
+        .padding(.horizontal, 20)
+        .padding(.top, 6)
+        .padding(.bottom, 10)
+        .background {
+            Rectangle()
+                .fill(.ultraThinMaterial)
+                .overlay(alignment: .bottom) {
+                    Rectangle()
+                        .fill(Palette.hairline)
+                        .frame(height: 1)
+                }
+                .opacity(isScrolled ? 1 : 0)
+                .ignoresSafeArea(edges: .top)
+                .animation(reduceMotion ? nil : .easeOut(duration: 0.2), value: isScrolled)
+        }
     }
 
     /// The grid proper: quick actions, one card per occasion, the shared row.

@@ -32,6 +32,26 @@ final class AdsService {
         static let interstitial: String = "ca-app-pub-3940256099942544/4411468910"
     }
 
+    /// Builds every ad request Kudao ever sends.
+    ///
+    /// `npa=1` asks Google for non-personalised ads, always. That single flag is
+    /// what keeps three declarations honest at once: the privacy manifest says
+    /// `NSPrivacyTracking = false`, the App Store label claims no tracking, and
+    /// the app never shows an App Tracking Transparency prompt. Without it, a
+    /// European user who accepts the consent form would receive personalised
+    /// ads — tracking, in Apple's sense, with no permission ever asked for.
+    ///
+    /// Consent is still gathered through the User Messaging Platform: it governs
+    /// whether an ad may be requested at all, which is a separate question from
+    /// whether that ad may be targeted.
+    static func makeRequest() -> Request {
+        let request = Request()
+        let extras = Extras()
+        extras.additionalParameters = ["npa": "1"]
+        request.register(extras)
+        return request
+    }
+
     /// Names of the project settings holding the live identifiers.
     private enum Keys {
         static let appID: String = "EXPO_PUBLIC_ADMOB_IOS_APP_ID"
@@ -204,7 +224,7 @@ final class AdsService {
         do {
             interstitial = try await InterstitialAd.load(
                 with: Self.interstitialUnitID,
-                request: Request()
+                request: Self.makeRequest()
             )
         } catch {
             print("[Kudao] Interstitial unavailable: \(error.localizedDescription)")

@@ -96,7 +96,7 @@ private struct BannerAdContainer: UIViewRepresentable {
         banner.adUnitID = adUnitID
         banner.delegate = context.coordinator
         banner.backgroundColor = .clear
-        banner.load(Request())
+        banner.load(AdsService.makeRequest())
         return banner
     }
 
