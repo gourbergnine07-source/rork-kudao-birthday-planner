@@ -47,6 +47,9 @@ struct ProfileFormView: View {
     @State private var didFillFromContact: Bool = false
     /// Name of the contact just imported, shown as a confirmation under the button.
     @State private var filledFromContactName: String = ""
+    /// Cards an import just wrote into, outlined for a moment as feedback.
+    @State private var highlightedFields: Set<FilledField> = []
+    @State private var highlightTask: Task<Void, Never>?
 
     private var strings: Strings { settings.strings }
     private var isEditing: Bool { profile != nil }
@@ -115,13 +118,14 @@ struct ProfileFormView: View {
             .sheet(isPresented: $isShowingPaywall) {
                 PaywallView()
             }
-            .sheet(isPresented: $isPickingContact) {
-                ContactPicker { candidate in
+            // Presented by UIKit from behind the form rather than as a sheet, so
+            // closing the picker never takes the form down with it.
+            .background(
+                ContactPickerPresenter(isPresented: $isPickingContact) { candidate in
                     fill(from: candidate)
-                    isPickingContact = false
                 }
-                .ignoresSafeArea()
-            }
+                .allowsHitTesting(false)
+            )
             .sensoryFeedback(.success, trigger: didFillFromContact)
             .environment(\.locale, settings.locale)
         }
@@ -326,6 +330,7 @@ struct ProfileFormView: View {
                         ringColor: Palette.surface,
                         ringWidth: 4
                     )
+                    .filledFieldHighlightCircle(highlightedFields.contains(.photo))
 
                     Image(systemName: "camera.fill")
                         .font(.system(size: 13, weight: .bold))
@@ -396,6 +401,7 @@ struct ProfileFormView: View {
                 .textInputAutocapitalization(.words)
                 .submitLabel(.done)
         }
+        .filledFieldHighlight(highlightedFields.contains(.name))
     }
 
     private var namePlaceholder: String {
@@ -521,6 +527,7 @@ struct ProfileFormView: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
         }
+        .filledFieldHighlight(highlightedFields.contains(.date))
     }
 
     private var dateHint: String {
@@ -644,6 +651,7 @@ struct ProfileFormView: View {
                 capitalization: .never
             )
         }
+        .filledFieldHighlight(highlightedFields.contains(.contact))
     }
 
     private func contactField(
@@ -796,26 +804,68 @@ struct ProfileFormView: View {
     /// is a starting point rather than the final word. Whatever the card does
     /// not carry is left exactly as it was.
     private func fill(from candidate: ContactCandidate) {
+        var filled: Set<FilledField> = []
+
         withAnimation(.smooth(duration: 0.25)) {
-            name = candidate.givenName.isEmpty ? candidate.fullName : candidate.givenName
-            lastName = candidate.givenName.isEmpty ? "" : candidate.familyName
+            if !candidate.givenName.isEmpty {
+                name = candidate.givenName
+                // A card with a first name but no surname must not wipe a
+                // surname the user already typed in by hand.
+                if !candidate.familyName.isEmpty { lastName = candidate.familyName }
+                filled.insert(.name)
+            } else if !candidate.familyName.isEmpty {
+                // The whole name on the card is that single word.
+                name = candidate.familyName
+                lastName = ""
+                filled.insert(.name)
+            }
 
             // Without a date in the card the picker keeps whatever is on screen:
             // inventing one would be worse than leaving the field to the user.
             if candidate.hasDate {
                 birthDate = candidate.resolvedDate()
                 hasUnknownBirthYear = !candidate.hasYear
+                filled.insert(.date)
             }
 
-            if let photo = candidate.photoData { photoData = photo }
-            if !candidate.phone.isEmpty { phone = candidate.phone }
-            if !candidate.email.isEmpty { email = candidate.email }
-            if !candidate.postalAddress.isEmpty { address = candidate.postalAddress }
+            if let photo = candidate.photoData {
+                photoData = photo
+                filled.insert(.photo)
+            }
+            if !candidate.phone.isEmpty {
+                phone = candidate.phone
+                filled.insert(.contact)
+            }
+            if !candidate.email.isEmpty {
+                email = candidate.email
+                filled.insert(.contact)
+            }
+            if !candidate.postalAddress.isEmpty {
+                address = candidate.postalAddress
+                filled.insert(.contact)
+            }
 
             filledFromContactName = candidate.fullName
         }
 
         didFillFromContact.toggle()
+        flashHighlight(on: filled)
+    }
+
+    /// Outlines the cards the import just filled, then lets the glow fade.
+    private func flashHighlight(on fields: Set<FilledField>) {
+        highlightTask?.cancel()
+        guard !fields.isEmpty else {
+            highlightedFields = []
+            return
+        }
+
+        highlightedFields = fields
+        highlightTask = Task { @MainActor in
+            try? await Task.sleep(for: .seconds(1.8))
+            guard !Task.isCancelled else { return }
+            highlightedFields = []
+        }
     }
 
     private func cleaned(_ value: String) -> String {
