@@ -395,7 +395,31 @@ struct PaywallView: View {
                 .foregroundStyle(.tertiary)
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
+
+            legalLinks
         }
+    }
+
+    /// Apple requires the terms and the privacy policy to be reachable from the
+    /// paywall itself, not buried in a settings screen.
+    private var legalLinks: some View {
+        HStack(spacing: 8) {
+            if let terms = LegalLinks.terms {
+                Button(strings.paywallTermsLink) { ExternalLink.open(terms) }
+            }
+
+            if LegalLinks.terms != nil && LegalLinks.privacy != nil {
+                Text("\u{00B7}")
+                    .foregroundStyle(.quaternary)
+            }
+
+            if let privacy = LegalLinks.privacy {
+                Button(strings.paywallPrivacyLink) { ExternalLink.open(privacy) }
+            }
+        }
+        .font(.system(.caption2, design: .rounded, weight: .semibold))
+        .foregroundStyle(.secondary)
+        .padding(.top, 2)
     }
 
     // MARK: - Package wording

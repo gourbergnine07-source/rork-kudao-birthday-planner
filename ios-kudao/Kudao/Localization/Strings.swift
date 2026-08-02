@@ -229,6 +229,19 @@ nonisolated struct Strings: Sendable {
     let privacyInfoControlTitle: String
     let privacyInfoControlBody: String
     let privacyInfoFooter: String
+    let legalTitle: String
+    let legalCaption: String
+    let legalIntro: String
+    let legalPrivacyTitle: String
+    let legalPrivacyBody: String
+    let legalTermsTitle: String
+    let legalTermsBody: String
+    let legalSupportTitle: String
+    let legalSupportBody: String
+    let legalChoicesTitle: String
+    let legalChoicesBody: String
+    let legalOpensInBrowser: String
+    let legalCopyright: String
     let settingsSharingNote: String
 
     let lastNameLabel: String
@@ -787,6 +800,8 @@ nonisolated struct Strings: Sendable {
     let paywallRestoreEmptyTitle: String
     let paywallRestoreEmptyMessage: String
     let paywallTermsNote: String
+    let paywallTermsLink: String
+    let paywallPrivacyLink: String
     let paywallUnavailableTitle: String
     let paywallUnavailableMessage: String
     let paywallErrorTitle: String
@@ -1012,6 +1027,19 @@ extension Strings {
         privacyInfoControlTitle: "Sempre nelle tue mani",
         privacyInfoControlBody: "Elimini un profilo e spariscono con lui note, foto e cronologia. Disattivi il backup e la copia sul server viene rimossa. Disinstalli Kudao e sul telefono non resta nulla.",
         privacyInfoFooter: "Nessun messaggio parte da solo: l'ultimo tocco e' sempre tuo.",
+        legalTitle: "Documenti",
+        legalCaption: "Informativa, condizioni e assistenza.",
+        legalIntro: "Le pagine ufficiali di Kudao, sempre consultabili anche senza account. Si aprono nel browser.",
+        legalPrivacyTitle: "Informativa privacy",
+        legalPrivacyBody: "Il testo completo: quali dati restano sul telefono, quali viaggiano quando condividi, chi li elabora e per quanto tempo.",
+        legalTermsTitle: "Condizioni d'uso",
+        legalTermsBody: "Le regole del servizio, il funzionamento dell'abbonamento, il rinnovo automatico e come disdire.",
+        legalSupportTitle: "Assistenza",
+        legalSupportBody: "Domande frequenti e l'indirizzo a cui scrivere se qualcosa non funziona. Rispondiamo di persona.",
+        legalChoicesTitle: "Le tue scelte",
+        legalChoicesBody: "Come chiedere una copia dei tuoi dati o la loro cancellazione definitiva.",
+        legalOpensInBrowser: "Ogni documento si apre nel browser.",
+        legalCopyright: "\u{00A9} 2026 Kudao",
         settingsSharingNote: "I profili sorpresa resteranno esclusi da qualsiasi condivisione con il festeggiato.",
         lastNameLabel: "Cognome",
         lastNamePlaceholder: "Cognome (opzionale)",
@@ -1536,6 +1564,8 @@ extension Strings {
         paywallRestoreEmptyTitle: "Nessun acquisto da ripristinare",
         paywallRestoreEmptyMessage: "Su questo ID Apple non risulta un abbonamento Kudao Premium attivo.",
         paywallTermsNote: "L\u{2019}abbonamento si rinnova automaticamente finch\u{00E9} non lo annulli dalle impostazioni dell\u{2019}App Store.",
+        paywallTermsLink: "Condizioni d\u{2019}uso",
+        paywallPrivacyLink: "Informativa privacy",
         paywallUnavailableTitle: "Piani non disponibili",
         paywallUnavailableMessage: "Non riusciamo a caricare gli abbonamenti in questo momento. Riprova tra poco.",
         paywallErrorTitle: "Qualcosa non ha funzionato",
@@ -1760,6 +1790,19 @@ extension Strings {
         privacyInfoControlTitle: "Always in your hands",
         privacyInfoControlBody: "Delete a profile and its notes, photos and history go with it. Turn off backup and the server copy is removed. Uninstall Kudao and nothing is left behind.",
         privacyInfoFooter: "Nothing is ever sent on its own: the last tap is always yours.",
+        legalTitle: "Legal",
+        legalCaption: "Policy, terms and support.",
+        legalIntro: "The official Kudao pages, readable without an account. They open in your browser.",
+        legalPrivacyTitle: "Privacy Policy",
+        legalPrivacyBody: "The full text: what stays on your phone, what travels when you share, who processes it and for how long.",
+        legalTermsTitle: "Terms of Use",
+        legalTermsBody: "The rules of the service, how the subscription works, automatic renewal and how to cancel.",
+        legalSupportTitle: "Support",
+        legalSupportBody: "Common questions and the address to write to when something breaks. A person answers.",
+        legalChoicesTitle: "Your choices",
+        legalChoicesBody: "How to request a copy of your data, or have it deleted for good.",
+        legalOpensInBrowser: "Each document opens in your browser.",
+        legalCopyright: "\u{00A9} 2026 Kudao",
         settingsSharingNote: "Surprise profiles will stay out of any sharing with the birthday person.",
         lastNameLabel: "Last name",
         lastNamePlaceholder: "Last name (optional)",
@@ -2284,6 +2327,8 @@ extension Strings {
         paywallRestoreEmptyTitle: "Nothing to restore",
         paywallRestoreEmptyMessage: "This Apple ID has no active Kudao Premium subscription.",
         paywallTermsNote: "The subscription renews automatically until you cancel it in your App Store settings.",
+        paywallTermsLink: "Terms of Use",
+        paywallPrivacyLink: "Privacy Policy",
         paywallUnavailableTitle: "Plans unavailable",
         paywallUnavailableMessage: "We can\u{2019}t load the subscriptions right now. Please try again shortly.",
         paywallErrorTitle: "Something went wrong",
@@ -2508,6 +2553,19 @@ extension Strings {
         privacyInfoControlTitle: "Toujours entre vos mains",
         privacyInfoControlBody: "Supprimez un profil et ses notes, photos et historique partent avec lui. Désactivez la sauvegarde et la copie sur le serveur est effacée. Désinstallez Kudao et il ne reste rien.",
         privacyInfoFooter: "Rien ne part tout seul : le dernier geste est toujours le vôtre.",
+        legalTitle: "Documents",
+        legalCaption: "Confidentialité, conditions et assistance.",
+        legalIntro: "Les pages officielles de Kudao, consultables sans compte. Elles s'ouvrent dans le navigateur.",
+        legalPrivacyTitle: "Politique de confidentialité",
+        legalPrivacyBody: "Le texte complet : ce qui reste sur votre téléphone, ce qui circule quand vous partagez, qui le traite et pendant combien de temps.",
+        legalTermsTitle: "Conditions d'utilisation",
+        legalTermsBody: "Les règles du service, le fonctionnement de l'abonnement, le renouvellement automatique et la résiliation.",
+        legalSupportTitle: "Assistance",
+        legalSupportBody: "Les questions fréquentes et l'adresse où écrire si quelque chose ne va pas. Une personne vous répond.",
+        legalChoicesTitle: "Vos choix",
+        legalChoicesBody: "Comment demander une copie de vos données ou leur suppression définitive.",
+        legalOpensInBrowser: "Chaque document s'ouvre dans le navigateur.",
+        legalCopyright: "\u{00A9} 2026 Kudao",
         settingsSharingNote: "Les profils surprise resteront exclus de tout partage avec la personne fêtée.",
         lastNameLabel: "Nom",
         lastNamePlaceholder: "Nom (facultatif)",
@@ -3032,6 +3090,8 @@ extension Strings {
         paywallRestoreEmptyTitle: "Rien \u{00E0} restaurer",
         paywallRestoreEmptyMessage: "Aucun abonnement Kudao Premium actif sur cet identifiant Apple.",
         paywallTermsNote: "L\u{2019}abonnement se renouvelle automatiquement jusqu\u{2019}\u{00E0} son annulation dans les r\u{00E9}glages de l\u{2019}App Store.",
+        paywallTermsLink: "Conditions d\u{2019}utilisation",
+        paywallPrivacyLink: "Politique de confidentialit\u{00E9}",
         paywallUnavailableTitle: "Formules indisponibles",
         paywallUnavailableMessage: "Impossible de charger les abonnements pour le moment. R\u{00E9}essayez dans un instant.",
         paywallErrorTitle: "Un probl\u{00E8}me est survenu",
@@ -3256,6 +3316,19 @@ extension Strings {
         privacyInfoControlTitle: "Siempre en tus manos",
         privacyInfoControlBody: "Borras un perfil y se van con él sus notas, fotos e historial. Desactivas la copia de seguridad y se elimina la copia del servidor. Desinstalas Kudao y no queda nada.",
         privacyInfoFooter: "Nada se envía solo: el último toque siempre es tuyo.",
+        legalTitle: "Documentos",
+        legalCaption: "Privacidad, condiciones y ayuda.",
+        legalIntro: "Las páginas oficiales de Kudao, disponibles sin cuenta. Se abren en el navegador.",
+        legalPrivacyTitle: "Política de privacidad",
+        legalPrivacyBody: "El texto completo: qué se queda en tu teléfono, qué viaja cuando compartes, quién lo trata y durante cuánto tiempo.",
+        legalTermsTitle: "Condiciones de uso",
+        legalTermsBody: "Las reglas del servicio, cómo funciona la suscripción, la renovación automática y cómo cancelarla.",
+        legalSupportTitle: "Ayuda",
+        legalSupportBody: "Preguntas frecuentes y la dirección a la que escribir si algo falla. Contesta una persona.",
+        legalChoicesTitle: "Tus opciones",
+        legalChoicesBody: "Cómo pedir una copia de tus datos o su eliminación definitiva.",
+        legalOpensInBrowser: "Cada documento se abre en el navegador.",
+        legalCopyright: "\u{00A9} 2026 Kudao",
         settingsSharingNote: "Los perfiles sorpresa quedarán fuera de cualquier compartición con la persona homenajeada.",
         lastNameLabel: "Apellido",
         lastNamePlaceholder: "Apellido (opcional)",
@@ -3780,6 +3853,8 @@ extension Strings {
         paywallRestoreEmptyTitle: "No hay nada que restaurar",
         paywallRestoreEmptyMessage: "Este ID de Apple no tiene ninguna suscripci\u{00F3}n Kudao Premium activa.",
         paywallTermsNote: "La suscripci\u{00F3}n se renueva autom\u{00E1}ticamente hasta que la canceles en los ajustes de la App Store.",
+        paywallTermsLink: "Condiciones de uso",
+        paywallPrivacyLink: "Pol\u{00ED}tica de privacidad",
         paywallUnavailableTitle: "Planes no disponibles",
         paywallUnavailableMessage: "No podemos cargar las suscripciones ahora mismo. Int\u{00E9}ntalo de nuevo en un momento.",
         paywallErrorTitle: "Algo no ha funcionado",

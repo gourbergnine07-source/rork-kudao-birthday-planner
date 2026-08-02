@@ -1,0 +1,202 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+  Kudao design system.
+
+  The website has to feel like the app: warm paper, coral ink, generous space.
+  All colors are HSL so shadcn components inherit them correctly.
+*/
+
+@layer base {
+  :root {
+    /* Warm paper, not white */
+    --background: 33 46% 96%;
+    --foreground: 20 26% 16%;
+
+    --card: 36 60% 99%;
+    --card-foreground: 20 26% 16%;
+
+    --popover: 36 60% 99%;
+    --popover-foreground: 20 26% 16%;
+
+    /* Kudao coral */
+    --primary: 9 79% 61%;
+    --primary-foreground: 36 100% 98%;
+
+    --secondary: 30 40% 92%;
+    --secondary-foreground: 20 26% 16%;
+
+    --muted: 30 33% 92%;
+    --muted-foreground: 22 12% 42%;
+
+    --accent: 24 74% 92%;
+    --accent-foreground: 12 60% 32%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 36 100% 98%;
+
+    --border: 28 28% 87%;
+    --input: 28 28% 87%;
+    --ring: 9 79% 61%;
+
+    --radius: 1rem;
+
+    /* Extra Kudao tones used by hand-written classes */
+    --clay: 18 58% 52%;
+    --amber: 38 88% 55%;
+    --plum: 330 32% 34%;
+    --sage: 150 22% 44%;
+    --ink-soft: 22 14% 34%;
+
+    --sidebar-background: 33 46% 96%;
+    --sidebar-foreground: 20 26% 16%;
+    --sidebar-primary: 9 79% 61%;
+    --sidebar-primary-foreground: 36 100% 98%;
+    --sidebar-accent: 24 74% 92%;
+    --sidebar-accent-foreground: 12 60% 32%;
+    --sidebar-border: 28 28% 87%;
+    --sidebar-ring: 9 79% 61%;
+  }
+
+  .dark {
+    --background: 20 22% 10%;
+    --foreground: 33 40% 94%;
+
+    --card: 20 20% 14%;
+    --card-foreground: 33 40% 94%;
+
+    --popover: 20 20% 14%;
+    --popover-foreground: 33 40% 94%;
+
+    --primary: 9 79% 63%;
+    --primary-foreground: 20 30% 10%;
+
+    --secondary: 20 14% 20%;
+    --secondary-foreground: 33 40% 94%;
+
+    --muted: 20 14% 20%;
+    --muted-foreground: 30 12% 66%;
+
+    --accent: 14 34% 24%;
+    --accent-foreground: 24 80% 84%;
+
+    --destructive: 0 62% 46%;
+    --destructive-foreground: 33 40% 94%;
+
+    --border: 20 14% 24%;
+    --input: 20 14% 24%;
+    --ring: 9 79% 63%;
+
+    --clay: 18 62% 62%;
+    --amber: 38 88% 62%;
+    --plum: 330 34% 62%;
+    --sage: 150 24% 58%;
+    --ink-soft: 30 12% 72%;
+
+    --sidebar-background: 20 22% 10%;
+    --sidebar-foreground: 33 40% 94%;
+    --sidebar-primary: 9 79% 63%;
+    --sidebar-primary-foreground: 20 30% 10%;
+    --sidebar-accent: 14 34% 24%;
+    --sidebar-accent-foreground: 24 80% 84%;
+    --sidebar-border: 20 14% 24%;
+    --sidebar-ring: 9 79% 63%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: "Karla", ui-sans-serif, system-ui, -apple-system, sans-serif;
+    font-feature-settings: "kern", "liga";
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: "Fraunces", ui-serif, Georgia, serif;
+    font-optical-sizing: auto;
+  }
+
+  ::selection {
+    background: hsl(var(--primary) / 0.24);
+  }
+}
+
+@layer components {
+  /* The soft grain that keeps large warm areas from looking flat. */
+  .paper-grain {
+    position: relative;
+  }
+
+  .paper-grain::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.035;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* Readable long-form legal copy. */
+  .legal-prose {
+    @apply text-[0.975rem] leading-relaxed text-foreground/80;
+  }
+
+  .legal-prose h2 {
+    @apply mb-3 mt-11 text-[1.35rem] font-semibold tracking-tight text-foreground;
+  }
+
+  .legal-prose h3 {
+    @apply mb-2 mt-7 text-[1.05rem] font-semibold text-foreground;
+    font-family: "Karla", sans-serif;
+  }
+
+  .legal-prose p {
+    @apply mb-4;
+  }
+
+  .legal-prose ul {
+    @apply mb-5 space-y-2 pl-1;
+  }
+
+  .legal-prose li {
+    @apply relative pl-5;
+  }
+
+  .legal-prose li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.62em;
+    width: 0.375rem;
+    height: 0.375rem;
+    border-radius: 9999px;
+    background: hsl(var(--primary) / 0.55);
+  }
+
+  .legal-prose strong {
+    @apply font-semibold text-foreground;
+  }
+
+  .legal-prose a {
+    @apply font-medium text-primary underline decoration-primary/30 underline-offset-4 transition-colors hover:decoration-primary;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}

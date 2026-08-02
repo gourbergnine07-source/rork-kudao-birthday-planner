@@ -27,6 +27,7 @@ struct AppSettingsView: View {
     @State private var isShowingMyProfile: Bool = false
     @State private var isEditingNotifications: Bool = false
     @State private var isShowingPrivacyInfo: Bool = false
+    @State private var isShowingLegal: Bool = false
 
     private var strings: Strings { settings.strings }
 
@@ -43,6 +44,7 @@ struct AppSettingsView: View {
                         backupCard
                         surpriseCard
                         privacyInfoCard
+                        legalCard
                         widgetCard
                     }
                     .padding(.horizontal, 20)
@@ -77,6 +79,9 @@ struct AppSettingsView: View {
             }
             .sheet(isPresented: $isShowingPrivacyInfo) {
                 PrivacyInfoView()
+            }
+            .sheet(isPresented: $isShowingLegal) {
+                LegalView()
             }
             #if DEBUG
             .sheet(isPresented: $isShowingPurchaseDebug) {
@@ -466,6 +471,45 @@ struct AppSettingsView: View {
                             .font(.system(.body, design: .rounded, weight: .semibold))
                             .foregroundStyle(.primary)
                         Text(strings.privacyInfoCaption)
+                            .font(.system(.caption2, design: .rounded))
+                            .foregroundStyle(.tertiary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+
+                    Spacer(minLength: 0)
+
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 11, weight: .heavy))
+                        .foregroundStyle(.tertiary)
+                }
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+        }
+    }
+
+    // MARK: - Legal
+
+    /// The published policy, terms and support pages, reachable without an account.
+    private var legalCard: some View {
+        AppSettingsCard(
+            title: strings.legalTitle,
+            systemImage: "checkmark.seal.fill",
+            tint: Palette.violet
+        ) {
+            Button {
+                isShowingLegal = true
+            } label: {
+                HStack(spacing: 10) {
+                    Image(systemName: "doc.on.doc.fill")
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(Palette.violet)
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(strings.legalTitle)
+                            .font(.system(.body, design: .rounded, weight: .semibold))
+                            .foregroundStyle(.primary)
+                        Text(strings.legalCaption)
                             .font(.system(.caption2, design: .rounded))
                             .foregroundStyle(.tertiary)
                             .fixedSize(horizontal: false, vertical: true)
