@@ -119,7 +119,12 @@ final class AuthService {
         }
     }
 
-    /// Creates an account. Supabase may require the address to be confirmed first.
+    /// Creates an account and signs straight in.
+    ///
+    /// The account is made by the `account` edge function, already confirmed, so
+    /// nobody has to chase a link in their inbox. Only if that endpoint cannot be
+    /// reached does this fall back to Supabase's own sign-up, which does send a
+    /// confirmation email.
     func signUp(email rawEmail: String, password: String, strings: Strings) async -> AuthOutcome? {
         guard let client = SupabaseBackend.client else {
             errorMessage = strings.authUnavailableMessage
@@ -141,6 +146,55 @@ final class AuthService {
         clearNotices()
         defer { isWorking = false }
 
+        do {
+            try await AccountClient.createAccount(email: address, password: password)
+        } catch let error as AccountSignUpError {
+            switch error {
+            case .alreadyRegistered:
+                errorMessage = strings.authEmailTakenMessage
+                return nil
+            case .invalidEmail:
+                errorMessage = strings.authInvalidEmailMessage
+                return nil
+            case .weakPassword:
+                errorMessage = String(format: strings.authWeakPasswordFormat, Self.minimumPasswordLength)
+                return nil
+            case .offline:
+                errorMessage = strings.authOfflineMessage
+                return nil
+            case .unavailable, .server:
+                logger.error("Account endpoint unusable, falling back to Supabase sign-up")
+                return await legacySignUp(
+                    client: client,
+                    address: address,
+                    password: password,
+                    strings: strings
+                )
+            }
+        } catch {
+            errorMessage = message(for: error, strings: strings)
+            return nil
+        }
+
+        // The address is confirmed the moment it is created, so the password
+        // works right away and the user never has to leave the app.
+        do {
+            let session = try await client.auth.signIn(email: address, password: password)
+            user = session.user
+            return .signedIn
+        } catch {
+            errorMessage = message(for: error, strings: strings)
+            return nil
+        }
+    }
+
+    /// Supabase's own sign-up, kept only for when the edge function is unreachable.
+    private func legacySignUp(
+        client: SupabaseClient,
+        address: String,
+        password: String,
+        strings: Strings
+    ) async -> AuthOutcome? {
         do {
             let response = try await client.auth.signUp(email: address, password: password)
             if let session = response.session {
