@@ -3,8 +3,9 @@
 //  Kudao
 //
 
-import SwiftUI
+import ContactsUI
 import SwiftData
+import SwiftUI
 
 /// Create or edit a celebration profile.
 ///
@@ -38,8 +39,12 @@ struct ProfileFormView: View {
     @State private var favoriteCharacter: String = ""
     @State private var isSurpriseMode: Bool = false
     @State private var photoData: Data?
+    /// Set when a picked contact only had a day and a month.
+    @State private var hasUnknownBirthYear: Bool = false
     @State private var didSave: Bool = false
     @State private var isShowingPaywall: Bool = false
+    @State private var isPickingContact: Bool = false
+    @State private var didFillFromContact: Bool = false
 
     private var strings: Strings { settings.strings }
     private var isEditing: Bool { profile != nil }
@@ -108,6 +113,13 @@ struct ProfileFormView: View {
             .sheet(isPresented: $isShowingPaywall) {
                 PaywallView()
             }
+            .sheet(isPresented: $isPickingContact) {
+                ContactPicker { candidate in
+                    fill(from: candidate)
+                }
+                .ignoresSafeArea()
+            }
+            .sensoryFeedback(.success, trigger: didFillFromContact)
             .environment(\.locale, settings.locale)
         }
         .tint(accent)
@@ -361,6 +373,34 @@ struct ProfileFormView: View {
 
     private var nameCard: some View {
         FormCard(title: strings.nameLabel, systemImage: "person.text.rectangle") {
+            // A birthday almost always belongs to somebody already in the phone.
+            if occasion == .birthday && !isEditing {
+                Button {
+                    isPickingContact = true
+                } label: {
+                    HStack(spacing: 7) {
+                        Image(systemName: "person.crop.circle.badge.plus")
+                            .font(.system(size: 12, weight: .bold))
+                        Text(strings.contactsFillFromContactAction)
+                            .font(.system(size: 13, weight: .bold, design: .rounded))
+                        Spacer(minLength: 0)
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 10, weight: .heavy))
+                            .foregroundStyle(.tertiary)
+                    }
+                    .foregroundStyle(accent)
+                    .padding(.horizontal, 11)
+                    .padding(.vertical, 9)
+                    .background(
+                        RoundedRectangle(cornerRadius: 13, style: .continuous)
+                            .fill(accent.opacity(0.1))
+                    )
+                }
+                .buttonStyle(PressableCardStyle())
+
+                Divider().overlay(Palette.hairline)
+            }
+
             TextField(namePlaceholder, text: $name)
                 .font(.system(.body, design: .rounded, weight: .medium))
                 .textContentType(.givenName)
@@ -419,8 +459,15 @@ struct ProfileFormView: View {
             .datePickerStyle(.compact)
             .tint(accent)
             .frame(maxWidth: .infinity, alignment: .leading)
+            // Touching the picker means the year is now deliberate.
+            .onChange(of: birthDate) { _, _ in hasUnknownBirthYear = false }
 
-            if occasion.wantsAgeBracket {
+            if hasUnknownBirthYear {
+                Text(strings.contactsImportNoYearNote)
+                    .font(.system(.caption2, design: .rounded))
+                    .foregroundStyle(.tertiary)
+                    .fixedSize(horizontal: false, vertical: true)
+            } else if occasion.wantsAgeBracket {
                 HStack(spacing: 7) {
                     Text(strings.ageBracketLabel)
                         .font(.system(.caption, design: .rounded))
@@ -646,6 +693,7 @@ struct ProfileFormView: View {
         favoriteCharacter = profile.favoriteCharacter
         isSurpriseMode = profile.isSurpriseMode
         photoData = profile.photoData
+        hasUnknownBirthYear = profile.hasUnknownBirthYear
         hasPickedOccasion = true
     }
 
@@ -672,6 +720,7 @@ struct ProfileFormView: View {
             profile.favoriteCharacter = character
             profile.isSurpriseMode = surprise
             profile.photoData = photoData
+            profile.hasUnknownBirthYear = hasUnknownBirthYear
             saved = profile
         } else {
             let newProfile = BirthdayProfile(
@@ -687,7 +736,8 @@ struct ProfileFormView: View {
                 isSurpriseMode: surprise,
                 occasion: occasion,
                 isSelfProfile: isSelfProfile,
-                bond: bond
+                bond: bond,
+                hasUnknownBirthYear: hasUnknownBirthYear
             )
             // A new celebration inherits the lead times chosen for its category.
             newProfile.reminderDaysBefore = settings.reminderDays(for: occasion)
@@ -703,6 +753,21 @@ struct ProfileFormView: View {
 
         didSave = true
         dismiss()
+    }
+
+    /// Copies a picked contact into the form without saving anything yet.
+    ///
+    /// Every field stays editable afterwards: the address book is a starting
+    /// point, not the final word.
+    private func fill(from candidate: ContactCandidate) {
+        name = candidate.givenName.isEmpty ? candidate.fullName : candidate.givenName
+        lastName = candidate.givenName.isEmpty ? "" : candidate.familyName
+        birthDate = candidate.resolvedDate()
+        hasUnknownBirthYear = !candidate.hasYear
+        if candidate.photoData != nil { photoData = candidate.photoData }
+        if !candidate.phone.isEmpty { phone = candidate.phone }
+        if !candidate.email.isEmpty { email = candidate.email }
+        didFillFromContact.toggle()
     }
 
     private func cleaned(_ value: String) -> String {

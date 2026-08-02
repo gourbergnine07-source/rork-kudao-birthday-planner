@@ -117,10 +117,12 @@ struct HeroProfileCard: View {
                     Label(settings.weekdayDayMonth(countdown.nextDate), systemImage: "calendar")
                         .font(.system(.footnote, design: .rounded, weight: .semibold))
                     Spacer(minLength: 0)
-                    Label(milestoneLabel, systemImage: occasion.symbolName)
-                        .font(.system(.footnote, design: .rounded, weight: .semibold))
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.8)
+                    if let milestoneLabel {
+                        Label(milestoneLabel, systemImage: occasion.symbolName)
+                            .font(.system(.footnote, design: .rounded, weight: .semibold))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
+                    }
                 }
                 .foregroundStyle(.white.opacity(0.92))
                 .padding(.top, 2)
@@ -170,7 +172,11 @@ struct HeroProfileCard: View {
     }
 
     /// "Compie 34 anni" / "34 anni insieme" / "34 anni fa".
-    private var milestoneLabel: String {
+    ///
+    /// Nil when the profile came from an address book that never stored the
+    /// year: the countdown is still right, the age simply is not known.
+    private var milestoneLabel: String? {
+        guard profile.showsAge else { return nil }
         let years = countdown.turningAge
         switch occasion {
         case .birthday:

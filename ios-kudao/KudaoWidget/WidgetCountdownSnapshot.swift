@@ -16,6 +16,11 @@ nonisolated struct WidgetCountdownEntry: Codable, Sendable, Equatable {
     let birthDate: Date
     let isMasked: Bool
     let relationshipRaw: String
+    /// Optional so a snapshot written by an older build still decodes.
+    let hidesAge: Bool?
+
+    /// True when the app knows the birth year and an age can be shown.
+    var showsAge: Bool { hidesAge != true }
 }
 
 nonisolated struct WidgetCountdownSnapshot: Codable, Sendable, Equatable {

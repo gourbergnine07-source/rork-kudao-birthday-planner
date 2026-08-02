@@ -46,6 +46,12 @@ final class BirthdayProfile {
     var favoriteCharacter: String = ""
     var isSurpriseMode: Bool = false
     var createdAt: Date = Date()
+    /// True when the date only really carries a day and a month.
+    ///
+    /// Address books very often store a birthday without its year. The profile
+    /// still needs a real date to count down from, so the year is a placeholder
+    /// and this flag stops the app from ever showing an invented age.
+    var hasUnknownBirthYear: Bool = false
 
     // MARK: Reminders
 
@@ -114,7 +120,8 @@ final class BirthdayProfile {
         ownerUserID: String? = nil,
         occasion: OccasionKind = .birthday,
         isSelfProfile: Bool = false,
-        bond: BondKind = .other
+        bond: BondKind = .other,
+        hasUnknownBirthYear: Bool = false
     ) {
         self.id = UUID()
         self.name = name
@@ -131,6 +138,7 @@ final class BirthdayProfile {
         self.occasionRaw = occasion.rawValue
         self.isSelfProfile = isSelfProfile
         self.bondRaw = bond.rawValue
+        self.hasUnknownBirthYear = hasUnknownBirthYear
         self.createdAt = Date()
     }
 
@@ -189,6 +197,9 @@ final class BirthdayProfile {
         let years = Calendar.current.dateComponents([.year], from: birthDate, to: Date()).year ?? 0
         return max(0, years)
     }
+
+    /// True when an age or a number of years can honestly be shown.
+    var showsAge: Bool { !hasUnknownBirthYear }
 
     /// Life stage derived from the birth date; never edited by hand.
     ///

@@ -17,6 +17,8 @@ nonisolated struct WidgetCountdownEntry: Codable, Sendable, Equatable {
     let birthDate: Date
     let isMasked: Bool
     let relationshipRaw: String
+    /// Optional so a snapshot written by an older build still decodes.
+    let hidesAge: Bool?
 }
 
 /// Payload written into the App Group container and read back by the widget.
@@ -59,7 +61,8 @@ nonisolated enum WidgetBridge {
                     initials: hidden ? "?" : profile.initials,
                     birthDate: profile.birthDate,
                     isMasked: hidden,
-                    relationshipRaw: profile.relationshipRaw
+                    relationshipRaw: profile.relationshipRaw,
+                    hidesAge: profile.hasUnknownBirthYear
                 )
             }
 

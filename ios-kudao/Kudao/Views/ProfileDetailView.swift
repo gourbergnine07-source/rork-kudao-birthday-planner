@@ -742,10 +742,16 @@ struct ProfileDetailView: View {
             StatTile(
                 icon: statElapsedSymbol,
                 caption: occasion.elapsedStatLabel(strings),
-                value: String(format: strings.ageYearsFormat, profile.currentAge),
+                value: elapsedStatValue,
                 tint: occasion == .remembrance ? Palette.sage : Palette.berry
             )
         }
+    }
+
+    /// The years elapsed, or a dash when the address book never stored a year.
+    private var elapsedStatValue: String {
+        guard profile.showsAge else { return strings.unknownYearShort }
+        return String(format: strings.ageYearsFormat, profile.currentAge)
     }
 
     private var statDateSymbol: String {

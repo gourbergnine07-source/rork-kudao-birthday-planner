@@ -42,7 +42,8 @@ nonisolated struct CountdownEntry: TimelineEntry {
                         initials: "G",
                         birthDate: Calendar.current.date(byAdding: .day, value: 12, to: reference) ?? reference,
                         isMasked: false,
-                        relationshipRaw: "friend"
+                        relationshipRaw: "friend",
+                        hidesAge: false
                     )
                 ]
             )
@@ -216,8 +217,11 @@ nonisolated struct MediumCountdownView: View {
                         Image(systemName: "birthday.cake.fill")
                             .font(.system(size: 10, weight: .bold))
                         Text(lead.countdown.nextDate, format: dayMonth(entry.snapshot.languageCode))
-                        Text("·")
-                        Text(String(format: entry.strings.turnsFormat, lead.countdown.turningAge))
+                        // Contacts imported without a birth year have no age to show.
+                        if lead.entry.showsAge {
+                            Text("·")
+                            Text(String(format: entry.strings.turnsFormat, lead.countdown.turningAge))
+                        }
                     }
                     .font(.system(.caption2, design: .rounded, weight: .semibold))
                     .foregroundStyle(.white.opacity(0.9))

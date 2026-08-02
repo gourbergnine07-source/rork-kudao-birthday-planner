@@ -134,6 +134,7 @@ struct HomeView: View {
     /// Profile named by a diary invitation, opened straight in the quick composer.
     @State private var quickNoteTarget: QuickNoteTarget?
     @State private var isShowingSettings: Bool = false
+    @State private var isImportingContacts: Bool = false
     @State private var isShowingMyProfile: Bool = false
     @State private var isJoiningShare: Bool = false
     @State private var unlockFailed: Bool = false
@@ -227,6 +228,9 @@ struct HomeView: View {
             }
             .sheet(isPresented: $isShowingSettings) {
                 AppSettingsView()
+            }
+            .sheet(isPresented: $isImportingContacts) {
+                ContactsImportView()
             }
             .sheet(isPresented: $isShowingMyProfile) {
                 MyProfileView()
@@ -448,18 +452,34 @@ struct HomeView: View {
                     .multilineTextAlignment(.center)
             }
 
-            Button {
-                startCreating(nil)
-            } label: {
-                Label(strings.emptyAction, systemImage: "plus")
-                    .font(.system(.headline, design: .rounded, weight: .semibold))
-                    .foregroundStyle(.white)
-                    .padding(.horizontal, 22)
-                    .padding(.vertical, 14)
-                    .background(Capsule().fill(Palette.warmGradient))
-                    .shadow(color: Palette.coral.opacity(0.35), radius: 14, y: 8)
+            VStack(spacing: 12) {
+                Button {
+                    startCreating(nil)
+                } label: {
+                    Label(strings.emptyAction, systemImage: "plus")
+                        .font(.system(.headline, design: .rounded, weight: .semibold))
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 22)
+                        .padding(.vertical, 14)
+                        .background(Capsule().fill(Palette.warmGradient))
+                        .shadow(color: Palette.coral.opacity(0.35), radius: 14, y: 8)
+                }
+                .buttonStyle(PressableCardStyle())
+
+                // The fastest way to go from an empty app to a full one.
+                Button {
+                    isImportingContacts = true
+                } label: {
+                    Label(strings.contactsImportAction, systemImage: "person.crop.circle.badge.plus")
+                        .font(.system(.subheadline, design: .rounded, weight: .semibold))
+                        .foregroundStyle(Palette.coral)
+                        .padding(.horizontal, 18)
+                        .padding(.vertical, 11)
+                        .background(Capsule().fill(Palette.surface))
+                        .overlay(Capsule().strokeBorder(Palette.coral.opacity(0.35), lineWidth: 1))
+                }
+                .buttonStyle(PressableCardStyle())
             }
-            .buttonStyle(PressableCardStyle())
         }
         .padding(.horizontal, 36)
     }
@@ -480,9 +500,23 @@ struct HomeView: View {
         isCreatingProfile = true
     }
 
+    /// Tapping creates a profile by hand; holding offers the address book too.
+    ///
+    /// A plain tap keeps doing the obvious thing, so the shortcut never gets in
+    /// the way of the primary action.
     private var addButton: some View {
-        Button {
-            startCreating(nil)
+        Menu {
+            Button {
+                startCreating(nil)
+            } label: {
+                Label(strings.newProfileTitle, systemImage: "plus")
+            }
+
+            Button {
+                isImportingContacts = true
+            } label: {
+                Label(strings.contactsImportAction, systemImage: "person.crop.circle.badge.plus")
+            }
         } label: {
             Image(systemName: "plus")
                 .font(.system(size: 22, weight: .bold))
@@ -490,6 +524,8 @@ struct HomeView: View {
                 .frame(width: 60, height: 60)
                 .background(Circle().fill(Palette.warmGradient))
                 .shadow(color: Palette.coral.opacity(0.42), radius: 16, y: 8)
+        } primaryAction: {
+            startCreating(nil)
         }
         .buttonStyle(PressableCardStyle())
         .accessibilityLabel(strings.newProfileTitle)
