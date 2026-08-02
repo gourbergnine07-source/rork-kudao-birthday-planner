@@ -47,7 +47,39 @@ struct ContactsImportView: View {
 
     private var filtered: [ContactCandidate] {
         guard !query.isEmpty else { return allCandidates }
-        return allCandidates.filter { $0.fullName.localizedStandardContains(query) }
+        let needle = query
+        return allCandidates.filter { matches($0, query: needle) }
+    }
+
+    /// A contact matches on their name or on any way of writing their date.
+    ///
+    /// People look for a birthday in whichever form they hold it in their head —
+    /// "Marco", "giugno", "12/06", "1990" — so all of them are accepted rather
+    /// than forcing one canonical format.
+    private func matches(_ candidate: ContactCandidate, query: String) -> Bool {
+        if candidate.fullName.localizedStandardContains(query) { return true }
+        return dateTokens(for: candidate).contains { $0.localizedStandardContains(query) }
+    }
+
+    /// Every written form of a contact's date that a search could plausibly use.
+    private func dateTokens(for candidate: ContactCandidate) -> [String] {
+        let date = candidate.resolvedDate()
+        var tokens: [String] = [settings.dayMonth(date)]
+
+        let parts = Calendar.current.dateComponents([.day, .month, .year], from: date)
+        if let day = parts.day, let month = parts.month {
+            tokens.append("\(day)/\(month)")
+            tokens.append(String(format: "%02d/%02d", day, month))
+            tokens.append(String(format: "%02d-%02d", day, month))
+            tokens.append(String(format: "%02d.%02d", day, month))
+        }
+
+        if candidate.hasYear {
+            tokens.append(settings.dayMonthYear(date))
+            if let year = parts.year { tokens.append("\(year)") }
+        }
+
+        return tokens
     }
 
     /// Contacts that would create something new, and the ones already covered.
@@ -197,7 +229,7 @@ struct ContactsImportView: View {
                 header
 
                 SearchField(
-                    placeholder: strings.searchPlaceholder,
+                    placeholder: strings.contactsSearchPlaceholder,
                     clearLabel: strings.searchClear,
                     text: $searchText
                 )

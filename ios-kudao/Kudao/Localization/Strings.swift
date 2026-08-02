@@ -242,6 +242,15 @@ nonisolated struct Strings: Sendable {
     let legalChoicesBody: String
     let legalOpensInBrowser: String
     let legalCopyright: String
+    let faqTitle: String
+    let faqCaption: String
+    let faqIntro: String
+    let faqSearchPlaceholder: String
+    let faqCountFormat: String
+    let faqHelpTitle: String
+    let faqHelpBody: String
+    let faqHelpAction: String
+    let contactsSearchPlaceholder: String
     let settingsSharingNote: String
 
     let lastNameLabel: String
@@ -1039,7 +1048,16 @@ extension Strings {
         legalChoicesTitle: "Le tue scelte",
         legalChoicesBody: "Come chiedere una copia dei tuoi dati o la loro cancellazione definitiva.",
         legalOpensInBrowser: "Ogni documento si apre nel browser.",
-        legalCopyright: "\u{00A9} 2026 Kudao",
+        legalCopyright: "@2026 Kudao",
+        faqTitle: "Domande frequenti",
+        faqCaption: "Le risposte alle domande piu' comuni.",
+        faqIntro: "Tocca una domanda per aprire la risposta.",
+        faqSearchPlaceholder: "Cerca tra le domande",
+        faqCountFormat: "%d domande",
+        faqHelpTitle: "Non hai trovato la risposta?",
+        faqHelpBody: "Scrivici: risponde una persona, di solito entro tre giorni lavorativi.",
+        faqHelpAction: "Contatta l'assistenza",
+        contactsSearchPlaceholder: "Cerca per nome o data",
         settingsSharingNote: "I profili sorpresa resteranno esclusi da qualsiasi condivisione con il festeggiato.",
         lastNameLabel: "Cognome",
         lastNamePlaceholder: "Cognome (opzionale)",
@@ -1802,7 +1820,16 @@ extension Strings {
         legalChoicesTitle: "Your choices",
         legalChoicesBody: "How to request a copy of your data, or have it deleted for good.",
         legalOpensInBrowser: "Each document opens in your browser.",
-        legalCopyright: "\u{00A9} 2026 Kudao",
+        legalCopyright: "@2026 Kudao",
+        faqTitle: "Frequently asked questions",
+        faqCaption: "Answers to what people ask most.",
+        faqIntro: "Tap a question to open the answer.",
+        faqSearchPlaceholder: "Search the questions",
+        faqCountFormat: "%d questions",
+        faqHelpTitle: "Still stuck?",
+        faqHelpBody: "Write to us: a person answers, usually within three working days.",
+        faqHelpAction: "Contact support",
+        contactsSearchPlaceholder: "Search by name or date",
         settingsSharingNote: "Surprise profiles will stay out of any sharing with the birthday person.",
         lastNameLabel: "Last name",
         lastNamePlaceholder: "Last name (optional)",
@@ -2565,7 +2592,16 @@ extension Strings {
         legalChoicesTitle: "Vos choix",
         legalChoicesBody: "Comment demander une copie de vos données ou leur suppression définitive.",
         legalOpensInBrowser: "Chaque document s'ouvre dans le navigateur.",
-        legalCopyright: "\u{00A9} 2026 Kudao",
+        legalCopyright: "@2026 Kudao",
+        faqTitle: "Questions fréquentes",
+        faqCaption: "Les réponses aux questions les plus courantes.",
+        faqIntro: "Touchez une question pour ouvrir la réponse.",
+        faqSearchPlaceholder: "Rechercher dans les questions",
+        faqCountFormat: "%d questions",
+        faqHelpTitle: "Vous ne trouvez pas la réponse ?",
+        faqHelpBody: "Écrivez-nous : une personne vous répond, en général sous trois jours ouvrés.",
+        faqHelpAction: "Contacter l'assistance",
+        contactsSearchPlaceholder: "Rechercher par nom ou date",
         settingsSharingNote: "Les profils surprise resteront exclus de tout partage avec la personne fêtée.",
         lastNameLabel: "Nom",
         lastNamePlaceholder: "Nom (facultatif)",
@@ -3328,7 +3364,16 @@ extension Strings {
         legalChoicesTitle: "Tus opciones",
         legalChoicesBody: "Cómo pedir una copia de tus datos o su eliminación definitiva.",
         legalOpensInBrowser: "Cada documento se abre en el navegador.",
-        legalCopyright: "\u{00A9} 2026 Kudao",
+        legalCopyright: "@2026 Kudao",
+        faqTitle: "Preguntas frecuentes",
+        faqCaption: "Las respuestas a lo que más se pregunta.",
+        faqIntro: "Toca una pregunta para abrir la respuesta.",
+        faqSearchPlaceholder: "Buscar entre las preguntas",
+        faqCountFormat: "%d preguntas",
+        faqHelpTitle: "¿No encuentras la respuesta?",
+        faqHelpBody: "Escríbenos: contesta una persona, normalmente en tres días laborables.",
+        faqHelpAction: "Contactar con ayuda",
+        contactsSearchPlaceholder: "Buscar por nombre o fecha",
         settingsSharingNote: "Los perfiles sorpresa quedarán fuera de cualquier compartición con la persona homenajeada.",
         lastNameLabel: "Apellido",
         lastNamePlaceholder: "Apellido (opcional)",

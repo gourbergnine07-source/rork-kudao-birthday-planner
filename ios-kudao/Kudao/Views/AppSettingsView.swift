@@ -28,6 +28,7 @@ struct AppSettingsView: View {
     @State private var isEditingNotifications: Bool = false
     @State private var isShowingPrivacyInfo: Bool = false
     @State private var isShowingLegal: Bool = false
+    @State private var isShowingFAQ: Bool = false
 
     private var strings: Strings { settings.strings }
 
@@ -43,6 +44,7 @@ struct AppSettingsView: View {
                         collaborationCard
                         backupCard
                         surpriseCard
+                        faqCard
                         privacyInfoCard
                         legalCard
                         widgetCard
@@ -82,6 +84,9 @@ struct AppSettingsView: View {
             }
             .sheet(isPresented: $isShowingLegal) {
                 LegalView()
+            }
+            .sheet(isPresented: $isShowingFAQ) {
+                FAQView()
             }
             #if DEBUG
             .sheet(isPresented: $isShowingPurchaseDebug) {
@@ -447,6 +452,52 @@ struct AppSettingsView: View {
             RoundedRectangle(cornerRadius: 16, style: .continuous)
                 .fill(Palette.surfaceRaised)
         )
+    }
+
+    // MARK: - Frequently asked questions
+
+    /// The help desk, one tap away from wherever the confusion started.
+    private var faqCard: some View {
+        AppSettingsCard(
+            title: strings.faqTitle,
+            systemImage: "questionmark.circle.fill",
+            tint: Palette.amber
+        ) {
+            Button {
+                isShowingFAQ = true
+            } label: {
+                HStack(spacing: 10) {
+                    Image(systemName: "questionmark.bubble.fill")
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(Palette.amber)
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(strings.faqTitle)
+                            .font(.system(.body, design: .rounded, weight: .semibold))
+                            .foregroundStyle(.primary)
+                        Text(strings.faqCaption)
+                            .font(.system(.caption2, design: .rounded))
+                            .foregroundStyle(.tertiary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+
+                    Spacer(minLength: 0)
+
+                    Text(String(format: strings.faqCountFormat, FAQCatalog.count(for: settings.language)))
+                        .font(.system(size: 10, weight: .heavy, design: .rounded))
+                        .foregroundStyle(Palette.amber)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(Capsule().fill(Palette.amber.opacity(0.13)))
+
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 11, weight: .heavy))
+                        .foregroundStyle(.tertiary)
+                }
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+        }
     }
 
     // MARK: - Privacy information
