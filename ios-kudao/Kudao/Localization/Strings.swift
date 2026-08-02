@@ -63,6 +63,13 @@ nonisolated struct Strings: Sendable {
     let nextBirthdayLabel: String
     let imminentBadge: String
     let imminentDaysFormat: String
+    let countdownCardTitle: String
+    let countdownHoursUnit: String
+    let countdownMinutesUnit: String
+    let countdownSecondsUnit: String
+    let countdownTodayCaption: String
+    /// Spoken countdown: days, hours, minutes.
+    let countdownAccessibilityFormat: String
 
     let diaryTab: String
     let preferencesTab: String
@@ -827,6 +834,12 @@ extension Strings {
         nextBirthdayLabel: "Prossimo compleanno",
         imminentBadge: "Questa settimana",
         imminentDaysFormat: "Tra %d giorni",
+        countdownCardTitle: "Conto alla rovescia",
+        countdownHoursUnit: "ore",
+        countdownMinutesUnit: "min",
+        countdownSecondsUnit: "sec",
+        countdownTodayCaption: "Il momento è arrivato",
+        countdownAccessibilityFormat: "Mancano %1$d giorni, %2$d ore e %3$d minuti",
         diaryTab: "Diario",
         preferencesTab: "Preferenze",
         suggestionsTab: "Suggerimenti",
@@ -1546,6 +1559,12 @@ extension Strings {
         nextBirthdayLabel: "Next birthday",
         imminentBadge: "This week",
         imminentDaysFormat: "In %d days",
+        countdownCardTitle: "Countdown",
+        countdownHoursUnit: "hrs",
+        countdownMinutesUnit: "min",
+        countdownSecondsUnit: "sec",
+        countdownTodayCaption: "The moment is here",
+        countdownAccessibilityFormat: "%1$d days, %2$d hours and %3$d minutes to go",
         diaryTab: "Diary",
         preferencesTab: "Preferences",
         suggestionsTab: "Suggestions",
@@ -2265,6 +2284,12 @@ extension Strings {
         nextBirthdayLabel: "Prochain anniversaire",
         imminentBadge: "Cette semaine",
         imminentDaysFormat: "Dans %d jours",
+        countdownCardTitle: "Compte à rebours",
+        countdownHoursUnit: "h",
+        countdownMinutesUnit: "min",
+        countdownSecondsUnit: "sec",
+        countdownTodayCaption: "Le moment est arrivé",
+        countdownAccessibilityFormat: "Il reste %1$d jours, %2$d heures et %3$d minutes",
         diaryTab: "Journal",
         preferencesTab: "Préférences",
         suggestionsTab: "Suggestions",
@@ -2984,6 +3009,12 @@ extension Strings {
         nextBirthdayLabel: "Próximo cumpleaños",
         imminentBadge: "Esta semana",
         imminentDaysFormat: "En %d días",
+        countdownCardTitle: "Cuenta atrás",
+        countdownHoursUnit: "h",
+        countdownMinutesUnit: "min",
+        countdownSecondsUnit: "seg",
+        countdownTodayCaption: "El momento ha llegado",
+        countdownAccessibilityFormat: "Faltan %1$d días, %2$d horas y %3$d minutos",
         diaryTab: "Diario",
         preferencesTab: "Preferencias",
         suggestionsTab: "Sugerencias",

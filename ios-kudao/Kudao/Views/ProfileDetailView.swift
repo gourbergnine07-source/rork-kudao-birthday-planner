@@ -117,6 +117,9 @@ struct ProfileDetailView: View {
             ScrollView {
                 VStack(spacing: 18) {
                     header
+                    if occasion.isFestive {
+                        countdownCard
+                    }
                     statsRow
                     contactCard
                     composeButton(proxy)
@@ -492,8 +495,12 @@ struct ProfileDetailView: View {
                 }
                 .padding(.top, 3)
 
-                countdownBanner
-                    .padding(.top, 5)
+                // A remembrance keeps the sober capsule; festive occasions get
+                // the live timer card right below the header instead.
+                if !occasion.isFestive {
+                    countdownBanner
+                        .padding(.top, 5)
+                }
 
                 if profile.isCollaborative {
                     participantsStrip
@@ -689,6 +696,20 @@ struct ProfileDetailView: View {
             .overlay(Capsule().strokeBorder(.white.opacity(0.45), lineWidth: 1))
         }
         .buttonStyle(PressableCardStyle())
+    }
+
+    /// Live days / hours / minutes / seconds until the next occurrence.
+    private var countdownCard: some View {
+        CountdownTimerCard(
+            targetDate: countdown.nextDate,
+            occasion: occasion,
+            strings: strings,
+            dateCaption: countdown.isToday
+                ? strings.todayLabel
+                : settings.weekdayDayMonth(countdown.nextDate),
+            progress: countdown.yearProgress,
+            isToday: countdown.isToday
+        )
     }
 
     private var countdownBanner: some View {
